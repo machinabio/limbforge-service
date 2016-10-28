@@ -1,17 +1,15 @@
 <head>
-  <title>fusion-microservice-worker</title>
+  <title>Fusion Microservice</title>
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
-
-  {{> hello}}
-  {{> info}}
+  <h1>Welcome to the Fusion Microservice Worker Dashboard!</h1>
+  {{> send_data}}
 </body>
 
-<template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
+<template name="send_data">
+  <input type="text" id="data" placeholder="Enter JSON to send" />
+  <button id="send">Send JSON</button>
 </template>
 
 <template name="info">
