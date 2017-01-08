@@ -1,23 +1,39 @@
 <head>
-  <title>Fusion Microservice</title>
+    <title>Fusion Microservice</title>
 </head>
 
 <body>
-  <h1>Welcome to the Fusion Microservice Worker Dashboard!</h1>
-  {{> send_data}}
+    <h1>Fusion Microservice Worker</h1>
+    <div>
+        <h2>Manually send an API request</h2> {{> test_api}}
+    </div>
+    <div>
+        <h2>API messages received in last 10s</h2> {{> monitor_api}}
+    </div>
 </body>
 
-<template name="send_data">
-  <input type="text" id="data" placeholder="Enter JSON to send" />
-  <button id="send">Send JSON</button>
+<template name="test_api">
+    <div>
+        <input type="text" id="data" placeholder="Enter JSON to send" size="40" />
+    </div>
+    <button id="send">Send JSON</button>
 </template>
 
-<template name="info">
-  <h2>Learn Meteor!</h2>
-  <ul>
-    <li><a href="https://www.meteor.com/try" target="_blank">Do the Tutorial</a></li>
-    <li><a href="http://guide.meteor.com" target="_blank">Follow the Guide</a></li>
-    <li><a href="https://docs.meteor.com" target="_blank">Read the Docs</a></li>
-    <li><a href="https://forums.meteor.com" target="_blank">Discussions</a></li>
-  </ul>
+<template name="monitor_api">
+    <div>
+        <table>
+            <thead>
+                <th>Reception time</th>
+                <th>Content</th>
+            </thead>
+            <tbody>
+                {{ #each last_messages}}
+                <tr>
+                    <td> {{ time }} </td>
+                    <td> {{ content }} </td>
+                </tr>
+                {{ /each}}
+            </tbody>
+        </table>
+    </div>
 </template>
