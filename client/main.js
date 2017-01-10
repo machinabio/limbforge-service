@@ -7,6 +7,7 @@ Template.test_api.events({
   'click #send'(event, template) {
   	var data = EJSON.parse(template.find('#data').value);
   	if (!data) console.error('Failed to parse JSON');
+  	console.log(data);
     Meteor.call('sendToFusion', data);
   }
 });
