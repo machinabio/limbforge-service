@@ -3,18 +3,37 @@ Right now we're building URLs and downloading static content from S3
 
 We want to use Fusion360 to generate the STLs dynamically!
 
+
+----- Handler
+1. Check to see if there's any available Fusion workers.If not, return server busy(?)
+2. Pass the request to a Fusion worker
+-----
+
+--- Fusion Worker
+FWorkers(numWorkers) - constructor.
+   1. Creates <numWorkers> of hardlinks to Fusion360.
+   (2). Create a new hardlink to Fusion360 called UUID (npm module lnk)
+(3). Register that hardlink to Fusion360 as the helper for fusion360 events (npm module windows-registry)
+
+FWorkers.anyIdle() - true/false
+FWorkers.employ() - 
+
+backed by a collection - 1 record per instance
+
+
+--- 
+
+
 0. The handler for the '/api/:tenant/:service' endpoint receives the request
 1. The handler makes relevant parameters available at '/request/:UUID' (restivus collection API?)
-(2). Create a new hardlink to Fusion360 called UUID (npm module lnk)
-(3). Register that hardlink to Fusion360 as the helper for fusion360 events (npm module windows-registry)
 4. The handler calls openurl('fusion360://command=open&file=/<UUID>-<WORKER>.f3d')
----this------
+---this------ ()
 5. The python bridge retrieves the parameters from the endpoint and saves
    the paremeters (including the UUID) to the temp directory in a text file as JSON.
 6. The python bridge retrieves and executes the appropriate CommandDefinition
 7. The javascript script loads the params from the text files, updates the 
    CAD parameters and sends the STL to an '/response/:UUID' endpoint
---- or ------
+--- or ------ 
 5. multiple Python workers (1 for each design) inside Fusion360 respond to the
    file opening event. Each checks the <WORKER> specified in the filename and
    only the appropriate worker continues processing the request.
