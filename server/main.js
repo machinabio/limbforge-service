@@ -8,11 +8,11 @@ import Archiver from 'archiver';
 import MultiStream from 'multistream';
 import Fiber from 'fibers';
 import fs from 'fs';
+import tmp from 'tmp';
 import s3Zip from 's3-zip';
 import path from 'path';
 import AWS from 'aws-sdk';
-import temp from 'temp';
-
+import send from 'send';
 
 AWS.config = new AWS.Config();
 AWS.config.accessKeyId = "AKIAJMQ3NQ364UPGGBOA";
@@ -42,8 +42,13 @@ Api.addRoute('submit', {
       time: new Date()
     });
 
-    var files = [];
+    /////////////////////////////////// 
+    // PARSE PARAMETERS...
+    ///////////////////////////////////
+    var archiveFilename = 'limbforge.zip';
 
+
+    var files = [];
     /////////////////////////////////// 
     // FOREARM
     ///////////////////////////////////
@@ -62,7 +67,7 @@ Api.addRoute('submit', {
     url.push(data.orientation);
     url.push(forearmFilename);
     url = url.join('/');
-    // files.push(url);
+    files.push(url);
 
     console.log('Generated forearm URL is ' + url);
 
@@ -82,7 +87,7 @@ Api.addRoute('submit', {
     url.push(data.orientation);
     url.push(terminalFilename);
     url = url.join('/');
-    // files.push(url);
+    files.push(url);
 
     console.log('Generated terminal device URL is ' + url);
 
@@ -100,39 +105,33 @@ Api.addRoute('submit', {
     /////////////////////////////////// 
     // DOWNLOAD AND ARCHIVE
     ///////////////////////////////////
-    var archiveStream = temp.createWriteStream();
-    // var tempDir = tmp.dirSync({ prefix: 'limbforge-' }).name;
-    // var archivePath = path.join(tempDir, 'limbforge.zip');
-    // var archiveFile = fs.createWriteStream(archivePath);
-    console.log('Archive path:', archiveStream.name);
+    var archivePath = path.join(tmp.dirSync({ prefix: 'limbforge-' }).name, 'limbforge.zip');
+    var archiveFile = fs.createWriteStream(archivePath);
+
     var fiber = Fiber.current;
 
     var startTime = Date.now();
     s3Zip.archive({ region: 'us-east-1', bucket: 'limbforgestls' }, '', files)
-      .pipe(archiveStream);
-    archiveStream.on('close', function() {
+      .pipe(archiveFile);
+    archiveFile.on('close', function() {
       var elapsed = (Date.now() - startTime) / 1000;
       console.log('Files took ' + elapsed + 'seconds to download and zip.');
       fiber.run();
     });
-
     Fiber.yield();
+    archiveFile.end();
 
-    /////////////////////////////////// 
-    // SEND TO CLIENT
-    ///////////////////////////////////    
-    this.response.writeHead(200, {
-      'Content-Disposition': 'attachment; filename=limbforge.zip',
-      'Content-Type': 'application/zip',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'x-requested-with',
-      'Transfer-Encoding': 'chunked'
-    });
-    var readStream = fs.createReadStream(archivePath);
-    readStream.pipe(this.response);
-
+    var fiber = Fiber.current;
+    send(this.request, archivePath)
+      .on('headers', (response) => {
+        response.setHeader('Content-Disposition', 'attachment; filename=' + archiveFilename);
+      })
+      .on('end', (response) => {
+        fiber.run();
+      })
+      .pipe(this.response)
+    Fiber.yield();
     this.done();
-    return;
   }
 });
 
