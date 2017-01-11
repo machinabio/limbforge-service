@@ -137,6 +137,6 @@ Api.addRoute('limbforge', {
 Meteor.methods({
   sendToFusion: function(data) {
     console.log('Sending data: ', data);
-    HTTP.get('http://localhost/api/limbforge', { params: { parameters: EJSON.stringify(data) } })
+    HTTP.get('http://localhost:3000/api/limbforge', { params: { parameters: EJSON.stringify(data) } })
   }
 });
