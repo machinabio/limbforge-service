@@ -5,7 +5,6 @@ import { EJSON } from 'meteor/ejson';
 import { Messages } from '/imports/messages.js';
 import Request from 'request';
 import Archiver from 'archiver';
-import MultiStream from 'multistream';
 import Fiber from 'fibers';
 import fs from 'fs';
 import tmp from 'tmp';
@@ -33,7 +32,7 @@ Api.addRoute('healthcheck', {
   }
 });
 
-Api.addRoute('submit', {
+Api.addRoute('limbforge', {
   get: function() {
     console.log('/api/submit #### data: ', this.queryParams.parameters);
     var data = EJSON.parse(this.queryParams.parameters);
@@ -138,7 +137,6 @@ Api.addRoute('submit', {
 Meteor.methods({
   sendToFusion: function(data) {
     console.log('Sending data: ', data);
-    HTTP.get('http://localhost:3100/api/submit', { params: { parameters: EJSON.stringify(data) } })
-      // openurl('fusion360://command=open&file=/dev/null.f3d&privateInfo=' + JSON.stringify(data));
+    HTTP.get('http://localhost/api/limbforge', { params: { parameters: EJSON.stringify(data) } })
   }
 });
