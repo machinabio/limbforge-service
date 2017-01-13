@@ -1,9 +1,10 @@
 import { Template } from 'meteor/templating';
 import { Messages } from '/imports/messages.js';
 import { EJSON } from 'meteor/ejson';
+import { Dashboard } from '/imports/dashboard.js';
 import './main.html';
 
-Template.test_api.events({
+Template.api_test.events({
   'click #send'(event, template) {
   	var data = EJSON.parse(template.find('#data').value);
   	if (!data) console.error('Failed to parse JSON');
@@ -12,9 +13,16 @@ Template.test_api.events({
   }
 });
 
+Template.api_test.helpers({
+  response() {
+  	return Dashboard.findOne('response');
+  }
+});
+
 Template.monitor_api.helpers({
   last_messages() {
   	return Messages.find({}, { sort: { time: -1 }}).fetch();
   }
 });
+
 

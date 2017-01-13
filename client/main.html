@@ -5,19 +5,23 @@
 <body>
     <h1>Fusion Microservice Worker</h1>
     <div>
-        <h2>Manually send an API request</h2> {{> test_api}}
+        <h2>Manually send an API request</h2> {{> api_test}}
     </div>
     <div>
-        <h2>API messages received in last 10s</h2> {{> monitor_api}}
+        <h2>API messages received in last 10 min</h2> {{> monitor_api}}
     </div>
 </body>
 
-<template name="test_api">
+<template name="api_test">
     <div>
         <textarea type="textarea" id="data" placeholder="Enter JSON to send" cols="60" rows="10">
         </textarea>
     </div>
     <button id="send">Send JSON</button>
+    <div>
+        <h3>Response:</h3> {{ response }}
+        <!-- {{ #with response }} -->
+    </div>
 </template>
 
 <template name="monitor_api">

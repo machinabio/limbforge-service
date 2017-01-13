@@ -12,11 +12,16 @@ import s3Zip from 's3-zip';
 import path from 'path';
 import AWS from 'aws-sdk';
 import send from 'send';
+import { Dashboard } from '/imports/dashboard.js';
+import { check } from 'meteor/check';
+import opn from 'opn';
+
+const settings = Meteor.settings.AWS;
 
 AWS.config = new AWS.Config();
-AWS.config.accessKeyId = "AKIAJMQ3NQ364UPGGBOA";
-AWS.config.secretAccessKey = "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";
-AWS.config.region = "us-east-1";
+AWS.config.accessKeyId = settings.accessKeyId;
+AWS.config.secretAccessKey = settings.secretAccessKey;
+AWS.config.region = settings.AWS;
 
 Meteor.startup(() => {
   // Whatever code is needed to startup the server goes here
@@ -34,109 +39,36 @@ Api.addRoute('healthcheck', {
 
 Api.addRoute('limbforge', {
   get: function() {
-    console.log('/api/submit #### data: ', this.queryParams.parameters);
-    var data = EJSON.parse(this.queryParams.parameters);
+    var data = this.queryParams.parametersl
+    console.log('/api/submit #### data: ', data);
+
+    if (!Match.test(data, Object)) {}
+        console.log('...Object not found. Checking for URLEncoding');
+        try {
+        data = EJSON.parse(this.queryParams.parameters);
+        check(data, Object);
+        console.log('...Success! Found URLEncoded object.')
+        }
+        catch (error) {
+            console.error('...Failure! No object data found');
+        }
+
     Messages.insert({
       content: EJSON.stringify(data),
       time: new Date()
     });
 
-    /////////////////////////////////// 
-    // PARSE PARAMETERS...
-    ///////////////////////////////////
-    var archiveFilename = 'limbforge.zip';
+    opn("fusion360://command=open&id='foobar'&file=/null.f3d")
 
-
-    var files = [];
-    /////////////////////////////////// 
-    // FOREARM
-    ///////////////////////////////////
-    var forearmFilename = [];
-    forearmFilename.push('forearm_ebearm_');
-    forearmFilename.push(data.orientation);
-    forearmFilename.push('_C4-');
-    forearmFilename.push(data.C4);
-    forearmFilename.push('_L1-');
-    forearmFilename.push(data.L1);
-    forearmFilename.push('.stl');
-    forearmFilename = forearmFilename.join('')
-
-    var url = [];
-    url.push('forearm/ebearm');
-    url.push(data.orientation);
-    url.push(forearmFilename);
-    url = url.join('/');
-    files.push(url);
-
-    console.log('Generated forearm URL is ' + url);
-
-    /////////////////////////////////// 
-    // TERMINAL
-    ///////////////////////////////////
-    var terminalFilename = [];
-    terminalFilename.push('td_');
-    terminalFilename.push(data.TD);
-    terminalFilename.push('_');
-    terminalFilename.push(data.orientation);
-    terminalFilename.push('.stl');
-    terminalFilename = terminalFilename.join('');
-    url = [];
-    url.push('td');
-    url.push(data.TD);
-    url.push(data.orientation);
-    url.push(terminalFilename);
-    url = url.join('/');
-    files.push(url);
-
-    console.log('Generated terminal device URL is ' + url);
-
-    /////////////////////////////////// 
-    // WRIST CONNECTOR
-    ///////////////////////////////////
-    url = [];
-    url.push('EbeArm');
-    url.push('EbeArm_wrist_unit v1.stl');
-    url = url.join('/');
-    files.push(url);
-
-    console.log('Generated wrist URL is ' + url);
-
-    /////////////////////////////////// 
-    // DOWNLOAD AND ARCHIVE
-    ///////////////////////////////////
-    var archivePath = path.join(tmp.dirSync({ prefix: 'limbforge-' }).name, 'limbforge.zip');
-    var archiveFile = fs.createWriteStream(archivePath);
-
-    var fiber = Fiber.current;
-
-    var startTime = Date.now();
-    s3Zip.archive({ region: 'us-east-1', bucket: 'limbforgestls' }, '', files)
-      .pipe(archiveFile);
-    archiveFile.on('close', function() {
-      var elapsed = (Date.now() - startTime) / 1000;
-      console.log('Files took ' + elapsed + 'seconds to download and zip.');
-      fiber.run();
-    });
-    Fiber.yield();
-    archiveFile.end();
-
-    var fiber = Fiber.current;
-    send(this.request, archivePath)
-      .on('headers', (response) => {
-        response.setHeader('Content-Disposition', 'attachment; filename=' + archiveFilename);
-      })
-      .on('end', (response) => {
-        fiber.run();
-      })
-      .pipe(this.response)
-    Fiber.yield();
-    this.done();
+    return 'OK';
   }
 });
 
 Meteor.methods({
   sendToFusion: function(data) {
     console.log('Sending data: ', data);
-    HTTP.get('http://localhost:3000/api/limbforge', { params: { parameters: EJSON.stringify(data) } })
+    HTTP.get('http://localhost:3000/api/limbforge', {
+      params: { parameters: EJSON.stringify(data) }
+    })
   }
 });
