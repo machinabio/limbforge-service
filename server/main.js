@@ -58,8 +58,7 @@ Api.addRoute('limbforge', {
       time: new Date()
     });
 
-    opn("fusion360://command=open&id='foobar'&file=/null.f3d")
-
+    opn("fusion360://command=open&file=UUID.stl&id=foobar&");
     return 'OK';
   }
 });
