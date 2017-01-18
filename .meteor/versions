@@ -41,6 +41,7 @@ launch-screen@1.1.0
 livedata@1.0.18
 localstorage@1.0.12
 logging@1.1.16
+maodouio:logs@0.0.4
 meteor@1.6.0
 meteor-base@1.0.4
 meteortoys:allthings@3.0.0
@@ -70,6 +71,7 @@ mongo-id@1.0.6
 msavin:jetsetter@2.0.0
 msavin:mongol@2.0.1
 nimble:restivus@0.8.11
+nooitaf:colors@0.0.3
 npm-bcrypt@0.9.2
 npm-mongo@2.2.11_2
 observe-sequence@1.0.14

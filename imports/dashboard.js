@@ -1,5 +1,5 @@
-export const Messages = new Mongo.Collection('dashboard');
+export const Dashboard = new Mongo.Collection('dashboard');
 
-if (!Messages.find({})) {
-	Messages.insert('response', {foo: 'bar'});
+if (!Dashboard.find({})) {
+	Dashboard.insert('response', {foo: 'bar'});
 }

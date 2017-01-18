@@ -24,11 +24,20 @@ AWS.config.secretAccessKey = settings.secretAccessKey;
 AWS.config.region = settings.AWS;
 
 Meteor.startup(() => {
+
   // Whatever code is needed to startup the server goes here
 });
 
+WebApp.rawConnectHandlers.use(function(req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  // BrowserPolicy.framing.allowAll()
+  return next();
+});
+
+
 let Api = new Restivus({
-  prettyJson: true
+  prettyJson: true,
+  apiPath: '/'
 });
 
 Api.addRoute('healthcheck', {
@@ -37,29 +46,35 @@ Api.addRoute('healthcheck', {
   }
 });
 
-Api.addRoute('limbforge', {
+Api.addRoute('api/limbforge', {
   get: function() {
     var data = this.queryParams.parametersl
     console.log('/api/submit #### data: ', data);
 
     if (!Match.test(data, Object)) {}
-        console.log('...Object not found. Checking for URLEncoding');
-        try {
-        data = EJSON.parse(this.queryParams.parameters);
-        check(data, Object);
-        console.log('...Success! Found URLEncoded object.')
-        }
-        catch (error) {
-            console.error('...Failure! No object data found');
-        }
+    console.log('...Object not found. Checking for URLEncoding');
+    try {
+      data = EJSON.parse(this.queryParams.parameters);
+      check(data, Object);
+      console.log('...Success! Found URLEncoded object.')
+    } catch (error) {
+      console.error('...Failure! No object data found');
+    }
 
     Messages.insert({
       content: EJSON.stringify(data),
       time: new Date()
     });
 
-    opn("fusion360://command=open&file=UUID.stl&id=foobar&");
+    opn("fusion360://command=open&file=UUID.stl&id=mytester&privateInfo=" + EJSON.stringify(data));
     return 'OK';
+  }
+});
+
+Api.addRoute('/Users/cquinonez/:id', {
+  get: function() {
+    console.log('Url params', this.urlParams);
+
   }
 });
 
