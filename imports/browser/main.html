@@ -1,8 +1,16 @@
 <head>
     <title>Fusion Microservice</title>
+
+    <body>
+        {{> App_body}}
+    </body>
 </head>
 
-<body>
+<template name="App_body">
+    {{> Template.dynamic template=main}}
+</template>
+
+<template name="webClientLayout">
     <h1>Fusion Microservice Worker</h1>
     <div>
         <h2>Manually send an API request</h2> {{> api_test}}
@@ -10,7 +18,7 @@
     <div>
         <h2>API messages received in last 10 min</h2> {{> monitor_api}}
     </div>
-</body>
+</template>
 
 <template name="api_test">
     <div>

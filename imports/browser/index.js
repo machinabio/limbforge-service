@@ -2,6 +2,7 @@ import { Template } from 'meteor/templating';
 import { Messages } from '/imports/messages.js';
 import { EJSON } from 'meteor/ejson';
 import { Dashboard } from '/imports/dashboard.js';
+import { CadMake } from '/imports/cadmake.js';
 import './main.html';
 
 Template.api_test.events({

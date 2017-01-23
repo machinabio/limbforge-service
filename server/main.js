@@ -13,6 +13,7 @@ import path from 'path';
 import AWS from 'aws-sdk';
 import send from 'send';
 import { Dashboard } from '/imports/dashboard.js';
+import { CadMake } from '/imports/cadmake.js';
 import { check } from 'meteor/check';
 import opn from 'opn';
 
@@ -28,25 +29,26 @@ Meteor.startup(() => {
   // Whatever code is needed to startup the server goes here
 });
 
-WebApp.rawConnectHandlers.use(function(req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  // BrowserPolicy.framing.allowAll()
-  return next();
-});
+// WebApp.rawConnectHandlers.use(function(req, res, next) {
+//   res.setHeader("Access-Control-Allow-Origin", "*");
+//   // BrowserPolicy.framing.allowAll()
+//   return next();
+// });
 
 
 let Api = new Restivus({
-  prettyJson: true,
-  apiPath: '/'
+  prettyJson: true
 });
+
+var microserverReady = true;
 
 Api.addRoute('healthcheck', {
   get: () => {
-    return 'OK';
+    return { statusCode:  microserverReady ? 200 : 404 };
   }
 });
 
-Api.addRoute('api/limbforge', {
+Api.addRoute('limbforge', {
   get: function() {
     var data = this.queryParams.parametersl
     console.log('/api/submit #### data: ', data);
@@ -68,13 +70,6 @@ Api.addRoute('api/limbforge', {
 
     opn("fusion360://command=open&file=UUID.stl&id=mytester&privateInfo=" + EJSON.stringify(data));
     return 'OK';
-  }
-});
-
-Api.addRoute('/Users/cquinonez/:id', {
-  get: function() {
-    console.log('Url params', this.urlParams);
-
   }
 });
 

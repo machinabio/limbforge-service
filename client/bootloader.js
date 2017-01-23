@@ -1,20 +1,9 @@
-// if (typeof adsk === 'object') {
-//   Meteor.call('printLog', 'Running inside of Fusion360');
-//   console.log("Adsk typeof ", typeof adsk);
-//   console.log("Window typeof ", typeof window); // object
-//   console.log("Process typeof ", typeof process); // object
-//   console.log("Process.versions  ", process.versions); //object
-//   console.log("Process.versions.node  ", process.versions.node); //undefined
-//   require('../imports/fusion360/index.js');
-// } else {
+Meteor.isFusion360 = navigator.userAgent.includes('Neutron');
 
-Meteor.call('printLog', 'Running inside of browser');
-console.log("Adsk typeof ", typeof adsk);
-console.log("Window typeof ", typeof window); // object
-console.log("Process typeof ", typeof process); // object
-console.log("Process.versions  ", process.versions); //object
-console.log("Process.versions.node  ", process.versions.node); //undefined
-
-import '../imports/fusion360/index.js';
-
-console.log('done with script');
+if (Meteor.isFusion360) {
+  Meteor.call('printLog', 'Client connected from Fusion360');
+  import '../imports/fusion360/';
+} else {
+  Meteor.call('printLog', 'Client connected from browser');
+  import '../imports/browser/';
+}

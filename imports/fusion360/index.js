@@ -1,36 +1,13 @@
-console.log('Loading Fusion360 plugin');
-import './api';
+import { CadMake } from '../cadmake.js';
+import './api/';
 
-"use strict";
-if (adsk.debug === true) {
-  /*jslint debug: true*/
-  debugger;
-  /*jslint debug: false*/
-}
+// var app = adsk.core.Application.get();
+// var ui = app.userInterface;
 
-var ui;
+// ui.messageBox('Meteor microserver loading.');
 
-try {
-  var app = adsk.core.Application.get();
-  var ui = app.userInterface;
-  // var dataFile = app.activeDocument.dataFile;
-  // var design = app.activeDocument.design;
-  // var startTime = Date.now();
-
-  // var data = countTimelineFromDesign(design);
-  // var data = countTimelineFromFile(dataFile);
-  // var totalTime = (Date.now() - startTime) / 1000;
-
-  // ui.messageBox('Total timeline count : ' + data.count + '\n' +
-  //   'Number of children : ' + data.children + '\n' +
-  //   'Took : ' + totalTime + ' s');
-
-  ui.messageBox('Meteor running inside fusion! RELOADING!!!');
-
-} catch (e) {
-  if (ui) {
-    ui.messageBox('Failed : ' + (e.description ? e.description : e));
-  }
-}
-
-// adsk.terminate();
+// Tracker.autorun(function() {
+//   var script = CadMake.findOne('limbforge').script;
+//   Meteor.call('printLog', '...loading code: ' + script);
+//   new Function(script)();
+// });
