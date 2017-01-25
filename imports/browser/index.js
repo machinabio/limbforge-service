@@ -3,7 +3,8 @@ import { Messages } from '/imports/messages.js';
 import { EJSON } from 'meteor/ejson';
 import { Dashboard } from '/imports/dashboard.js';
 import { CadMake } from '/imports/cadmake.js';
-import './main.html';
+import { Agent } from '/imports/api/agents.js';
+import './index.html';
 
 Template.api_test.events({
   'click #send'(event, template) {
@@ -25,4 +26,11 @@ Template.monitor_api.helpers({
   }
 });
 
+Template.agent_list.helpers({
+  agents() {
+    // var agents = ;
+    // console.log('found '+agents.count()+' agents');
+    return Agent.find({}).fetch();
+  }
+});
 

@@ -16,6 +16,7 @@ import { Dashboard } from '/imports/dashboard.js';
 import { CadMake } from '/imports/cadmake.js';
 import { check } from 'meteor/check';
 import opn from 'opn';
+import '/imports/api/agents.js';
 
 const settings = Meteor.settings.AWS;
 
@@ -28,13 +29,6 @@ Meteor.startup(() => {
 
   // Whatever code is needed to startup the server goes here
 });
-
-// WebApp.rawConnectHandlers.use(function(req, res, next) {
-//   res.setHeader("Access-Control-Allow-Origin", "*");
-//   // BrowserPolicy.framing.allowAll()
-//   return next();
-// });
-
 
 let Api = new Restivus({
   prettyJson: true

@@ -1,0 +1,1 @@
+Meteor.isFusion360 = navigator.userAgent.includes('Neutron');

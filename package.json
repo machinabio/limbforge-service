@@ -12,6 +12,7 @@
     "bcrypt": "^0.8.7",
     "meteor-node-stubs": "~0.2.0",
     "multistream": "^2.1.0",
+    "namor": "^1.0.1",
     "openurl": "^1.1.1",
     "opn": "^4.0.2",
     "request": "^2.79.0",

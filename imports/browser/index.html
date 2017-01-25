@@ -1,0 +1,69 @@
+<template name="webClientLayout">
+  <h1>Fusion Microservice Worker</h1>
+  <div>
+    <h2>Manually send an API request</h2> {{> api_test}}
+  </div>
+  <div>
+    <h2>API messages received in last 10 min</h2> {{> monitor_api}}
+  </div>
+  <div>
+    <h2>Agents</h2> {{> agent_list }}
+  </div>
+</template>
+
+<template name="api_test">
+  <div>
+    <textarea type="textarea" id="data" placeholder="Enter JSON to send" cols="60" rows="10">
+    </textarea>
+  </div>
+  <button id="send">Send JSON</button>
+  <div>
+    <h3>Response:</h3> {{ response }}
+    <!-- {{ #with response }} -->
+  </div>
+</template>
+
+<template name="monitor_api">
+  <div>
+    <table>
+      <thead>
+        <th>Reception time</th>
+        <th>Content</th>
+      </thead>
+      <tbody>
+        {{ #each last_messages}}
+        <tr>
+          <td> {{ time }} </td>
+          <td> {{ content }} </td>
+        </tr>
+        {{ /each}}
+      </tbody>
+    </table>
+  </div>
+</template>
+
+
+<template name="agent_list">
+  <div>
+    <table>
+      <thead>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Address</th>
+        <th>Workgang</th>
+        <th>Jobs</th>
+      </thead>
+      <tbody>
+        {{ #each agents}}
+        <tr>
+          <td> {{ name }} </td>
+          <td> {{ status }} </td>
+          <td> {{ address }} </td>
+          <td> {{ workgang }} </td>
+          <td> {{ jobs }} </td>
+        </tr>
+        {{ /each}}
+      </tbody>
+    </table>
+  </div>
+</template>
