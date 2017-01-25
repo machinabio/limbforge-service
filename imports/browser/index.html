@@ -48,19 +48,17 @@
     <table>
       <thead>
         <th>Name</th>
-        <th>Status</th>
-        <th>Address</th>
-        <th>Workgang</th>
-        <th>Jobs</th>
+        <th>Last Seen</th>
+        <th>Factory</th>
+        <th>Foreman</th>
       </thead>
       <tbody>
         {{ #each agents}}
         <tr>
           <td> {{ name }} </td>
-          <td> {{ status }} </td>
-          <td> {{ address }} </td>
-          <td> {{ workgang }} </td>
-          <td> {{ jobs }} </td>
+          <td> {{ lastSeen }} </td>
+          <td> {{ factory }} </td>
+          <td> {{ foreman }} </td>
         </tr>
         {{ /each}}
       </tbody>

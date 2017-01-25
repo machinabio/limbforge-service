@@ -4,8 +4,9 @@ import '/imports/fusion360';
 
 FlowRouter.route('/', {
   action: function(params) {
+    Meteor.call("printLog", "...connection on / route");
     if (Meteor.isFusion360) {
-      window.location.replace(Meteor.absoluteUrl('fusion360',{replaceLocalhost: true}));
+      window.location.replace(Meteor.absoluteUrl('fusion360', { replaceLocalhost: true }));
     };
     BlazeLayout.render("App_body", { main: "webClientLayout" });
   }
@@ -13,9 +14,9 @@ FlowRouter.route('/', {
 
 FlowRouter.route('/fusion360', {
   action: function(params) {
-    Meteor.call("printLog", "...on /fusion360 route");
+    Meteor.call("printLog", "...connection on /fusion360 route");
     if (!Meteor.isFusion360) {
-      window.location.replace(Meteor.absoluteUrl('',{replaceLocalhost: true}));
+      window.location.replace(Meteor.absoluteUrl('', { replaceLocalhost: true }));
     };
     BlazeLayout.render("App_body", { main: "fusionClientLayout" });
   }

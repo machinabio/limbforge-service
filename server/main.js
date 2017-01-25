@@ -16,7 +16,9 @@ import { Dashboard } from '/imports/dashboard.js';
 import { CadMake } from '/imports/cadmake.js';
 import { check } from 'meteor/check';
 import opn from 'opn';
-import '/imports/api/agents.js';
+import Agent from '/imports/api/agents.js';
+import '/imports/api/agent-factory.js';
+
 
 const settings = Meteor.settings.AWS;
 
@@ -37,7 +39,7 @@ let Api = new Restivus({
 var microserverReady = true;
 
 Api.addRoute('healthcheck', {
-  get: () => {
+  get: function () {
     return { statusCode:  microserverReady ? 200 : 404 };
   }
 });
@@ -62,7 +64,7 @@ Api.addRoute('limbforge', {
       time: new Date()
     });
 
-    opn("fusion360://command=open&file=UUID.stl&id=mytester&privateInfo=" + EJSON.stringify(data));
+    // opn("fusion360://command=open&file=UUID.stl&id=mytester&privateInfo=" + EJSON.stringify(data));
     return 'OK';
   }
 });
