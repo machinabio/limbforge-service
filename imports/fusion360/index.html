@@ -1,5 +1,16 @@
 <template name="fusionClientLayout">
   <div>
-  	Fusion Microserver Name {{ agent.name }}
+  	{{#with agent}}
+  		Microserver name: {{ name }}
+  		LastSeen: {{ lastSeen }}
+  		Script: {{ _script }}
+  		{{#if _runOnce}}
+  			RunOnce
+  			{{ runScript }}
+  		{{else}}
+  			Stopped
+  		{{/if}}
+  	{{/with}}
   </div>
 </template>
+

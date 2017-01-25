@@ -16,27 +16,10 @@ Api.addRoute('retrieveId', {
     });
     var agent = new Agent();
     agent.name = namor.generate({ words: 2, numbers: 3, manly: true });
+    agent.foreman = Meteor.settings.shift.foreman.name;
     agent.save(() => {
       this.response.write(agent._id);
       this.done();
     });
   }
 });
-
-// Template.fusionClientLayout.onRendered(() => {
-//   try {
-//     var agent = Session.get('agent');
-//   } catch (e) {
-//     Meteor.call("printLog", "...Error retrieving agent from Session");
-//   }
-//   if (!agent) {
-//     agent = new Agent();
-//     agent.name = namor.generate({ words: 2, numbers: 3, manly: true });
-//     agent.lastSeen = new Date();
-//     agent.save((args) => {
-//       Meteor.call("printLog", "...Created new agent");
-//     });
-//   }
-//   // debugger;
-//   // agent.startHeartbeat();
-// });

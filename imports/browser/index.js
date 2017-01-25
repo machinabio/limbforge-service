@@ -28,9 +28,7 @@ Template.monitor_api.helpers({
 
 Template.agent_list.helpers({
   agents() {
-    // var agents = ;
-    // console.log('found '+agents.count()+' agents');
-    return Agent.find({}, { sort: { _id: 1 }}).fetch();
+    return Agent.find({}, { sort: { lastSeen: -1 }}).fetch();
   }
 });
 

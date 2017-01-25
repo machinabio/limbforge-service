@@ -18,6 +18,7 @@ import { check } from 'meteor/check';
 import opn from 'opn';
 import Agent from '/imports/api/agents.js';
 import '/imports/api/agent-factory.js';
+import '/imports/api/agent-mock.js';
 
 
 const settings = Meteor.settings.AWS;

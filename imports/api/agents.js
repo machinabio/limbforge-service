@@ -18,10 +18,6 @@ let Agent = Class.create({
       type: String,
       optional: true
     },
-    lastSeen: {
-      type: Date,
-      optional: true
-    },
     factory: {
       type: String,
       optional: true
@@ -29,7 +25,19 @@ let Agent = Class.create({
     foreman: {
       type: String,
       optional: true
-    }
+    },
+    lastSeen: {
+      type: Date,
+      optional: true
+    },
+    _script: {
+      type: String,
+      optional: true
+    },
+    _runOnce: {
+      type: Boolean,
+      optional: true
+    },
   },
   behaviors: {},
   events: {
@@ -52,57 +60,47 @@ let Agent = Class.create({
 
 
 /// Persistant server-side controllers for Agents
-
 if (Meteor.isServer) {
   Agent.extend({
-    events: {
-      afterInsert: (e) => {
-        // var id = e.currentTarget._id;
-        // agents.set(id, new Agent(id)); // construct an Agent on the server
-        // console.log('SERVER afterInsert agent ', e.currentTarget.name);
-
-      },
-      afterInit: (e) => {
-        // a new Agents is always created by the Client, so 
-        // console.log('SERVER afterInit agent ', e.currentTarget.name);
-      }
-    },
+    events: {}
   });
 }
 
-
 if (Meteor.isFusion360) {
-  Meteor.call("printLog", 'adding f360 agent helpers ');
+  Agent._watchdogs = new Map();
+  Agent.checkWatchdog = function checkWatchdog(e) {
+    var id = e.currentTarget._id;
+    switch (Agent._watchdogs.get(id)) {
+      case true:
+        // It's only watchdog being reset, so don't reload anything on the client 
+        e.preventDefault();
+        break;
+      case false:
+        // It's something other than the watchdog, so proceed with the reload
+        break;
+      case undefined:
+        // There's no watchdog configured for this agent, so set one up
+        Agent._watchdogs.set(id, false);
+        var heartbeat = function heartbeat() {
+          var agent = Agent.findOne(id);
+          // Meteor.call("printLog", 'heartbeat for ', agent.name);
+          agent.lastSeen = new Date();
+          Agent._watchdogs.set(id, true); // suppress reloading during the save
+          agent.save(() => { Agent._watchdogs.set(id, false); });
+          Meteor.setTimeout(heartbeat, 3000);
+        }.bind(this);
+        heartbeat();
+        break;
+    };
+  }.bind(Agent);
+
   Agent.extend({
     events: {
-      //     afterInsert: (e) => {
-      //       Meteor.call("printLog", 'client saving agent to session ', e.currentTarget);
-      //       Session.setPersistent('agent', e.currentTarget);
-      //     },
-
-      afterInit: (e) => {
-        // a new Agents is always created by the Client, so 
-        // e.currentTarget.startHeartbeat();
-        // console.log('starting heartbeak for agent ', e);
-        Meteor.call("printLog", 'client AfterInit for agent ', e.currentTarget.name);
-      }
+      afterInit: Agent.checkWatchdog
     },
-    helpers: {
-      heartbeat() {
-        //       // var heartbeat = () => {
-        //       //   this.lastSeen = new Date();
-        //       //   this.save();
-        //       //   Meteor.call("printLog", 'heartbeak for ', this.name);
-        //       //   Meteor.setTimeout(heartbeat, 1000);
-        //       // };
-        //       // heartbeat();
-        Meteor.call("printLog", 'heartbeak for ', this.name);
-      }
-    }
+    helpers: {}
   });
-  Meteor.call("printLog", 'done adding f360 agent helpers ');
+
 }
 
 export default Agent;
-
-// there are additional Client-side methods for this class in the /imports/fusion360/index.js

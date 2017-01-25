@@ -1,4 +1,3 @@
-// import '/imports/fusionUtilities.js';
 import Agent from '/imports/api/agents.js';
 import namor from 'namor';
 import './index.html'
@@ -12,6 +11,12 @@ if (Meteor.isFusion360) {
 Template.fusionClientLayout.helpers({
   agent() {
     return Agent.findOne(Session.get('agentId'));
+  },
+  runScript() {
+  	this._runOnce = false;
+  	this.save();
+    Meteor.call("printLog", 'running script ', this._script);
+    // new Function(this._script)();
   }
 });
 
@@ -24,7 +29,10 @@ Template.fusionClientLayout.onRendered(() => {
   }
 });
 
+/*
+simple cut+paste script for testing purposes
 
-// var app = adsk.core.Application.get();
-// var ui = app.userInterface;
-// ui.messageBox('Emdedded Fusion360 microserver started.');
+var app = adsk.core.Application.get();
+var ui = app.userInterface;
+ui.messageBox('Emdedded Fusion360 microserver started.');
+*/
