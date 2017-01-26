@@ -14,10 +14,6 @@ let Agent = Class.create({
   collection: Agents,
   fields: {
     name: String,
-    status: {
-      type: String,
-      optional: true
-    },
     factory: {
       type: String,
       optional: true
@@ -34,9 +30,14 @@ let Agent = Class.create({
       type: String,
       optional: true
     },
-    _runOnce: {
+    _runningScript: {
       type: Boolean,
       optional: true
+    },
+    _runOnce: {
+      type: Boolean,
+      optional: true,
+      default: false
     },
   },
   behaviors: {},
@@ -82,11 +83,13 @@ if (Meteor.isFusion360) {
         // There's no watchdog configured for this agent, so set one up
         Agent._watchdogs.set(id, false);
         var heartbeat = function heartbeat() {
+          // suppress reloading during the save
           var agent = Agent.findOne(id);
-          // Meteor.call("printLog", 'heartbeat for ', agent.name);
           agent.lastSeen = new Date();
-          Agent._watchdogs.set(id, true); // suppress reloading during the save
+          
+          Agent._watchdogs.set(id, true); 
           agent.save(() => { Agent._watchdogs.set(id, false); });
+          
           Meteor.setTimeout(heartbeat, 3000);
         }.bind(this);
         heartbeat();

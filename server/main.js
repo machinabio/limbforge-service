@@ -19,7 +19,7 @@ import opn from 'opn';
 import Agent from '/imports/api/agents.js';
 import '/imports/api/agent-factory.js';
 import '/imports/api/agent-mock.js';
-
+import '/imports/api/job-queue.js';
 
 const settings = Meteor.settings.AWS;
 
@@ -38,6 +38,8 @@ let Api = new Restivus({
 });
 
 var microserverReady = true;
+
+
 
 Api.addRoute('healthcheck', {
   get: function () {

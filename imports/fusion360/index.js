@@ -12,11 +12,17 @@ Template.fusionClientLayout.helpers({
   agent() {
     return Agent.findOne(Session.get('agentId'));
   },
+
   runScript() {
-  	this._runOnce = false;
-  	this.save();
-    Meteor.call("printLog", 'running script ', this._script);
-    // new Function(this._script)();
+    if (this._runOnce) {
+      this._runOnce = false;
+      this._runningScript = true;
+      this.save();
+      Meteor.call("printLog", 'running script ', this._script);
+      new Function(this._script)();
+      this._runningScript = false;
+      this.save();
+    }
   }
 });
 
