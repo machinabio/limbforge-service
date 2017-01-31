@@ -20,6 +20,7 @@ import Agent from '/imports/api/agents.js';
 import '/imports/api/agent-factory.js';
 import '/imports/api/agent-mock.js';
 import '/imports/api/job-queue.js';
+import Params from '/imports/parameters.js';
 
 const settings = Meteor.settings.AWS;
 
@@ -39,8 +40,6 @@ let Api = new Restivus({
 
 var microserverReady = true;
 
-
-
 Api.addRoute('healthcheck', {
   get: function () {
     return { statusCode:  microserverReady ? 200 : 404 };
@@ -49,7 +48,7 @@ Api.addRoute('healthcheck', {
 
 Api.addRoute('limbforge', {
   get: function() {
-    var data = this.queryParams.parametersl
+    var data = this.queryParams.parameters;
     console.log('/api/submit #### data: ', data);
 
     if (!Match.test(data, Object)) {}

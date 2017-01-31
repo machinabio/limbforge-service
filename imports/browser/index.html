@@ -7,7 +7,17 @@
     <h2>API messages received in last 10 min</h2> {{> monitor_api}}
   </div>
   <div>
-    <h2>Agents</h2> {{> agent_list }}
+    <h2>Agents</h2> {{> agent_table }}
+  </div>
+</template>
+
+<template name="scriptingLayout">
+  <h1>Fusion360 Code Station</h1>
+  <div>
+    <h2>Script</h2> {{> scripting}}
+  </div>
+  <div>
+    <h2>Agents</h2> {{> agent_table }}
   </div>
 </template>
 
@@ -21,6 +31,26 @@
     <h3>Response:</h3> {{ response }}
     <!-- {{ #with response }} -->
   </div>
+</template>
+
+<template name="scripting">
+  <div>
+    <textarea type="textarea" id="script" placeholder="// enter your Fusion360 script here" cols="60" rows="10">{{default_script}}
+    </textarea>
+  </div>
+    {{> agent_dropdown}}
+  <button id="send">Run Script</button>
+</template>
+
+<template name="agent_dropdown">
+  <select class="form-control" id="select_agent">
+    <option disabled="disabled" selected="selected" value="NA">Please Select</option> 
+    {{#each agents}}
+      {{#if status}}
+      <option value="{{_id}}">{{name}}</option>
+      {{/if}}
+    {{/each}}
+  </select>
 </template>
 
 <template name="monitor_api">
@@ -43,7 +73,7 @@
 </template>
 
 
-<template name="agent_list">
+<template name="agent_table">
   <div>
     <table>
       <thead>
@@ -66,4 +96,11 @@
       </tbody>
     </table>
   </div>
+</template>
+
+<template  name="parameters_browser">
+  {{#with limbforge}}
+    length: {{ length }}
+    filet: {{ filet }}
+  {{/with}}
 </template>

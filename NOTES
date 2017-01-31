@@ -1,0 +1,32 @@
+var app = adsk.core.Application.get();
+var ui = app.userInterface;
+var data = app.data;
+var design = app.activeDocument.design;
+var docs = app.documents;
+var hubs = data.dataHubs;
+
+var pHub = hubs.item(0); // found through trial and error.
+//TODO write a method to find hub by name
+
+var lfProj = pHub.dataProjects.item(7); // found through trial and error
+//TODO write a method to find project by name
+
+var lfRoot = lfProj.rootFolder;
+var workingFolder = lfRoot.dataFolders.itemByName('microservice');
+var files = workingFolder.dataFiles;
+
+var testFile = files.item(1); // found through trial and error
+//TODO write a method to find file by name
+
+//docs.open(testFile);
+
+
+var params = design.allParameters;
+var length = params.itemByName('length');
+var filet = params.itemByName('filet');
+
+length.value = 15
+
+ui.messageBox('parameter '+length.name);
+
+var filtered = OrigArry.filter((val)=>{return val!='abc'});
