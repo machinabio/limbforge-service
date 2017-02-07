@@ -1,106 +1,121 @@
 <template name="webClientLayout">
-  <h1>Fusion Microservice Worker</h1>
-  <div>
-    <h2>Manually send an API request</h2> {{> api_test}}
-  </div>
-  <div>
-    <h2>API messages received in last 10 min</h2> {{> monitor_api}}
-  </div>
-  <div>
-    <h2>Agents</h2> {{> agent_table }}
-  </div>
+    <div id='body'>
+        <h1>Fusion Microservice Worker</h1>
+        <div>
+            <h2>Manually send an API request</h2> {{> api_test}}
+        </div>
+        <div>
+            <h2>API messages received in last 10 min</h2> {{> monitor_api}}
+        </div>
+        <div>
+            <h2>Agents</h2> {{> agent_table }}
+        </div>
+    </div>
 </template>
 
 <template name="scriptingLayout">
-  <h1>Fusion360 Code Station</h1>
-  <div>
-    <h2>Script</h2> {{> scripting}}
-  </div>
-  <div>
-    <h2>Agents</h2> {{> agent_table }}
-  </div>
+    <h1>Fusion360 Code Station</h1>
+    <div>
+        <h2>Script</h2> {{> scripting}}
+    </div>
+    <div>
+        <h2>Agents</h2> {{> agent_table }}
+    </div>
 </template>
 
+<template name='sidebar'>
+    <div id='sidebar'>
+        {{> loginButtons}}
+    </div>
+</template>
+
+<template name='topbar'>
+    <div id='topbar'>
+    </div>
+</template>
+
+
 <template name="api_test">
-  <div>
+    <div>
     <textarea type="textarea" id="data" placeholder="Enter JSON to send" cols="60" rows="10">
     </textarea>
-  </div>
-  <button id="send">Send JSON</button>
-  <div>
-    <h3>Response:</h3> {{ response }}
-    <!-- {{ #with response }} -->
-  </div>
+    </div>
+    <button id="send">Send JSON</button>
+    <div>
+        <h3>Response:</h3> {{ response }}
+        <!-- {{ #with response }} -->
+    </div>
 </template>
 
 <template name="scripting">
-  <div>
-    <textarea type="textarea" id="script" placeholder="// enter your Fusion360 script here" cols="60" rows="10">{{default_script}}
+    <div>
+    <textarea type="textarea" id="script" placeholder="// enter your Fusion360 script here" cols="60"
+              rows="10">{{default_script}}
     </textarea>
-  </div>
+    </div>
     {{> agent_dropdown}}
-  <button id="send">Run Script</button>
+    <button id="send">Run Script</button>
 </template>
 
 <template name="agent_dropdown">
-  <select class="form-control" id="select_agent">
-    <option disabled="disabled" selected="selected" value="NA">Please Select</option> 
-    {{#each agents}}
-      {{#if status}}
-      <option value="{{_id}}">{{name}}</option>
-      {{/if}}
-    {{/each}}
-  </select>
+    <select class="form-control" id="select_agent">
+        <option disabled="disabled" selected="selected" value="NA">Please Select</option>
+        {{#each agents}}
+            {{#if status}}
+                <option value="{{_id}}">{{name}}</option>
+            {{/if}}
+        {{/each}}
+    </select>
 </template>
 
 <template name="monitor_api">
-  <div>
-    <table>
-      <thead>
-        <th>Reception time</th>
-        <th>Content</th>
-      </thead>
-      <tbody>
-        {{ #each last_messages}}
-        <tr>
-          <td> {{ time }} </td>
-          <td> {{ content }} </td>
-        </tr>
-        {{ /each}}
-      </tbody>
-    </table>
-  </div>
+    <div>
+        <table>
+            <thead>
+            <th>Reception time</th>
+            <th>Content</th>
+            </thead>
+            <tbody>
+            {{ #each last_messages}}
+            <tr>
+                <td> {{ time }} </td>
+                <td> {{ content }} </td>
+            </tr>
+            {{ /each}}
+            </tbody>
+        </table>
+    </div>
 </template>
 
 
 <template name="agent_table">
-  <div>
-    <table>
-      <thead>
-        <th>Name</th>
-        <th>Status</th>
-        <th>Last Seen</th>
-        <th>Factory</th>
-        <th>Foreman</th>
-      </thead>
-      <tbody>
-        {{ #each agents}}
-        <tr>
-          <td> {{ name }} </td>
-          <td style="text-align:center"> {{ status }} </td>
-          <td> {{ formattedLastSeen }} </td>
-          <td> {{ factory }} </td>
-          <td> {{ foreman }} </td>
-        </tr>
-        {{ /each}}
-      </tbody>
-    </table>
-  </div>
+    <div>
+        <table>
+            <thead>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Last Seen</th>
+            <th>Factory</th>
+            <th>Foreman</th>
+            </thead>
+            <tbody>
+            {{ #each agents}}
+            <tr>
+                <td> {{ name }} </td>
+                <td style="text-align:center"> {{ status }} </td>
+                <td> {{ formattedLastSeen }} </td>
+                <td> {{ factory }} </td>
+                <td> {{ foreman }} </td>
+            </tr>
+            {{ /each}}
+            </tbody>
+        </table>
+    </div>
 </template>
 
-<template  name="parameters_browser">
-  {{#with limbforge}}
-    length: {{ length }}
-    filet: {{ filet }}
-  {{/with}}
+<template name="parameters_browser">
+    {{#with limbforge}}
+        length: {{ length }}
+        filet: {{ filet }}
+    {{/with}}
 </template>

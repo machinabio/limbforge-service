@@ -2,11 +2,21 @@ import { CadMake } from '/imports/cadmake.js';
 import '/imports/browser';
 import '/imports/fusion360';
 import '/imports/demo';
-
+import '/imports/startup.js';
 
 FlowRouter.route('/', {
   action: function(params) {
     Meteor.call("printLog", "...connection on / route");
+    if (Meteor.isFusion360) {
+      window.location.replace(Meteor.absoluteUrl('fusion360', { replaceLocalhost: true }));
+    };
+    BlazeLayout.render("App_body", { main: "webClientLayout" });
+  }
+});
+
+FlowRouter.route('/legacy', {
+  action: function(params) {
+    Meteor.call("printLog", "...connection on /legacy route");
     if (Meteor.isFusion360) {
       window.location.replace(Meteor.absoluteUrl('fusion360', { replaceLocalhost: true }));
     };
