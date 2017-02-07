@@ -1,4 +1,4 @@
-import Agenda from 'Agenda';
+import Agenda from 'agenda';
 
 const agendaCollectionNAme = 'jobs';
 const jobs = new Mongo.Collection(agendaCollectionNAme);
