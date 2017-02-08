@@ -3015,6 +3015,14 @@
         }
     });
 
+    // The user can set an override opacity for components and these opacity overrides combine if children and parent components have overrides. This property returns the actual opacity that is being used to render the occurence. To set the opacity use the opacity property of the Component object.
+    Object.defineProperty(adsk.fusion.Occurrence.prototype, 'visibleOpacity', {
+        get : function () {
+            var result = this._execute('visibleOpacity');
+            return result ? result.value : undefined;
+        }
+    });
+
     // Deletes the occurrence from the design. If this is the last occurrence referencing a specific Component, the component is also deleted.
     // Returns true if the delete was successful.
     adsk.fusion.Occurrence.prototype.deleteMe = function () {
@@ -3177,7 +3185,7 @@
     };
 
     // Method that creates a new occurrence using an existing component. This is the equivalent of copying and pasting an occurrence in the user interface.
-    // component : The component to create a new occurrence of
+    // component : The existing component to create a new occurrence of.
     // transform : A transform that defines the location for the new occurrence
     // Returns the newly created occurrence or null if the creation failed.
     adsk.fusion.Occurrences.prototype.addExistingComponent = function (component, transform) {
@@ -4002,6 +4010,22 @@
                 resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.fusion.RigidGroup) : null;
             }
             return resultValue
+        }
+    });
+
+    // Gets and sets the opacity override assigned to this component. A value of 1.0 specifies that is it completely opaque and a value of 0.0 specifies that is it completely transparent. This is only applicable for a non-root local component. This value is not necessarily related to what the user sees because the opacity is inherited. For example, if you have TopComponent and it has a component in it called SubComponent and you set the opacity of TopComponent to be 0.5, SubComponent will also be shown as slightly transparent even though the opacity property for it will return 1.0. Because a component can be referenced as an occurrence in other components and they can have different opacity settings, it's possible that different instances of the same component can display using different opacity levels. To get the opacity that it is being displayed with use the Occurrence.visibleOpacity property.
+    Object.defineProperty(adsk.fusion.Component.prototype, 'opacity', {
+        get : function () {
+            var result = this._execute('opacity');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (!isFinite(value)) { throw new TypeError('value must be a number'); }
+            var args = {
+                value : Number(value)
+            };
+            var result = this._execute('opacity', args);
+            return result ? result.value : undefined;
         }
     });
 

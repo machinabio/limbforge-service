@@ -1083,9 +1083,9 @@
         return (result && result.value) ? adsk.createObject(result.value, adsk.core.ObjectCollection) : null;
     };
 
-    // Creates new sketch curves and points that represent the specified entity as sketch geometry.
+    // Creates new sketch curves and points that represent the specified entity as sketch geometry. The sketch geometry is not projected but is created in the same location in space as the input geometry.
     // entity : The entity to include into the sketch. This can be a sketch entity from another sketch, edge, face (which results in getting all of its edges, a vertex, construction axis, or construction point.
-    //
+    // Returns a collection of the sketch entities that were created as a result of the include. When including this curves it will be a single sketch curve, but for faces, multiple sketch curves will be created; one for each edge.
     adsk.fusion.Sketch.prototype.include = function (entity) {
         if (entity !== null && !(entity instanceof adsk.core.Base)) { throw new TypeError('entity must be a adsk.core.Base'); }
         var args = {
@@ -1205,7 +1205,7 @@
         return result ? result.value : undefined;
     };
 
-    // Imports the contents of an SVG file into the active sketch ///
+    // Imports the contents of an SVG file into the active sketch.
     // fullFilename : The full filename, including the path, of the SVG file.
     // xPosition : The X offset in centimeters in the sketch for the origin of the SVG data relative to the sketch origin.
     // yPosition : The Y offset in centimeters in the sketch for the origin of the SVG data relative to the sketch origin.
@@ -2150,7 +2150,7 @@
         }
     });
 
-    // When a sketch is created geometry is sometimes automatically included in the sketch. For example the origin point is always included and depending on what was selected to create the sketch one, geometry from the selected face will be included. This geometry behaves in a special way in that it is invisible but is available for selection and it also participates in profile calculations. It's not possible to make them visible but they can be deleted and they can be used for any other standard sketch operation.
+    // When a sketch is created, geometry is sometimes automatically added to the sketch. For example a sketch point that references the origin point is always included and if a face was selected to create the sketch on, geometry from the face is also included. This automatically created geometry behaves in a special way in that it is invisible but is available for selection and it also participates in profile calculations. It's not possible to make them visible but they can be deleted and they can be used for any other standard sketch operation.
     Object.defineProperty(adsk.fusion.SketchEntity.prototype, 'isVisible', {
         get : function () {
             var result = this._execute('isVisible');
@@ -2321,7 +2321,7 @@
     };
 
     // Creates a parametric sketch that is associated with a base feature. Because of a current limitation, if you want to create a sketch associated with a base feature, you must first call the edit method of the base feature, use this method to create the sketch, and then call the finishEdit method of the base feature. The base feature must be in an "edit" state to be able to add any additional items to it.
-    // planarEntity : A construction plane or planar face that defines the sketch plane
+    // planarEntity : A construction plane or planar face that defines the sketch plane.
     // targetBaseOrFormFeature : The existing base feature that you want to associate this sketch with.
     // includeFaceEdges : When a BrepFace is used as the planarEntity argument, this defines if the edges of the face should be included in the sketch.
     // Returns the newly created Sketch or null if the creation failed.

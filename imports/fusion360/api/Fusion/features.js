@@ -2136,6 +2136,35 @@
         }
     });
 
+    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection. If this property has not been set, the default behavior is that all bodies that are intersected by the feature will participate. This property can return null in the case where the feature has not been fully defined so that possible intersecting bodies can be computed.
+    Object.defineProperty(adsk.fusion.ExtrudeFeatureInput.prototype, 'participantBodies', {
+        get : function () {
+            var result = this._execute('participantBodies');
+            if (!result || !Array.isArray(result.value)) {
+                return undefined
+            }
+            var resultIter;
+            var resultValue = [];
+            for (resultIter = 0; resultIter < result.value.length; ++resultIter) {
+                resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.fusion.BRepBody) : null;
+            }
+            return resultValue
+        },
+        set : function (value) {
+            if (!Array.isArray(value)) { throw new TypeError('value must be an array'); }
+            var valueLength = value.length;
+            var valueIt;
+            for (valueIt = 0; valueIt < valueLength; ++valueIt) {
+                if (value[valueIt] !== null && !(value[valueIt] instanceof adsk.fusion.BRepBody)) { throw new TypeError('value[valueIt] must be a adsk.fusion.BRepBody'); }
+            }
+            var args = {
+                value : value
+            };
+            var result = this._execute('participantBodies', args);
+            return result ? result.value : undefined;
+        }
+    });
+
     // Sets the extrusion extents option to 'Distance'.
     // isSymmetric : Set to 'true' for an extrusion symmetrical about the profile plane
     // distance : ValueInput object that defines the extrude distance. If the isSymmetric argument is 'false', a positive or negative distance can be used to control the direction.
@@ -2356,6 +2385,24 @@
             name : name
         };
         var result = this._execute('itemByName', args);
+        return (result && result.value) ? adsk.createObject(result.value, adsk.fusion.ExtrudeFeature) : null;
+    };
+
+    // Creates a basic extrusion that goes from the profile plane the specified distance.
+    // profile : The profile argument can be a single Profile, a single planar face, a single SketchText object, or an ObjectCollection consisting of multiple profiles, planar faces, and sketch texts. When an ObjectCollection is used all of the profiles, faces, and sketch texts must be co-planar. To create a surface (non-solid) extrusion, you can use the createOpenProfile and createBRepEdgeProfile methods of the Component object to create an open profile. You also need to set the isSolid property of the returned ExtrudeFeatureInput property to False.
+    // distance : ValueInput object that defines the extrude distance. A positive value extrudes in the positive direction of the sketch plane and negative value is in the opposite direction.
+    // operation : The feature operation to perform.
+    // Returns the newly created ExtrudeFeature or null if the creation failed.
+    adsk.fusion.ExtrudeFeatures.prototype.addSimple = function (profile, distance, operation) {
+        if (profile !== null && !(profile instanceof adsk.core.Base)) { throw new TypeError('profile must be a adsk.core.Base'); }
+        if (distance !== null && !(distance instanceof adsk.core.ValueInput)) { throw new TypeError('distance must be a adsk.core.ValueInput'); }
+        if (!isFinite(operation)) { throw new TypeError('operation must be a number'); }
+        var args = {
+            profile : (profile === null ? profile : profile.handle),
+            distance : (distance === null ? distance : distance.handle),
+            operation : Number(operation)
+        };
+        var result = this._execute('addSimple', args);
         return (result && result.value) ? adsk.createObject(result.value, adsk.fusion.ExtrudeFeature) : null;
     };
 
@@ -3404,6 +3451,35 @@
         }
     });
 
+    // Gets and sets the list of bodies that will participate in the hole. If this property has not been set, the default behavior is that all bodies that are intersected by the hole will participate. This property can return null in the case where the feature has not been fully defined so that possible intersecting bodies can be computed.
+    Object.defineProperty(adsk.fusion.HoleFeatureInput.prototype, 'participantBodies', {
+        get : function () {
+            var result = this._execute('participantBodies');
+            if (!result || !Array.isArray(result.value)) {
+                return undefined
+            }
+            var resultIter;
+            var resultValue = [];
+            for (resultIter = 0; resultIter < result.value.length; ++resultIter) {
+                resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.fusion.BRepBody) : null;
+            }
+            return resultValue
+        },
+        set : function (value) {
+            if (!Array.isArray(value)) { throw new TypeError('value must be an array'); }
+            var valueLength = value.length;
+            var valueIt;
+            for (valueIt = 0; valueIt < valueLength; ++valueIt) {
+                if (value[valueIt] !== null && !(value[valueIt] instanceof adsk.fusion.BRepBody)) { throw new TypeError('value[valueIt] must be a adsk.fusion.BRepBody'); }
+            }
+            var args = {
+                value : value
+            };
+            var result = this._execute('participantBodies', args);
+            return result ? result.value : undefined;
+        }
+    });
+
     // Defines the position of a the hole using a point. The point can be a vertex on the face or it can be a Point3D object to define any location on the face. If a Point3D object is provided it will be projected onto the plane along the planes normal. The orientation of the hole is defined by the planar face or construction plane. If a vertex is used, the position of the hole is associative to that vertex. If a Point3D object is used the position of the hole is not associative.
     // planarEntity : The planar BRepFace or ConstructionPlane object that defines the orientation of the hole. The natural direction of the hole will be opposite the normal of the face or construction plane.
     // point : A Point3D object or vertex that defines the position of the hole. The point will be projected onto the plane along the normal of the plane.
@@ -3932,6 +4008,35 @@
                 value : value
             };
             var result = this._execute('targetBaseFeature', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection. If this property has not been set, the default behavior is that all bodies that are intersected by the feature will participate. This property can return null in the case where the feature has not been fully defined so that possible intersecting bodies can be computed.
+    Object.defineProperty(adsk.fusion.LoftFeatureInput.prototype, 'participantBodies', {
+        get : function () {
+            var result = this._execute('participantBodies');
+            if (!result || !Array.isArray(result.value)) {
+                return undefined
+            }
+            var resultIter;
+            var resultValue = [];
+            for (resultIter = 0; resultIter < result.value.length; ++resultIter) {
+                resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.fusion.BRepBody) : null;
+            }
+            return resultValue
+        },
+        set : function (value) {
+            if (!Array.isArray(value)) { throw new TypeError('value must be an array'); }
+            var valueLength = value.length;
+            var valueIt;
+            for (valueIt = 0; valueIt < valueLength; ++valueIt) {
+                if (value[valueIt] !== null && !(value[valueIt] instanceof adsk.fusion.BRepBody)) { throw new TypeError('value[valueIt] must be a adsk.fusion.BRepBody'); }
+            }
+            var args = {
+                value : value
+            };
+            var result = this._execute('participantBodies', args);
             return result ? result.value : undefined;
         }
     });
@@ -6295,6 +6400,35 @@
         }
     });
 
+    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection. If this property has not been set, the default behavior is that all bodies that are intersected by the feature will participate. This property can return null in the case where the feature has not been fully defined so that possible intersecting bodies can be computed.
+    Object.defineProperty(adsk.fusion.RevolveFeatureInput.prototype, 'participantBodies', {
+        get : function () {
+            var result = this._execute('participantBodies');
+            if (!result || !Array.isArray(result.value)) {
+                return undefined
+            }
+            var resultIter;
+            var resultValue = [];
+            for (resultIter = 0; resultIter < result.value.length; ++resultIter) {
+                resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.fusion.BRepBody) : null;
+            }
+            return resultValue
+        },
+        set : function (value) {
+            if (!Array.isArray(value)) { throw new TypeError('value must be an array'); }
+            var valueLength = value.length;
+            var valueIt;
+            for (valueIt = 0; valueIt < valueLength; ++valueIt) {
+                if (value[valueIt] !== null && !(value[valueIt] instanceof adsk.fusion.BRepBody)) { throw new TypeError('value[valueIt] must be a adsk.fusion.BRepBody'); }
+            }
+            var args = {
+                value : value
+            };
+            var result = this._execute('participantBodies', args);
+            return result ? result.value : undefined;
+        }
+    });
+
     // Defines the extent of the revolution to be at a specified angle. An angle and whether the extent is symmetric or only in one direction is specified. If it's not symmetric a positive or negative angle can be used to control the direction. If symmetric, the angle is the angle on one side so the entire angle of the revolution will be twice the specified angle. Use an angle of 360 deg or 2 pi radians to create a full revolve.
     // isSymmetric : Set to 'true' for a revolve symmetrical about the profile plane
     // angle : The ValueInput object that defines the angle of the revolution
@@ -7952,6 +8086,35 @@
                 value : value
             };
             var result = this._execute('targetBaseFeature', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection. If this property has not been set, the default behavior is that all bodies that are intersected by the feature will participate. This property can return null in the case where the feature has not been fully defined so that possible intersecting bodies can be computed.
+    Object.defineProperty(adsk.fusion.SweepFeatureInput.prototype, 'participantBodies', {
+        get : function () {
+            var result = this._execute('participantBodies');
+            if (!result || !Array.isArray(result.value)) {
+                return undefined
+            }
+            var resultIter;
+            var resultValue = [];
+            for (resultIter = 0; resultIter < result.value.length; ++resultIter) {
+                resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.fusion.BRepBody) : null;
+            }
+            return resultValue
+        },
+        set : function (value) {
+            if (!Array.isArray(value)) { throw new TypeError('value must be an array'); }
+            var valueLength = value.length;
+            var valueIt;
+            for (valueIt = 0; valueIt < valueLength; ++valueIt) {
+                if (value[valueIt] !== null && !(value[valueIt] instanceof adsk.fusion.BRepBody)) { throw new TypeError('value[valueIt] must be a adsk.fusion.BRepBody'); }
+            }
+            var args = {
+                value : value
+            };
+            var result = this._execute('participantBodies', args);
             return result ? result.value : undefined;
         }
     });
@@ -10146,8 +10309,8 @@
     });
 
     // Statically creates a new DistanceExtentDefinition object. This is used as input when defining the extents of a feature to be a specified distance.
-    // distance :
-    //
+    // distance : A ValueInput that defines the distance of the extrusion.
+    // Returns the newly created DistanceExtentDefinition or null in the case of failure.
     adsk.fusion.DistanceExtentDefinition.create = function (distance) {
         if (distance !== null && !(distance instanceof adsk.core.ValueInput)) { throw new TypeError('distance must be a adsk.core.ValueInput'); }
         var args = {
@@ -10605,7 +10768,7 @@
     Object.defineProperty(adsk.fusion.ExtrudeFeature.prototype, 'taperAngleOne', {
         get : function () {
             var result = this._execute('taperAngleOne');
-            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Base) : null;
+            return (result && result.value) ? adsk.createObject(result.value, adsk.fusion.ModelParameter) : null;
         }
     });
 
@@ -10613,7 +10776,7 @@
     Object.defineProperty(adsk.fusion.ExtrudeFeature.prototype, 'taperAngleTwo', {
         get : function () {
             var result = this._execute('taperAngleTwo');
-            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Base) : null;
+            return (result && result.value) ? adsk.createObject(result.value, adsk.fusion.ModelParameter) : null;
         }
     });
 
@@ -10621,6 +10784,35 @@
     Object.defineProperty(adsk.fusion.ExtrudeFeature.prototype, 'hasTwoExtents', {
         get : function () {
             var result = this._execute('hasTwoExtents');
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection. When setting or getting this property, you must roll the timeline back to just before the feature so that the model is in the state just before the feature is computed.
+    Object.defineProperty(adsk.fusion.ExtrudeFeature.prototype, 'participantBodies', {
+        get : function () {
+            var result = this._execute('participantBodies');
+            if (!result || !Array.isArray(result.value)) {
+                return undefined
+            }
+            var resultIter;
+            var resultValue = [];
+            for (resultIter = 0; resultIter < result.value.length; ++resultIter) {
+                resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.fusion.BRepBody) : null;
+            }
+            return resultValue
+        },
+        set : function (value) {
+            if (!Array.isArray(value)) { throw new TypeError('value must be an array'); }
+            var valueLength = value.length;
+            var valueIt;
+            for (valueIt = 0; valueIt < valueLength; ++valueIt) {
+                if (value[valueIt] !== null && !(value[valueIt] instanceof adsk.fusion.BRepBody)) { throw new TypeError('value[valueIt] must be a adsk.fusion.BRepBody'); }
+            }
+            var args = {
+                value : value
+            };
+            var result = this._execute('participantBodies', args);
             return result ? result.value : undefined;
         }
     });
@@ -11109,6 +11301,37 @@
         }
     });
 
+    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection.
+    // When setting or getting this property, you must roll the timeline back to just before the feature
+    // so that the model is in the state just before the feature is computed.
+    Object.defineProperty(adsk.fusion.HoleFeature.prototype, 'participantBodies', {
+        get : function () {
+            var result = this._execute('participantBodies');
+            if (!result || !Array.isArray(result.value)) {
+                return undefined
+            }
+            var resultIter;
+            var resultValue = [];
+            for (resultIter = 0; resultIter < result.value.length; ++resultIter) {
+                resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.fusion.BRepBody) : null;
+            }
+            return resultValue
+        },
+        set : function (value) {
+            if (!Array.isArray(value)) { throw new TypeError('value must be an array'); }
+            var valueLength = value.length;
+            var valueIt;
+            for (valueIt = 0; valueIt < valueLength; ++valueIt) {
+                if (value[valueIt] !== null && !(value[valueIt] instanceof adsk.fusion.BRepBody)) { throw new TypeError('value[valueIt] must be a adsk.fusion.BRepBody'); }
+            }
+            var args = {
+                value : value
+            };
+            var result = this._execute('participantBodies', args);
+            return result ? result.value : undefined;
+        }
+    });
+
     // Calling this method will change the hole to a simple hole.
     // Returns true if changing the hole was successful.
     adsk.fusion.HoleFeature.prototype.setToSimple = function () {
@@ -11432,6 +11655,35 @@
         get : function () {
             var result = this._execute('nativeObject');
             return (result && result.value) ? adsk.createObject(result.value, adsk.fusion.LoftFeature) : null;
+        }
+    });
+
+    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection. When setting or getting this property, you must roll the timeline back to just before the feature so that the model is in the state just before the feature is computed.
+    Object.defineProperty(adsk.fusion.LoftFeature.prototype, 'participantBodies', {
+        get : function () {
+            var result = this._execute('participantBodies');
+            if (!result || !Array.isArray(result.value)) {
+                return undefined
+            }
+            var resultIter;
+            var resultValue = [];
+            for (resultIter = 0; resultIter < result.value.length; ++resultIter) {
+                resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.fusion.BRepBody) : null;
+            }
+            return resultValue
+        },
+        set : function (value) {
+            if (!Array.isArray(value)) { throw new TypeError('value must be an array'); }
+            var valueLength = value.length;
+            var valueIt;
+            for (valueIt = 0; valueIt < valueLength; ++valueIt) {
+                if (value[valueIt] !== null && !(value[valueIt] instanceof adsk.fusion.BRepBody)) { throw new TypeError('value[valueIt] must be a adsk.fusion.BRepBody'); }
+            }
+            var args = {
+                value : value
+            };
+            var result = this._execute('participantBodies', args);
+            return result ? result.value : undefined;
         }
     });
 
@@ -13010,6 +13262,37 @@
         }
     });
 
+    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection.
+    // When setting or getting this property, you must roll the timeline back to just before the feature
+    // so that the model is in the state just before the feature is computed.
+    Object.defineProperty(adsk.fusion.RevolveFeature.prototype, 'participantBodies', {
+        get : function () {
+            var result = this._execute('participantBodies');
+            if (!result || !Array.isArray(result.value)) {
+                return undefined
+            }
+            var resultIter;
+            var resultValue = [];
+            for (resultIter = 0; resultIter < result.value.length; ++resultIter) {
+                resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.fusion.BRepBody) : null;
+            }
+            return resultValue
+        },
+        set : function (value) {
+            if (!Array.isArray(value)) { throw new TypeError('value must be an array'); }
+            var valueLength = value.length;
+            var valueIt;
+            for (valueIt = 0; valueIt < valueLength; ++valueIt) {
+                if (value[valueIt] !== null && !(value[valueIt] instanceof adsk.fusion.BRepBody)) { throw new TypeError('value[valueIt] must be a adsk.fusion.BRepBody'); }
+            }
+            var args = {
+                value : value
+            };
+            var result = this._execute('participantBodies', args);
+            return result ? result.value : undefined;
+        }
+    });
+
     // Defines the extent of the revolution to be at a defined angle.
     // isSymmetric : Boolean that specifies if the extent is symmetric or not.
     // angle : ValueInput object that defines the angle. This can be a string or a value. If it's a string it is interpreted using the current document units and can include equations. For example all of the following are valid as long as they result in angle units; "45", "45 deg", "a1 / 2". If a value is input it is interpreted as radians. If isSymmetric is false a positive or negative angle can be used to control the direction. If isSymmetric is true, the angle is the extent in one direction so the entire angle of the revolution will be twice the specified angle. Use an angle of 360 deg or 2 pi radians to create a full revolve.
@@ -13729,7 +14012,7 @@
         return object instanceof adsk.fusion.StitchFeature ? object : null;
     };
 
-    // Gets and sets the surfaces to stitch together. In some cases the stitch operation results in faces being merged so the original faces are no longer available after the feature is created. in this case you need to reposition the timeline marker to just before this feature when the faces do exist.
+    // Gets and sets the surfaces to stitch together. In some cases the stitch operation results in faces being merged so the original faces are no longer available after the feature is created. in this case you need to reposition the timeline marker to just before this feature when the faces do exist. To get valid results and when setting this property, the timeline should be rolled back to immediately before this feature.
     Object.defineProperty(adsk.fusion.StitchFeature.prototype, 'stitchSurfaces', {
         get : function () {
             var result = this._execute('stitchSurfaces');
@@ -14052,6 +14335,35 @@
                 value : Number(value)
             };
             var result = this._execute('profileScaling', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection. When setting or getting this property, you must roll the timeline back to just before the feature so that the model is in the state just before the feature is computed.
+    Object.defineProperty(adsk.fusion.SweepFeature.prototype, 'participantBodies', {
+        get : function () {
+            var result = this._execute('participantBodies');
+            if (!result || !Array.isArray(result.value)) {
+                return undefined
+            }
+            var resultIter;
+            var resultValue = [];
+            for (resultIter = 0; resultIter < result.value.length; ++resultIter) {
+                resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.fusion.BRepBody) : null;
+            }
+            return resultValue
+        },
+        set : function (value) {
+            if (!Array.isArray(value)) { throw new TypeError('value must be an array'); }
+            var valueLength = value.length;
+            var valueIt;
+            for (valueIt = 0; valueIt < valueLength; ++valueIt) {
+                if (value[valueIt] !== null && !(value[valueIt] instanceof adsk.fusion.BRepBody)) { throw new TypeError('value[valueIt] must be a adsk.fusion.BRepBody'); }
+            }
+            var args = {
+                value : value
+            };
+            var result = this._execute('participantBodies', args);
             return result ? result.value : undefined;
         }
     });
@@ -14483,14 +14795,9 @@
     });
 
     // Statically creates a new ThroughAllExtentDefinition object. This is used as input when defining the extents of a feature to be through all.
-    // isPositiveDirection : Specifies if the direction is in the positive direction of the profile's sketch plane. A value of true indicates it is in the same direction as the z direction of the sketch plane. This is only used when creating an extrusion is being created to one side. For a two sided extrusion, this is ignored so any value can be used.
     // Returns the newly created ThroughAllExtentDefinition or null in the case of a failure.
-    adsk.fusion.ThroughAllExtentDefinition.create = function (isPositiveDirection) {
-        if (typeof isPositiveDirection !== 'boolean') { throw new TypeError('isPositiveDirection must be a boolean'); }
-        var args = {
-            isPositiveDirection : isPositiveDirection
-        };
-        var result = adsk.core.Base._executeStatic('adsk.fusion.ThroughAllExtentDefinition', 'create', args);
+    adsk.fusion.ThroughAllExtentDefinition.create = function () {
+        var result = adsk.core.Base._executeStatic('adsk.fusion.ThroughAllExtentDefinition', 'create');
         return (result && result.value) ? adsk.createObject(result.value, adsk.fusion.ThroughAllExtentDefinition) : null;
     };
 

@@ -1213,7 +1213,7 @@
     // Adds a text box input to the command.
     // id : The unique ID of this command input. It must be unique with respect to the other inputs associated with this command.
     // name : The displayed name of this command as seen in the dialog. If an empty string is provided then no name will be displayed and the text box will span the width of the command dialog.
-    // formattedText : Gets and sets the formatted text displayed in the dialog. Formatted text includes any basic html formatting that has been defined. For example, you can use basic html formatting such as <b>Bold</b>, <i>Italic</i>, and <br /> for a line break. It also supports hyperlinks, which when clicked by the user, Fusion will open the specified url in the default browser. Hyperlinks are defined using the <a> tag such as "You are using Autodesk's <a href="http://fusion360.autodesk.com">Fusion 360</a>.".
+    // formattedText : Gets and sets the formatted text displayed in the dialog. Formatted text includes any basic html formatting that has been defined. For example, you can use basic html formatting such as <code>&lt;b&gt;Bold&lt;/b&gt;</code>, <code>&lt;i&gt;Italic&lt;/i&gt;</code>, and <code>&lt;br /&gt;</code> for a line break. It also supports hyperlinks, which when clicked by the user, Fusion will open the specified url in the default browser. Hyperlinks are defined using the <code>&lt;a&gt;</code> tag such as "<code>You are using Autodesk's &lt;a href="http://fusion360.autodesk.com"&gt;Fusion 360&lt;/a&gt;.</code>".
     // numRows : Specifies the height of the text box as defined by the number of rows of text that can be displayed. If the text is larger than will fit in the box a scroll bar will automatically be displayed.
     // isReadOnly : Specifies if the text box is read-only or not.
     // Returns the created TextBoxCommandInput object or null if the creation failed.
@@ -1383,6 +1383,7 @@
     // id : The unique ID of this command input. It must be unique with respect to the other inputs associated with this command.
     // name : The displayed name of this command as seen in the dialog.
     // resourceFolder : Specifies the folder that contains the image for the input. This is an optional argument. The input is shown as a check box if the resource folder is not set.
+    // Returns the created DirectionCommandInput object or null if the creation failed.
     adsk.core.CommandInputs.prototype.addDirectionCommandInput = function (id, name, resourceFolder) {
         if (id === undefined || id === null || id.constructor !== String) { throw new TypeError('id must be a string'); }
         if (name === undefined || name === null || name.constructor !== String) { throw new TypeError('name must be a string'); }
@@ -1403,6 +1404,7 @@
     // name : The displayed name of this command as seen in the dialog.
     // numberOfColumns : The number of columns displayed within the table.
     // columnRatio : The width ratio of the columns. This is defined using a string like "1:1:1" where this is used where there are three columns all the same width. "2:1" is for two columns where the first column is twice the width of the second column.
+    // Returns the created TableCommandInput object or null if the creation failed.
     adsk.core.CommandInputs.prototype.addTableCommandInput = function (id, name, numberOfColumns, columnRatio) {
         if (id === undefined || id === null || id.constructor !== String) { throw new TypeError('id must be a string'); }
         if (name === undefined || name === null || name.constructor !== String) { throw new TypeError('name must be a string'); }
@@ -1416,6 +1418,24 @@
         };
         var result = this._execute('addTableCommandInput', args);
         return (result && result.value) ? adsk.createObject(result.value, adsk.core.TableCommandInput) : null;
+    };
+
+    // Adds a new angle value input to the command. This displays a field in the command dialog where an angle value can be entered. It displays the angle in the dialog using degrees. There is also a graphical manipulator associated with the input to allow the user to graphically set the value. You use the setManipulator method of the returned AngleValueCommandInput object to define the position and orientation of the manipulator.
+    // id : The unique ID of this command input. It must be unique with respect to the other inputs associated with this command.
+    // name : The displayed label of this input as seen in the dialog. If a name is not specified (an empty string), the input will be centered horizontally within it's row in the dialog. If a name is specified it will appear as a left justified label aligned with the other command input labels, and the left side of the image will be aligned with the other command input controls.
+    // initialValue : The initial value of the input. If the value input is a number then it is interpreted as radians. If it is a string it uses the units specified in the string or if no units are specified it uses degrees.
+    // Returns the created AngleValueCommandInput object or null if the creation failed.
+    adsk.core.CommandInputs.prototype.addAngleValueCommandInput = function (id, name, initialValue) {
+        if (id === undefined || id === null || id.constructor !== String) { throw new TypeError('id must be a string'); }
+        if (name === undefined || name === null || name.constructor !== String) { throw new TypeError('name must be a string'); }
+        if (initialValue !== null && !(initialValue instanceof adsk.core.ValueInput)) { throw new TypeError('initialValue must be a adsk.core.ValueInput'); }
+        var args = {
+            id : id,
+            name : name,
+            initialValue : (initialValue === null ? initialValue : initialValue.handle)
+        };
+        var result = this._execute('addAngleValueCommandInput', args);
+        return (result && result.value) ? adsk.createObject(result.value, adsk.core.AngleValueCommandInput) : null;
     };
 
     //=========== CommandTerminationReason ============
@@ -1890,6 +1910,40 @@
         MenuKeyCode : 16777301
     };
 
+    //=========== LinearMarkingMenu ============
+    // Represents the linear marking menu which is the vertical menu that's displayed when the user right-clicks within Fusion. This supports customizing the contents of the context menu.
+    adsk.core.LinearMarkingMenu = function LinearMarkingMenu(handle) {
+        if (!(this instanceof adsk.core.LinearMarkingMenu)) {
+            return adsk.core.LinearMarkingMenu.cast(handle);
+        }
+        adsk.core.Base.call(this, handle);
+    };
+    adsk.core.LinearMarkingMenu.prototype = Object.create(adsk.core.Base.prototype);
+    adsk.core.LinearMarkingMenu.prototype.constructor = adsk.core.LinearMarkingMenu;
+    adsk.core.LinearMarkingMenu.classType = function classType () {
+        return 'adsk::core::LinearMarkingMenu';
+    };
+    adsk.core.LinearMarkingMenu.interfaceId = 'adsk.core.LinearMarkingMenu';
+    adsk.objectTypes['adsk.core.LinearMarkingMenu'] = adsk.core.LinearMarkingMenu;
+    adsk.core.LinearMarkingMenu.cast = function (object) {
+        return object instanceof adsk.core.LinearMarkingMenu ? object : null;
+    };
+
+    // Return the collection of top-level controls in the context menu. It's possible to have drop-down controls (fly-outs) that provide access to additional conrols. You can remove and add controls to customize the contents of the context menu.
+    Object.defineProperty(adsk.core.LinearMarkingMenu.prototype, 'controls', {
+        get : function () {
+            var result = this._execute('controls');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.ToolbarControls) : null;
+        }
+    });
+
+    // Completely clears the contents of the context menu. If left in this state, the context menu will not be displayed.
+    // Returns true if the clear was successful.
+    adsk.core.LinearMarkingMenu.prototype.clear = function () {
+        var result = this._execute('clear');
+        return result ? result.value : undefined;
+    };
+
     //=========== ListControlDisplayTypes ============
     // The different types of items that can be displayed in a list control.
     adsk.core.ListControlDisplayTypes = {
@@ -2071,6 +2125,81 @@
         var result = this._execute('item', args);
         return (result && result.value) ? adsk.createObject(result.value, adsk.core.ListItem) : null;
     };
+
+    //=========== MarkingMenuEvent ============
+    // A MarkingMenuEvent is fired when the marking menu and context menu are displayed. For exampele, in response to the markingMenuDisplaying event.
+    adsk.core.MarkingMenuEvent = function MarkingMenuEvent(handle) {
+        if (!(this instanceof adsk.core.MarkingMenuEvent)) {
+            return adsk.core.MarkingMenuEvent.cast(handle);
+        }
+        adsk.core.Event.call(this, handle);
+    };
+    adsk.core.MarkingMenuEvent.prototype = Object.create(adsk.core.Event.prototype);
+    adsk.core.MarkingMenuEvent.prototype.constructor = adsk.core.MarkingMenuEvent;
+    adsk.core.MarkingMenuEvent.classType = function classType () {
+        return 'adsk::core::MarkingMenuEvent';
+    };
+    adsk.core.MarkingMenuEvent.interfaceId = 'adsk.core.MarkingMenuEvent';
+    adsk.objectTypes['adsk.core.MarkingMenuEvent'] = adsk.core.MarkingMenuEvent;
+    adsk.core.MarkingMenuEvent.cast = function (object) {
+        return object instanceof adsk.core.MarkingMenuEvent ? object : null;
+    };
+
+    adsk.core.MarkingMenuEvent.prototype.add = function (handler) {
+        if (typeof handler !== 'function') { throw new TypeError('handler must be a function'); }
+        return adsk.core.Event.prototype.add.call(this, handler, adsk.core.MarkingMenuEventArgs);
+    };
+
+    //=========== MarkingMenuEventArgs ============
+    // The MarkingMenuEventArgs provides information associated with the marking and context menu being displayed.
+    adsk.core.MarkingMenuEventArgs = function MarkingMenuEventArgs(handle) {
+        if (!(this instanceof adsk.core.MarkingMenuEventArgs)) {
+            return adsk.core.MarkingMenuEventArgs.cast(handle);
+        }
+        adsk.core.EventArgs.call(this, handle);
+    };
+    adsk.core.MarkingMenuEventArgs.prototype = Object.create(adsk.core.EventArgs.prototype);
+    adsk.core.MarkingMenuEventArgs.prototype.constructor = adsk.core.MarkingMenuEventArgs;
+    adsk.core.MarkingMenuEventArgs.classType = function classType () {
+        return 'adsk::core::MarkingMenuEventArgs';
+    };
+    adsk.core.MarkingMenuEventArgs.interfaceId = 'adsk.core.MarkingMenuEventArgs';
+    adsk.objectTypes['adsk.core.MarkingMenuEventArgs'] = adsk.core.MarkingMenuEventArgs;
+    adsk.core.MarkingMenuEventArgs.cast = function (object) {
+        return object instanceof adsk.core.MarkingMenuEventArgs ? object : null;
+    };
+
+    // Provides access to the radial marking menu.
+    Object.defineProperty(adsk.core.MarkingMenuEventArgs.prototype, 'radialMarkingMenu', {
+        get : function () {
+            var result = this._execute('radialMarkingMenu');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.RadialMarkingMenu) : null;
+        }
+    });
+
+    // Provides access to the linear marking menu.
+    Object.defineProperty(adsk.core.MarkingMenuEventArgs.prototype, 'linearMarkingMenu', {
+        get : function () {
+            var result = this._execute('linearMarkingMenu');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.LinearMarkingMenu) : null;
+        }
+    });
+
+    // Returns the currently selected entities that the user left-clicked over. These provide the "context" of what should be displayed in the menu. This can be an empty array in the case where they clicked in a open area within the graphics window.
+    Object.defineProperty(adsk.core.MarkingMenuEventArgs.prototype, 'selectedEntities', {
+        get : function () {
+            var result = this._execute('selectedEntities');
+            if (!result || !Array.isArray(result.value)) {
+                return undefined
+            }
+            var resultIter;
+            var resultValue = [];
+            for (resultIter = 0; resultIter < result.value.length; ++resultIter) {
+                resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.core.Base) : null;
+            }
+            return resultValue
+        }
+    });
 
     //=========== MessageBoxButtonTypes ============
     // Defines the valid return types from a message box.
@@ -2384,6 +2513,188 @@
     // Returns true if successful
     adsk.core.ProgressDialog.prototype.reset = function () {
         var result = this._execute('reset');
+        return result ? result.value : undefined;
+    };
+
+    //=========== RadialMarkingMenu ============
+    // Represents the marking menu which is the round menu that's displayed when the user right-clicks within Fusion. This supports customizing the contents of the marking menu.
+    adsk.core.RadialMarkingMenu = function RadialMarkingMenu(handle) {
+        if (!(this instanceof adsk.core.RadialMarkingMenu)) {
+            return adsk.core.RadialMarkingMenu.cast(handle);
+        }
+        adsk.core.Base.call(this, handle);
+    };
+    adsk.core.RadialMarkingMenu.prototype = Object.create(adsk.core.Base.prototype);
+    adsk.core.RadialMarkingMenu.prototype.constructor = adsk.core.RadialMarkingMenu;
+    adsk.core.RadialMarkingMenu.classType = function classType () {
+        return 'adsk::core::RadialMarkingMenu';
+    };
+    adsk.core.RadialMarkingMenu.interfaceId = 'adsk.core.RadialMarkingMenu';
+    adsk.objectTypes['adsk.core.RadialMarkingMenu'] = adsk.core.RadialMarkingMenu;
+    adsk.core.RadialMarkingMenu.cast = function (object) {
+        return object instanceof adsk.core.RadialMarkingMenu ? object : null;
+    };
+
+    // Gets and sets the text that is displayed in the parent marking menu to access a sub marking menu. This property is not used for the main marking menu and will return an empty string and setting it will have no effect.
+    Object.defineProperty(adsk.core.RadialMarkingMenu.prototype, 'text', {
+        get : function () {
+            var result = this._execute('text');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (value === undefined || value === null || value.constructor !== String) { throw new TypeError('value must be a string'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('text', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the command definition that's displayed in the East position (right) of the marking menu. Setting this to null indicates that the East position should be empty. This can also return or be set with a MarkingMenu object which is used to have a sub-menu. New marking menus can be created using the create method and then assigned to the desired position in the marking menu.
+    Object.defineProperty(adsk.core.RadialMarkingMenu.prototype, 'eastCommand', {
+        get : function () {
+            var result = this._execute('eastCommand');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Base) : null;
+        },
+        set : function (value) {
+            if (value !== null && !(value instanceof adsk.core.Base)) { throw new TypeError('value must be a adsk.core.Base'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('eastCommand', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the command definition that's displayed in the North position (top) of the marking menu. Setting this to null indicates that the North position should be empty. This can also return or be set with a MarkingMenu object which is used to have a sub-menu. New marking menus can be created using the create method and then assigned to the desired position in the marking menu.
+    Object.defineProperty(adsk.core.RadialMarkingMenu.prototype, 'northCommand', {
+        get : function () {
+            var result = this._execute('northCommand');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Base) : null;
+        },
+        set : function (value) {
+            if (value !== null && !(value instanceof adsk.core.Base)) { throw new TypeError('value must be a adsk.core.Base'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('northCommand', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the command definition that's displayed in the Northeast position (top-right) of the marking menu. Setting this to null indicates that the Northeast position should be empty. This can also return or be set with a MarkingMenu object which is used to have a sub-menu. New marking menus can be created using the create method and then assigned to the desired position in the marking menu.
+    Object.defineProperty(adsk.core.RadialMarkingMenu.prototype, 'northeastCommand', {
+        get : function () {
+            var result = this._execute('northeastCommand');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Base) : null;
+        },
+        set : function (value) {
+            if (value !== null && !(value instanceof adsk.core.Base)) { throw new TypeError('value must be a adsk.core.Base'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('northeastCommand', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the command definition that's displayed in the West position (left) of the marking menu. Setting this to null indicates that the West position should be empty. This can also return or be set with a MarkingMenu object which is used to have a sub-menu. New marking menus can be created using the create method and then assigned to the desired position in the marking menu.
+    Object.defineProperty(adsk.core.RadialMarkingMenu.prototype, 'westCommand', {
+        get : function () {
+            var result = this._execute('westCommand');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Base) : null;
+        },
+        set : function (value) {
+            if (value !== null && !(value instanceof adsk.core.Base)) { throw new TypeError('value must be a adsk.core.Base'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('westCommand', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the command definition that's displayed in the Northwest position (upper-left) of the marking menu. Setting this to null indicates that the Northwest position should be empty. This can also return or be set with a MarkingMenu object which is used to have a sub-menu. New marking menus can be created using the create method and then assigned to the desired position in the marking menu.
+    Object.defineProperty(adsk.core.RadialMarkingMenu.prototype, 'northwestCommand', {
+        get : function () {
+            var result = this._execute('northwestCommand');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Base) : null;
+        },
+        set : function (value) {
+            if (value !== null && !(value instanceof adsk.core.Base)) { throw new TypeError('value must be a adsk.core.Base'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('northwestCommand', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the command definition that's displayed in the Southwest position (bottom-left) of the marking menu. Setting this to null indicates that the Southwest position should be empty. This can also return or be set with a MarkingMenu object which is used to have a sub-menu. New marking menus can be created using the create method and then assigned to the desired position in the marking menu.
+    Object.defineProperty(adsk.core.RadialMarkingMenu.prototype, 'southwestCommand', {
+        get : function () {
+            var result = this._execute('southwestCommand');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Base) : null;
+        },
+        set : function (value) {
+            if (value !== null && !(value instanceof adsk.core.Base)) { throw new TypeError('value must be a adsk.core.Base'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('southwestCommand', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the command definition that's displayed in the South position (bottom) of the marking menu. Setting this to null indicates that the South position should be empty. This can also return or be set with a MarkingMenu object which is used to have a sub-menu. New marking menus can be created using the create method and then assigned to the desired position in the marking menu.
+    Object.defineProperty(adsk.core.RadialMarkingMenu.prototype, 'southCommand', {
+        get : function () {
+            var result = this._execute('southCommand');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Base) : null;
+        },
+        set : function (value) {
+            if (value !== null && !(value instanceof adsk.core.Base)) { throw new TypeError('value must be a adsk.core.Base'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('southCommand', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the command definition that's displayed in the Southeast position (bottom-right) of the marking menu. Setting this to null indicates that the Southeast position should be empty. This can also return or be set with a MarkingMenu object which is used to have a sub-menu. New marking menus can be created using the create method and then assigned to the desired position in the marking menu.
+    Object.defineProperty(adsk.core.RadialMarkingMenu.prototype, 'southeastCommand', {
+        get : function () {
+            var result = this._execute('southeastCommand');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Base) : null;
+        },
+        set : function (value) {
+            if (value !== null && !(value instanceof adsk.core.Base)) { throw new TypeError('value must be a adsk.core.Base'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('southeastCommand', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // This is used to create a sub-menu in a marking menu. This method creates a new, empty marking menu which can then be assigned to a position in the displayed marking menu to define the sub-menu.
+    // text : The text that will be displayed in the parent menu to access this menu.
+    // Returns the newly created marking menu or null in the case of a failure.
+    adsk.core.RadialMarkingMenu.prototype.create = function (text) {
+        if (text === undefined || text === null || text.constructor !== String) { throw new TypeError('text must be a string'); }
+        var args = {
+            text : text
+        };
+        var result = this._execute('create', args);
+        return (result && result.value) ? adsk.createObject(result.value, adsk.core.RadialMarkingMenu) : null;
+    };
+
+    // Completely clears the contents of the marking menu. If left in this state, the marking menu will not be displayed.
+    // Returns true if the clear was successful.
+    adsk.core.RadialMarkingMenu.prototype.clear = function () {
+        var result = this._execute('clear');
         return result ? result.value : undefined;
     };
 
@@ -3807,6 +4118,203 @@
         };
         var result = this._execute('add', args);
         return (result && result.value) ? adsk.createObject(result.value, adsk.core.Workspace) : null;
+    };
+
+    //=========== AngleValueCommandInput ============
+    // Represents a command input that gets an angle from the user. This displays an entry in the command dialog where the user can enter a value and also displays a manipulator in the graphics window to allow them to graphically set the value. The input box is displayed in the dialog when the isVisible property of the command input is true. The manipulator is displayed in the graphics when both the isVisible and isEnabled properties are true.
+    adsk.core.AngleValueCommandInput = function AngleValueCommandInput(handle) {
+        if (!(this instanceof adsk.core.AngleValueCommandInput)) {
+            return adsk.core.AngleValueCommandInput.cast(handle);
+        }
+        adsk.core.CommandInput.call(this, handle);
+    };
+    adsk.core.AngleValueCommandInput.prototype = Object.create(adsk.core.CommandInput.prototype);
+    adsk.core.AngleValueCommandInput.prototype.constructor = adsk.core.AngleValueCommandInput;
+    adsk.core.AngleValueCommandInput.classType = function classType () {
+        return 'adsk::core::AngleValueCommandInput';
+    };
+    adsk.core.AngleValueCommandInput.interfaceId = 'adsk.core.AngleValueCommandInput';
+    adsk.objectTypes['adsk.core.AngleValueCommandInput'] = adsk.core.AngleValueCommandInput;
+    adsk.core.AngleValueCommandInput.cast = function (object) {
+        return object instanceof adsk.core.AngleValueCommandInput ? object : null;
+    };
+
+    // Gets and sets the current value of the command input. The value is in radians but will be displayed to the user in degrees. Setting this value can fail if the input value is not within the minimum and maximum value range. The isValidExpression property should be checked before using the value within the command because if the expression can't be evaluated there isn't a valid value. Fusion won't allow the execution of a command that contains ValueCommandInput object with invalid expressions so you can dependably use the value in the execute event of the command.
+    Object.defineProperty(adsk.core.AngleValueCommandInput.prototype, 'value', {
+        get : function () {
+            var result = this._execute('value');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (!isFinite(value)) { throw new TypeError('value must be a number'); }
+            var args = {
+                value : Number(value)
+            };
+            var result = this._execute('value', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets or sets the expression displayed in the input field. This can contain equations and references to parameters but must result in a valid angle expression. If units are not specified as part of the expression, the default user units of degrees are used.
+    Object.defineProperty(adsk.core.AngleValueCommandInput.prototype, 'expression', {
+        get : function () {
+            var result = this._execute('expression');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (value === undefined || value === null || value.constructor !== String) { throw new TypeError('value must be a string'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('expression', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets minimum value, if any, that the value can be. The value is in radians. When getting this property you should first check the hasMinimumValue property to see if this property applies. Also, the isMinimumValueInclusive indicates if the minimum includes this value or will be up to this value. Setting this value will change the isMinimumValueInclusive to True and the hasMinimumValue property to True if hasMinimumValue is currently False, otherwise it will just update the value.
+    Object.defineProperty(adsk.core.AngleValueCommandInput.prototype, 'minimumValue', {
+        get : function () {
+            var result = this._execute('minimumValue');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (!isFinite(value)) { throw new TypeError('value must be a number'); }
+            var args = {
+                value : Number(value)
+            };
+            var result = this._execute('minimumValue', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets if there is a minimum value for this command input. When setting this property, it is only valid to set it to False to remove the minimum value. Setting the minimumValue property will result in this property being set to True.
+    Object.defineProperty(adsk.core.AngleValueCommandInput.prototype, 'hasMinimumValue', {
+        get : function () {
+            var result = this._execute('hasMinimumValue');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (typeof value !== 'boolean') { throw new TypeError('value must be a boolean'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('hasMinimumValue', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets if the value of the input includes the minimum value or is up to the minimum value. For example, if the minimum value is zero and this property is True, the minimum value can be zero. If this is False, the minimum value must be greater than zero. When the minimum value is first defined using the minimumValue property, this property is set to True. The value returned by this property is only meaningful when the hasMinimumValue property returns True.
+    Object.defineProperty(adsk.core.AngleValueCommandInput.prototype, 'isMinimumValueInclusive', {
+        get : function () {
+            var result = this._execute('isMinimumValueInclusive');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (typeof value !== 'boolean') { throw new TypeError('value must be a boolean'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('isMinimumValueInclusive', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets maximum value, if any, that the value can be. The value is in radians. When getting this property you should first check the hasMaximumValue property to see if this property applies. Also, the isMaximumValueInclusive indicates if the minimum includes this value or will be up to this value. Setting this value will change the isMaximumValueInclusive to True and the hasMaximumValue property to True if hasMaximumValue is currently False, otherwise it will just update the value.
+    Object.defineProperty(adsk.core.AngleValueCommandInput.prototype, 'maximumValue', {
+        get : function () {
+            var result = this._execute('maximumValue');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (!isFinite(value)) { throw new TypeError('value must be a number'); }
+            var args = {
+                value : Number(value)
+            };
+            var result = this._execute('maximumValue', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets if there is a maximum value for this command input. When setting this property, it is only valid to set it to False to remove the maximum value. Setting the maximumValue property will result in this property being set to True.
+    Object.defineProperty(adsk.core.AngleValueCommandInput.prototype, 'hasMaximumValue', {
+        get : function () {
+            var result = this._execute('hasMaximumValue');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (typeof value !== 'boolean') { throw new TypeError('value must be a boolean'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('hasMaximumValue', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets if the value of the input includes the maximum value or is up to the maximum value. For example, if the maximum value is the value of pi (180 degrees) and this property is True, the maximum value can be pi. If this is False, the minimum value must be less than pi. When the maximum value is first defined using the maximumValue property, this property is set to True. The value returned by this property is only meaninful when the hasMaximumValue property returns True.
+    Object.defineProperty(adsk.core.AngleValueCommandInput.prototype, 'isMaximumValueInclusive', {
+        get : function () {
+            var result = this._execute('isMaximumValueInclusive');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (typeof value !== 'boolean') { throw new TypeError('value must be a boolean'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('isMaximumValueInclusive', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets the origin point of the manipulator in the model space of the root component. To set the origin use the setManipulator method.
+    Object.defineProperty(adsk.core.AngleValueCommandInput.prototype, 'manipulatorOrigin', {
+        get : function () {
+            var result = this._execute('manipulatorOrigin');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Point3D) : null;
+        }
+    });
+
+    // Gets the X direction of the manipulator in the model space of the root component. The X direction is the 0 angle direction. This direction, along with the Y direction vector define the plane that the manipulator is displayed on. To set the direction use the setManipulator method.
+    Object.defineProperty(adsk.core.AngleValueCommandInput.prototype, 'manipulatorXDirection', {
+        get : function () {
+            var result = this._execute('manipulatorXDirection');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Vector3D) : null;
+        }
+    });
+
+    // Gets the Y direction of the manipulator in the model space of the root component. The X and Y direction vectors define the plane that the manipulator is displayed on. To set the direction use the setManipulator method.
+    Object.defineProperty(adsk.core.AngleValueCommandInput.prototype, 'manipulatorYDirection', {
+        get : function () {
+            var result = this._execute('manipulatorYDirection');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Vector3D) : null;
+        }
+    });
+
+    // Returns true if the current expression is valid and can be evaluated. If this is false, the value returned should be ignored because there currently is not a valid value.
+    Object.defineProperty(adsk.core.AngleValueCommandInput.prototype, 'isValidExpression', {
+        get : function () {
+            var result = this._execute('isValidExpression');
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Defines the position and orientation of the manipulator. The manipulator is only visible when both the isVisible and isEnabled properties are true. If those properties are true and the setManipulator has not been called, the manipulator will be displayed in a default location (0,0,0) using default directions; x direction (1,0,0) and y direction (0,1,0). Because of that the input is typically set to be invisible and/or disabled and then enabled once enough input has been specified that you can display the manipulator in the desired location.
+    // origin : Defines the center position of the manipulator in root component space.
+    // xDirection : Defines the X direction of the manipulator in root component space. The X direction is the 0 angle direction. This direction, along with the Y direction vector define the plane that the manipulator is displayed on.
+    // yDirection : Defines the Y direction of the manipulator in root component space. The X and Y direction vectors define the plane the manipulator is displayed one. When the manipulator is rotated from the xDirection vector towards the yDirection vector that is the positive direction.
+    // Returns true if successful.
+    adsk.core.AngleValueCommandInput.prototype.setManipulator = function (origin, xDirection, yDirection) {
+        if (origin !== null && !(origin instanceof adsk.core.Point3D)) { throw new TypeError('origin must be a adsk.core.Point3D'); }
+        if (xDirection !== null && !(xDirection instanceof adsk.core.Vector3D)) { throw new TypeError('xDirection must be a adsk.core.Vector3D'); }
+        if (yDirection !== null && !(yDirection instanceof adsk.core.Vector3D)) { throw new TypeError('yDirection must be a adsk.core.Vector3D'); }
+        var args = {
+            origin : (origin === null ? origin : origin.handle),
+            xDirection : (xDirection === null ? xDirection : xDirection.handle),
+            yDirection : (yDirection === null ? yDirection : yDirection.handle)
+        };
+        var result = this._execute('setManipulator', args);
+        return result ? result.value : undefined;
     };
 
     //=========== BoolValueCommandInput ============
@@ -5455,8 +5963,8 @@
         return result ? result.value : undefined;
     };
 
-    // Adds a command input to a particular cell in the table. Rows are automatically added to the table to able to contain the command input. The command input can span multiple columns within a row and spanning across multiple rows is not currently supported. The command input must be created using the CommandInputs collection obtained using the childCommandInputs property of this TableCommandInput. If the cell already has a commandInput associated with it, this will replace the existing commandInput.
-    // input : The command input to associate to a cell. The command input must be created using the CommandInputs collection obtained using the childCommandInputs property of this TableCommandInput.
+    // Adds a command input to a particular cell in the table. Rows are automatically added to the table to able to contain the command input. The command input can span multiple columns within a row and spanning across multiple rows is not currently supported. The command input is created in the standard way but when it's added to the table using this method it will be displayed in the table instead of the main area of the dialog.
+    // input : The command input to associate to a cell. The command input is created in the standard way but when it's added to the table using this method it will be displayed in the table instead of the main area of the dialog.
     // row : The row index of the cell where 0 is the first row.
     // column : The column index of the cell where 0 is the first column.
     // rowSpan : The number of additional rows that this input uses. The default value of 0 indicates that now additional rows are used. Row spanning is not currently supported so this value must always be 0.
@@ -5536,7 +6044,7 @@
     };
 
     // Adds a new command input to the toolbar at the bottom of the table.
-    // input : Adds a command input to the toolbar at the bottom of the table. The inputs are displayed in the same order that they're added. The command input must be created using the CommandInputs collection obtained using the childCommandInputs property of this TableCommandInput.
+    // input : Adds a command input to the toolbar at the bottom of the table. The inputs are displayed in the same order that they're added. The command input is created in the standard way but when it's added to the table using this method it will be displayed in the table instead of the main area of the dialog.
     //
     adsk.core.TableCommandInput.prototype.addToolbarCommandInput = function (input) {
         if (input !== null && !(input instanceof adsk.core.CommandInput)) { throw new TypeError('input must be a adsk.core.CommandInput'); }

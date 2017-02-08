@@ -421,6 +421,47 @@
         return result ? result.value : undefined;
     };
 
+    // This registers a new CustomEvent which is intended to be primarily used used to send an event from a worker thread you've created back to your add-in running in the primary thread. It's also possible that two add-ins could be cooperating and another add-in can fire the event to your add-in.
+    // eventId : This serves as the unique ID for this event and is used by the worker thread or other add-in to identify which custom event to fire using the fireCustomEvent method.
+    // Returns the registered CustomEvent or null in the case of failure, which would typically be because the provided eventId is not unique.
+    adsk.core.Application.prototype.registerCustomEvent = function (eventId) {
+        if (eventId === undefined || eventId === null || eventId.constructor !== String) { throw new TypeError('eventId must be a string'); }
+        var args = {
+            eventId : eventId
+        };
+        var result = this._execute('registerCustomEvent', args);
+        return (result && result.value) ? adsk.createObject(result.value, adsk.core.CustomEvent) : null;
+    };
+
+    // Fires a previously registered custom event. This method is used by a worker thread or another add-in to fire an event to the add-in that registered the event and is running in the primary thread. Firing a custom event does not immediately result in the event handler being called. When a custom event is fired the event is put on the queue and will be handled in the main thread when Fusion is idle.
+    // eventId : The ID of the custom event you want to fire.
+    // additionalInfo : Any additional information you want to pass through the event to the add-in in the primary thread.
+    // Returns true if the event was successfully added to the event queue. A value of true does not indicate that the event was fired and handled but only that it's been put on the primary thread's event queue to be fired when application is idle.
+    adsk.core.Application.prototype.fireCustomEvent = function (eventId, additionalInfo) {
+        if (eventId === undefined || eventId === null || eventId.constructor !== String) { throw new TypeError('eventId must be a string'); }
+        if (additionalInfo === null || (additionalInfo !== undefined && additionalInfo.constructor !== String)) { throw new TypeError('additionalInfo must be a string'); }
+        var args = {
+            eventId : eventId
+        };
+        if (additionalInfo !== undefined) {
+            args.additionalInfo = additionalInfo;
+        }
+        var result = this._execute('fireCustomEvent', args);
+        return result ? result.value : undefined;
+    };
+
+    // Unregisters an existing CustomEvent.
+    // eventId : Th unique ID of the custom event you want to unregister.
+    // Returns True if the unregister succeeded.
+    adsk.core.Application.prototype.unregisterCustomEvent = function (eventId) {
+        if (eventId === undefined || eventId === null || eventId.constructor !== String) { throw new TypeError('eventId must be a string'); }
+        var args = {
+            eventId : eventId
+        };
+        var result = this._execute('unregisterCustomEvent', args);
+        return result ? result.value : undefined;
+    };
+
     //=========== Attribute ============
     // Represents an attribute associated with a specific entity, Product, or Document. An attribute is a named value.
     adsk.core.Attribute = function Attribute(handle) {
@@ -472,11 +513,19 @@
         }
     });
 
-    // Returns the parent entity this attribute is associated with. This can return null in some cases. For example a BRepEdge might have been consumed by a fillet feature but can come back if the model is rolled back or the fillet is deleted.
+    // Returns the parent entity this attribute is associated with. This can return null in some cases. For example a BRepEdge might have been consumed by a fillet feature but can come back if the model is rolled back or the fillet is deleted. It's possible that the original parent that an attribute was placed on has been split. For example, if an attribute is placed on a face and then a slot is created that cuts the face into two pieces and the attribute is available from each face. In this case the parent property will return the "primary" face, which in most cases is somewhat arbitrary. You can get the other entities the attribute is associated with by using the otherParents property.
     Object.defineProperty(adsk.core.Attribute.prototype, 'parent', {
         get : function () {
             var result = this._execute('parent');
             return (result && result.value) ? adsk.createObject(result.value, adsk.core.Base) : null;
+        }
+    });
+
+    // In the case where the entity the attribute was originally placed on has been split, this property will return the other entities the attribute is associated with. For example, if an attribute is placed on a face and then a slot is created that cuts the face into two pieces and the attribute is available from both faces. The parent property returns the "primary" entity and this property returns any other entities, if any. If there aren't any other associated entities the ObjectCollection returned will be empty.
+    Object.defineProperty(adsk.core.Attribute.prototype, 'otherParents', {
+        get : function () {
+            var result = this._execute('otherParents');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.ObjectCollection) : null;
         }
     });
 
@@ -1210,7 +1259,7 @@
 
     // Creates and opens a new document of the specified type.
     // documentType : A value from the DocumentTypes enum that specifies the type of document to create.
-    // visible : Optional argument specifying is the document should be visible or not.
+    // visible : Optional argument specifying is the document should be visible or not. Currently, documents can only be created visibly so this argument must always be true.
     // options : Various options that are supported that are specific to the document type. See the documentation for the DocumentTypes enum for information about the options supported for the various types.
     // Returns the created document
     adsk.core.Documents.prototype.add = function (documentType, visible, options) {
@@ -1244,7 +1293,7 @@
 
     // Opens an item that has previously been saved.
     // dataFile : The item to open.
-    // visible : Specifies if the document should be opened visibly or not.
+    // visible : Specifies if the document should be opened visibly or not. Currently, documents can only be opened visibly so this argument must always be true.
     // Returns the open document or null if the open failed.
     adsk.core.Documents.prototype.open = function (dataFile, visible) {
         if (dataFile !== null && !(dataFile instanceof adsk.core.DataFile)) { throw new TypeError('dataFile must be a adsk.core.DataFile'); }
@@ -2538,6 +2587,18 @@
             resultValue[resultIter] = (result.value[resultIter] !== undefined) ? adsk.createObject(result.value[resultIter], adsk.core.Attribute) : null;
         }
         return resultValue
+    };
+
+    // Deletes the specified set of entities that are associated with this product.
+    // entities : An ObjectCollection containing the list of entities to delete.
+    // Returns True if any of the entities provided in the list were deleted. If entities were specified that can't be deleted or aren't owned by this product, they are ignored.
+    adsk.core.Product.prototype.deleteEntities = function (entities) {
+        if (entities !== null && !(entities instanceof adsk.core.ObjectCollection)) { throw new TypeError('entities must be a adsk.core.ObjectCollection'); }
+        var args = {
+            entities : (entities === null ? entities : entities.handle)
+        };
+        var result = this._execute('deleteEntities', args);
+        return result ? result.value : undefined;
     };
 
     //=========== ProductPreferences ============
