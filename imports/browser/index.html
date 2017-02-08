@@ -1,121 +1,177 @@
 <template name="webClientLayout">
-    <div id='body'>
-        <h1>Fusion Microservice Worker</h1>
-        <div>
-            <h2>Manually send an API request</h2> {{> api_test}}
-        </div>
-        <div>
-            <h2>API messages received in last 10 min</h2> {{> monitor_api}}
-        </div>
-        <div>
-            <h2>Agents</h2> {{> agent_table }}
-        </div>
+
+  {{> topbar}} {{> sidebar}}
+
+  <div id='body' class="container">
+    <div class='row' style='height:100%'>
+      <div class="col s3" id='scriptsPane'>{{> scripts}}</div>
+      <div class="col s9" id='codePane'>{{> code}}</div>
     </div>
+  </div>
+</template>
+
+<template name="scripts">
+  <!-- <div class="container"> -->
+  <div id='scriptsPaneHeading'>
+    Your scripts
+    <a id='newScript' class="btn-floating waves-effect waves-light red"><i class="tiny material-icons">add</i>
+  </a>
+  </div>
+  <div class="collection">
+    {{ #each scripts}}
+    <a href="#!" class="collection-item {{active}}">{{name}}</a> {{ /each}}
+  </div>
+  <!-- </div> -->
+</template>
+
+<template name="code">
+  {{#with activeScript}}
+  <div>
+    <ul class="collapsible" data-collapsible="accordion">
+      <li>
+        <div class="collapsible-header"><i class="material-icons">settings</i>Settings</div>
+        <div class="collapsible-body">
+          {{> codeSettings}}
+        </div>
+      </li>
+      <li>
+        <div class="collapsible-header"><i class="material-icons">code</i>Code</div>
+        <div class="collapsible-body">
+          {{> codeExecute}}
+          <div > {{> CodeMirror id="scriptBody" name="someName" options=editorOptions reactiveVar="scriptBody"}}
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+  {{/with}}
+</template>
+
+<template name="codeExecute">
+  <div style="margin:5px">
+    <a id="runScript" class="waves-effect waves-light btn">
+      <i class="material-icons left">play_arrow</i>Run</a>
+  </div>
+</template>
+
+
+<template name="codeSettings">
+  <div class="row">
+    <div class="input-field col s6">
+      <input placeholder="Placeholder" id="script_name" type="text" class="validate" value="{{name}}">
+      <label class="active" for="script_name">Script Name</label>
+    </div>
+  </div>
+  <a id="deleteScript" class="waves-effect waves-light btn"><i class="material-icons left">delete</i>Delete</a>
 </template>
 
 <template name="scriptingLayout">
-    <h1>Fusion360 Code Station</h1>
-    <div>
-        <h2>Script</h2> {{> scripting}}
-    </div>
-    <div>
-        <h2>Agents</h2> {{> agent_table }}
-    </div>
+  <h1>Fusion360 Code Station</h1>
+  <div>
+    <h2>Script</h2> {{> scripting}}
+  </div>
+  <div>
+    <h2>Agents</h2> {{> agent_table }}
+  </div>
 </template>
 
 <template name='sidebar'>
-    <div id='sidebar'>
-        {{> loginButtons}}
+  <div id='sidebar'>
+    <div class='row'>
+      <div class='sidebarNav' id='scriptNavButton'>
+        <img src='/images/punchcard.png'> Scripts
+      </div>
     </div>
+    <div class='row'>
+      <div id='loginContainer'>
+        {{> loginButtons}}
+      </div>
+    </div>
+  </div>
 </template>
 
 <template name='topbar'>
-    <div id='topbar'>
-    </div>
+  <div id='topbar'>
+    <h1> shift </h1>
+    <h2> microservices for additive design </h2>
+  </div>
 </template>
 
-
 <template name="api_test">
-    <div>
+  <div>
     <textarea type="textarea" id="data" placeholder="Enter JSON to send" cols="60" rows="10">
     </textarea>
-    </div>
-    <button id="send">Send JSON</button>
-    <div>
-        <h3>Response:</h3> {{ response }}
-        <!-- {{ #with response }} -->
-    </div>
+  </div>
+  <button id="send">Send JSON</button>
+  <div>
+    <h3>Response:</h3> {{ response }}
+    <!-- {{ #with response }} -->
+  </div>
 </template>
 
 <template name="scripting">
-    <div>
-    <textarea type="textarea" id="script" placeholder="// enter your Fusion360 script here" cols="60"
-              rows="10">{{default_script}}
+  <div>
+    <textarea type="textarea" id="script" placeholder="// enter your Fusion360 script here" cols="60" rows="10">{{default_script}}
     </textarea>
-    </div>
-    {{> agent_dropdown}}
-    <button id="send">Run Script</button>
+  </div>
+  {{> agent_dropdown}}
+  <button id="send">Run Script</button>
 </template>
 
 <template name="agent_dropdown">
-    <select class="form-control" id="select_agent">
-        <option disabled="disabled" selected="selected" value="NA">Please Select</option>
-        {{#each agents}}
-            {{#if status}}
-                <option value="{{_id}}">{{name}}</option>
-            {{/if}}
-        {{/each}}
-    </select>
+  <select class="form-control" id="select_agent">
+    <option disabled="disabled" selected="selected" value="NA">Please Select</option>
+    {{#each agents}} {{#if status}}
+    <option value="{{_id}}">{{name}}</option>
+    {{/if}} {{/each}}
+  </select>
 </template>
 
 <template name="monitor_api">
-    <div>
-        <table>
-            <thead>
-            <th>Reception time</th>
-            <th>Content</th>
-            </thead>
-            <tbody>
-            {{ #each last_messages}}
-            <tr>
-                <td> {{ time }} </td>
-                <td> {{ content }} </td>
-            </tr>
-            {{ /each}}
-            </tbody>
-        </table>
-    </div>
+  <div>
+    <table>
+      <thead>
+        <th>Reception time</th>
+        <th>Content</th>
+      </thead>
+      <tbody>
+        {{ #each last_messages}}
+        <tr>
+          <td> {{ time }} </td>
+          <td> {{ content }} </td>
+        </tr>
+        {{ /each}}
+      </tbody>
+    </table>
+  </div>
 </template>
 
 
 <template name="agent_table">
-    <div>
-        <table>
-            <thead>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Last Seen</th>
-            <th>Factory</th>
-            <th>Foreman</th>
-            </thead>
-            <tbody>
-            {{ #each agents}}
-            <tr>
-                <td> {{ name }} </td>
-                <td style="text-align:center"> {{ status }} </td>
-                <td> {{ formattedLastSeen }} </td>
-                <td> {{ factory }} </td>
-                <td> {{ foreman }} </td>
-            </tr>
-            {{ /each}}
-            </tbody>
-        </table>
-    </div>
+  <div>
+    <table>
+      <thead>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Last Seen</th>
+        <th>Factory</th>
+        <th>Foreman</th>
+      </thead>
+      <tbody>
+        {{ #each agents}}
+        <tr>
+          <td> {{ name }} </td>
+          <td style="text-align:center"> {{ status }} </td>
+          <td> {{ formattedLastSeen }} </td>
+          <td> {{ factory }} </td>
+          <td> {{ foreman }} </td>
+        </tr>
+        {{ /each}}
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <template name="parameters_browser">
-    {{#with limbforge}}
-        length: {{ length }}
-        filet: {{ filet }}
-    {{/with}}
+  {{#with limbforge}} length: {{ length }} filet: {{ filet }} {{/with}}
 </template>

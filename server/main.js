@@ -17,6 +17,7 @@ import { CadMake } from '/imports/cadmake.js';
 import { check } from 'meteor/check';
 import opn from 'opn';
 import Agent from '/imports/api/agents.js';
+import Script from '/imports/api/scripts.js';
 import '/imports/startup.js';
 import '/imports/api/agent-factory.js';
 import '/imports/api/agent-mock.js';

@@ -26,6 +26,14 @@ let Agent = Class.create({
       type: Date,
       optional: true
     },
+    autodeskAccount: {
+      type: String,
+      optional: true
+    },
+    userId: {
+      type: String,
+      optional: true
+    },
     _script: {
       type: String,
       optional: true

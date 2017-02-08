@@ -8,8 +8,18 @@ export default Params = Class.create({
   name: 'Param',
   collection: params,
   fields: {
-    name: String,
-    value: Number
+    name: {
+    	type: String,
+    	optional: true
+    },
+    value: {
+    	type: Number,
+    	optional: true
+    },
+    userId: {
+    	type: String,
+    	optional: true
+    }
   },
   secured: false
 });
