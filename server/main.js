@@ -23,6 +23,8 @@ import '/imports/api/agent-factory.js';
 import '/imports/api/agent-mock.js';
 import '/imports/api/job-queue.js';
 import Params from '/imports/parameters.js';
+import 'meteor/yogiben:mixpanel';
+
 
 const settings = Meteor.settings.AWS;
 

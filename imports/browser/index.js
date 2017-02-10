@@ -81,6 +81,7 @@ Template.agent_dropdown.helpers({
 });
 
 Session.setDefault('script', 'var app = adsk.core.Application.get();\nvar ui = app.userInterface;\nui.messageBox("FusionFiddle by FATHOM");');
+
 Template.scripting.events({
   'click #send' (event, template) {
     var script = template.find('#script').value;
@@ -117,6 +118,7 @@ Template.scripts.events({
     Session.set('activeScript', this._id);
   },
   'click #newScript' (event) {
+    mixpanel.track('script.new');
     var script = new Script();
     script.name = 'new script';
     script.userId = Meteor.userId();
@@ -129,8 +131,13 @@ Template.scripts.events({
 Template.codeExecute.events({
   'click #runScript' (event) {
     var agent = Agent.findOne({});
+    if (!agent) {
+      console.error('No connected agent found for autodesk ID '+Meteor.user().emails[0].address);
+      return;
+    }
     agent._script = Session.get('scriptBody');
     agent._runOnce = true;
+    mixpanel.track('script.execute');
     agent.save();
   }
 })
@@ -138,8 +145,6 @@ Template.codeExecute.events({
 Template.code.helpers({
   activeScript() {
     $('.collapsible').collapsible();
-    // var editor = CodeMirrors["scriptBody"];
-    // editor.refresh(); // or whatever
     var script = Script.findOne(Session.get('activeScript'));
     Session.set('scriptBody', script.code);
     Tracker.autorun(()=>{
@@ -156,12 +161,17 @@ Template.code.helpers({
   }
 });
 
+Template.code.onRendered(()=>{
+  $('.collapsible').collapsible();
+});
+
 Template.codeSettings.events({
   'change #script_name' (event) {
     this.name = String(event.target.value);
     this.save();
   },
   'click #deleteScript' (event) {
+    mixpanel.track('script.remove');
     this.remove();
   }
 })

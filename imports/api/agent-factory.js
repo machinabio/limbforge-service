@@ -8,6 +8,8 @@ let Api = new Restivus({
 
 Api.addRoute('retrieveId/:adskAccount', {
   get: function() {
+    // mixpanel('worker.checkin', { autodeskAccount: this.urlParams.adskAccount, ip: this.request.headers.host });
+    // mixpanel.track('worker.checkin');
     var done = this.done;
     var response = this.response;
     // console.log(this);
@@ -17,15 +19,17 @@ Api.addRoute('retrieveId/:adskAccount', {
     });
     var agent = Agent.findOne({ autodeskAccount: this.urlParams.adskAccount });
     if (!agent) {
+      // mixpanel('worker.new', { autodeskAccount: this.urlParams.adskAccount, ip: this.request.headers.host });
+      // mixpanel.track('worker.new');
       agent = new Agent();
-      agent.name = namor.generate({ words: 2, numbers: 3, manly: true });
+      agent.name = namor.generate({ words: 3, numbers: 4, manly: true });
       agent.autodeskAccount = this.urlParams.adskAccount;
-      try {
-        console.log('looking up account by email ' + agent.autodeskAccount);
-        agent.userId = Accounts.findUserByEmail(agent.autodeskAccount)._id;
-      } catch (e) {
-
-      }
+    }
+    try {
+      console.log('looking up account by email ' + agent.autodeskAccount);
+      agent.userId = Accounts.findUserByEmail(agent.autodeskAccount)._id;
+    } catch (e) {
+      console.error('failed to find a matching autodeskAccount');
     }
     agent.foreman = Meteor.settings.shift.foreman.name;
     agent.save(() => {
