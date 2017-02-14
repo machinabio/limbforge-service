@@ -37,8 +37,11 @@
       <li>
         <div class="collapsible-header"><i class="material-icons">code</i>Code</div>
         <div class="collapsible-body">
-          {{> codeExecute}}
-          <div > {{> CodeMirror id="scriptBody" name="someName" options=editorOptions reactiveVar="scriptBody"}}
+          <div style="margin:5px">
+            <a id="runScript" class="waves-effect waves-light btn">
+              <i class="material-icons left">play_arrow</i>Run</a>
+          </div>
+          <div> {{> CodeMirror id="scriptBody" name="someName" options=editorOptions reactiveVar="scriptBody"}}
           </div>
         </div>
       </li>

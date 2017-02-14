@@ -8,8 +8,8 @@ Meteor.startup(function() {
       "Name": user.emails[0].address,
 
       // special mixpanel property names
-      "$email": user.emails[0].address,
-      "$created": user.createdAt.toISOString()
+      // "$created": user.createdAt.toISOString(),
+      "$email": user.emails[0].address
     }
 
     mixpanel.people.set(person);

@@ -128,7 +128,7 @@ Template.scripts.events({
   }
 })
 
-Template.codeExecute.events({
+Template.code.events({
   'click #runScript' (event) {
     var agent = Agent.findOne({});
     if (!agent) {
