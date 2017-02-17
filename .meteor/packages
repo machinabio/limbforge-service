@@ -34,3 +34,4 @@ accounts-password@1.3.3
 materialize:materialize
 perak:codemirror
 yogiben:mixpanel
+gantrim:meteor-json-view-materialize

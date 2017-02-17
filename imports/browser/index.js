@@ -9,6 +9,186 @@ import './index.html';
 import moment from 'moment';
 import Params from '/imports/parameters.js';
 
+Session.setDefault('activeTab', 'scripting');
+
+Template.webClientLayout.onRendered(() => {
+  Tracker.autorun(() => {
+    BlazeLayout.render("webClientLayout", {
+      body: Session.get('activeTab')
+    });
+  });
+});
+
+Template.scriptList.helpers({
+  scripts() {
+    return Script.find({});
+  },
+  active() {
+    return this._id == Session.get('activeScript') ? "active" : "";
+  }
+});
+
+Template.scriptList.events({
+  'click .collection-item' (event) {
+    Session.set('activeScript', this._id);
+  },
+  'click #newScript' (event) {
+    mixpanel.track('script.new');
+    var script = new Script();
+    script.name = 'new script';
+    script.userId = Meteor.userId();
+    script.save(() => {
+      Session.set('activeScript', script._id);
+    });
+  }
+})
+
+Template.code.events({
+  'click #runScript' (event) {
+    var agent = Agent.findOne({});
+    if (!agent) {
+      console.error('No connected agent found for autodesk ID ' + Meteor.user().emails[0].address);
+      return;
+    }
+    agent._script = Session.get('scriptBody');
+    agent._runOnce = true;
+    mixpanel.track('script.execute');
+    agent.save();
+  }
+})
+
+Template.code.helpers({
+  activeScript() {
+    $('.collapsible').collapsible();
+    var script = Script.findOne(Session.get('activeScript'));
+    Session.set('scriptBody', script.code);
+    Session.set('cloud_params', script.parameters);
+    Tracker.autorun(() => {
+      script.code = Session.get('scriptBody');
+      script.parameters = Session.get('cloud_params');
+      script.save();
+    });
+    return script;
+  },
+  codeEditorOptions() {
+    return {
+      lineNumbers: true,
+      mode: "javascript",
+      autofocus: true
+    }
+  }
+});
+
+Template.code.onRendered(() => {
+  $('.collapsible').collapsible();
+  debugger
+  CodeMirrors["scriptBody"].refresh();
+});
+
+Template.code.onCreated(() => {
+  $('.collapsible').collapsible();
+  // CodeMirrors["scriptBody"].refresh();
+});
+
+Template.codeSettings.events({
+  'change #script_name' (event) {
+    this.name = String(event.target.value);
+    this.save();
+  },
+  'click #deleteScript' (event) {
+    mixpanel.track('script.remove');
+    this.remove();
+  }
+});
+
+Template.script_publish.events({
+  'change #script_published' (event) {
+    this.published = event.target.checked;
+    this.save();
+  }
+});
+
+Template.script_publish.helpers({
+  published() {
+    return this.published;
+  }
+});
+
+Template.agent_list.onRendered(() => {
+  $('select').material_select();
+});
+
+Template.agent_list.helpers({
+  cloud_agents() {
+    return Agent.find({});
+  },
+  status() {
+    // return this.online;
+    return true;
+  }
+});
+
+
+Template.debug_api.helpers({
+  paramEditorOptions() {
+    return {
+      lineNumbers: false,
+      mode: {
+        name: "javascript",
+        json: true
+      },
+      autofocus: true
+    }
+  }
+});
+
+// Template.debug_api.onRendered(()=>{
+// });
+
+Template.navbar.helpers({
+  scriptActive() {
+    return Session.get('activeTab') == 'scripting' ? "grey lighten-2" : "";
+  },
+  workgangActive() {
+    return Session.get('activeTab') == 'workgang' ? "grey lighten-2" : "";
+  }
+});
+
+Template.navbar.events({
+  'click #workgangtNavButton' (event) {
+    mixpanel.track('nav.workgang');
+    Session.set('activeTab', 'workgang');
+  },
+  'click #scriptNavButton' (event) {
+    mixpanel.track('nav.scripting');
+    Session.set('activeTab', 'scripting');
+  }
+});
+
+
+/** OLD TEMPLATES
+
+Template.scripting.events({
+  'click #send' (event, template) {
+    var script = template.find('#script').value;
+    var agent_id = template.find('#select_agent').value;
+    if (agent_id == 'NA') {
+      window.alert('You need to select an agent before running');
+      return
+    }
+    var agent = Agent.findOne(agent_id);
+    agent._script = script;
+    agent._runOnce = true;
+    agent.save();
+    Session.setPersistent('script', script);
+  }
+});
+
+Template.scripting.helpers({
+  default_script() {
+    return Session.get('script');
+  }
+});
 Template.api_test.events({
   'click #send' (event, template) {
     var data = EJSON.parse(template.find('#data').value);
@@ -79,99 +259,4 @@ Template.agent_dropdown.helpers({
     return status;
   }
 });
-
-Session.setDefault('script', 'var app = adsk.core.Application.get();\nvar ui = app.userInterface;\nui.messageBox("FusionFiddle by FATHOM");');
-
-Template.scripting.events({
-  'click #send' (event, template) {
-    var script = template.find('#script').value;
-    var agent_id = template.find('#select_agent').value;
-    if (agent_id == 'NA') {
-      window.alert('You need to select an agent before running');
-      return
-    }
-    var agent = Agent.findOne(agent_id);
-    agent._script = script;
-    agent._runOnce = true;
-    agent.save();
-    Session.setPersistent('script', script);
-  }
-});
-
-Template.scripting.helpers({
-  default_script() {
-    return Session.get('script');
-  }
-});
-
-Template.scripts.helpers({
-  scripts() {
-    return Script.find({});
-  },
-  active() {
-    return this._id == Session.get('activeScript') ? "active" : "";
-  }
-});
-
-Template.scripts.events({
-  'click .collection-item' (event) {
-    Session.set('activeScript', this._id);
-  },
-  'click #newScript' (event) {
-    mixpanel.track('script.new');
-    var script = new Script();
-    script.name = 'new script';
-    script.userId = Meteor.userId();
-    script.save(() => {
-      Session.set('activeScript', script._id);
-    });
-  }
-})
-
-Template.code.events({
-  'click #runScript' (event) {
-    var agent = Agent.findOne({});
-    if (!agent) {
-      console.error('No connected agent found for autodesk ID '+Meteor.user().emails[0].address);
-      return;
-    }
-    agent._script = Session.get('scriptBody');
-    agent._runOnce = true;
-    mixpanel.track('script.execute');
-    agent.save();
-  }
-})
-
-Template.code.helpers({
-  activeScript() {
-    $('.collapsible').collapsible();
-    var script = Script.findOne(Session.get('activeScript'));
-    Session.set('scriptBody', script.code);
-    Tracker.autorun(()=>{
-      script.code = Session.get('scriptBody');
-      script.save();
-    });
-    return script;
-  },
-  editorOptions() {
-    return {
-      lineNumbers: true,
-      mode: "javascript"
-    }
-  }
-});
-
-Template.code.onRendered(()=>{
-  $('.collapsible').collapsible();
-});
-
-Template.codeSettings.events({
-  'change #script_name' (event) {
-    this.name = String(event.target.value);
-    this.save();
-  },
-  'click #deleteScript' (event) {
-    mixpanel.track('script.remove');
-    this.remove();
-  }
-})
+**/

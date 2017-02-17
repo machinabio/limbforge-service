@@ -16,6 +16,14 @@ const Script = Class.create({
     userId: {
       type: String,
       optional: true
+    },
+    parameters: {
+      type: String,
+      optional: true
+    },
+    published: {
+      type: Boolean,
+      optional: true
     }
   },
   behaviors: {},

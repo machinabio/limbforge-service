@@ -30,6 +30,10 @@ let Agent = Class.create({
       type: String,
       optional: true
     },
+    online: {
+      type: Boolean,
+      optional: true
+    },
     userId: {
       type: String,
       optional: true
@@ -94,10 +98,10 @@ if (Meteor.isFusion360) {
           // suppress reloading during the save
           var agent = Agent.findOne(id);
           agent.lastSeen = new Date();
-          
-          Agent._watchdogs.set(id, true); 
+
+          Agent._watchdogs.set(id, true);
           agent.save(() => { Agent._watchdogs.set(id, false); });
-          
+
           Meteor.setTimeout(heartbeat, 3000);
         }.bind(this);
         heartbeat();

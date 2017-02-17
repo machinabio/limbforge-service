@@ -1,62 +1,58 @@
 <template name="webClientLayout">
-
-  {{> topbar}} {{> sidebar}}
-
-  <div id='body' class="container">
-    <div class='row' style='height:100%'>
-      <div class="col s3" id='scriptsPane'>{{> scripts}}</div>
-      <div class="col s9" id='codePane'>{{> code}}</div>
-    </div>
+  {{> topbar}} {{> navbar}}
+  <div id='body'>
+    {{> Template.dynamic template=body}}
+    <!-- {{> scripting}} -->
   </div>
 </template>
 
-<template name="scripts">
-  <!-- <div class="container"> -->
-  <div id='scriptsPaneHeading'>
-    Your scripts
-    <a id='newScript' class="btn-floating waves-effect waves-light red"><i class="tiny material-icons">add</i>
-  </a>
+<template name="scripting">
+  <div class='row' style='height:available'>
+    {{> scriptList}} {{> code}}
   </div>
-  <div class="collection">
-    {{ #each scripts}}
-    <a href="#!" class="collection-item {{active}}">{{name}}</a> {{ /each}}
+</template>
+
+<template name="scriptList">
+  <div class="col s3 grey lighten-2 pinned" id='scriptsPane'>
+    <div id='scriptsPaneHeading'>
+      Your scripts
+      <a id='newScript' class="btn-floating waves-effect waves-light red"><i class="tiny material-icons">add</i></a>
+    </div>
+    <div class="collection">
+      {{ #each scripts}}
+      <a href="#!" class="collection-item {{active}}">{{name}}</a> {{ /each}}
+    </div>
+
   </div>
-  <!-- </div> -->
 </template>
 
 <template name="code">
-  {{#with activeScript}}
-  <div>
-    <ul class="collapsible" data-collapsible="accordion">
-      <li>
-        <div class="collapsible-header"><i class="material-icons">settings</i>Settings</div>
-        <div class="collapsible-body">
-          {{> codeSettings}}
-        </div>
-      </li>
-      <li>
-        <div class="collapsible-header"><i class="material-icons">code</i>Code</div>
-        <div class="collapsible-body">
-          <div style="margin:5px">
-            <a id="runScript" class="waves-effect waves-light btn">
-              <i class="material-icons left">play_arrow</i>Run</a>
+  <div class="col s9" id='codePane'>
+    {{#with activeScript}}
+    <div>
+      <ul class="collapsible" data-collapsible="accordion">
+        <li>
+          <div class="collapsible-header"><i class="material-icons">settings</i>Settings</div>
+          <div class="collapsible-body">
+            {{> codeSettings}}
           </div>
-          <div> {{> CodeMirror id="scriptBody" name="someName" options=editorOptions reactiveVar="scriptBody"}}
+        </li>
+        <li>
+          <div class="collapsible-header active"><i class="material-icons">code</i>Code</div>
+          <div class="collapsible-body">
+            <div style="margin:5px">
+              <a id="runScript" class="waves-effect waves-light btn">
+                <i class="material-icons left">play_arrow</i>Run</a>
+            </div>
+            <div> {{> CodeMirror id="scriptBody" name="scriptBody" options=codeEditorOptions reactiveVar="scriptBody"}}
+            </div>
           </div>
-        </div>
-      </li>
-    </ul>
-  </div>
-  {{/with}}
-</template>
-
-<template name="codeExecute">
-  <div style="margin:5px">
-    <a id="runScript" class="waves-effect waves-light btn">
-      <i class="material-icons left">play_arrow</i>Run</a>
+        </li>
+      </ul>
+    </div>
+    {{/with}}
   </div>
 </template>
-
 
 <template name="codeSettings">
   <div class="row">
@@ -66,23 +62,69 @@
     </div>
   </div>
   <a id="deleteScript" class="waves-effect waves-light btn"><i class="material-icons left">delete</i>Delete</a>
-</template>
-
-<template name="scriptingLayout">
-  <h1>Fusion360 Code Station</h1>
-  <div>
-    <h2>Script</h2> {{> scripting}}
-  </div>
-  <div>
-    <h2>Agents</h2> {{> agent_table }}
+  <div class="section">
+    {{> script_publish}}
   </div>
 </template>
 
-<template name='sidebar'>
+<template name="script_publish">
+  <label>Publish</label>
+  <div class="switch row">
+    <label>
+      Off
+      <input type="checkbox" id="script_published" checked={{published}}>
+      <span class="lever"></span> On
+    </label>
+  </div>
+  {{#if published}} {{> debug_api}} {{/if}}
+</template>
+
+<template name="debug_api">
+  <div class="row">
+    <label>Cloud agent</label>
+    <div class="row">
+      <div class="col s6">
+        {{> agent_list}}
+      </div>
+      <div class="col s6 valign-wrapper">
+        <div style="margin:5px" class="valign">
+          <a id="runCloudScript" class="waves-effect waves-light btn">
+            <i class="material-icons left">play_arrow</i>Run on cloud</a>
+        </div>
+      </div>
+    </div>
+    <label>Parameters for API call to script</label>
+    <div class="row input-field col s12">
+      <div class="row">
+        {{> CodeMirror id="cloud_params" name="cloud_params" options=paramEditorOptions reactiveVar="cloud_params"}}
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="agent_list">
+  <select id="cloud_agent">
+    <option value="" disabled selected>Choose your agent</option>
+    {{#each cloud_agents}} {{#if status}}
+    <option value="{{_id}}">{{name}}</option>
+    {{/if}} {{/each}}
+  </select>
+</template>
+
+<template name='navbar'>
   <div id='sidebar'>
     <div class='row'>
-      <div class='sidebarNav' id='scriptNavButton'>
-        <img src='/images/punchcard.png'> Scripts
+      <div class='sidebarNav {{scriptActive}}'>
+        <a href="" id='scriptNavButton'>
+          <img src='/images/punchcard.png'> Scripts
+        </a>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='sidebarNav {{workgangActive}}' id='workgangtNavButton'>
+        <a href="" id='workgangtNavButton'>
+          <img src='/images/robot.png'> Workgang
+        </a>
       </div>
     </div>
     <div class='row'>
@@ -94,9 +136,66 @@
 </template>
 
 <template name='topbar'>
-  <div id='topbar'>
+  <div id='topbar' class='pinned amber lighten-1'>
     <h1> shift </h1>
     <h2> microservices for additive design </h2>
+  </div>
+</template>
+
+<template name="workgang">
+  <div class="col s3 grey lighten-2 pinned" id='scriptsPane'>
+    <div id='scriptsPaneHeading'>
+      Your Agents
+      <a id='newAgent' class="btn-floating waves-effect waves-light red"><i class="tiny material-icons">add</i></a>
+    </div>
+    <div class="collection">
+      {{ #each agents}}
+      <a href="#!" class="collection-item {{active}}">{{name}}</a> {{ /each}}
+    </div>
+  </div>
+</template>
+
+<template name='agentStatus'>
+  <div class="col s9" id='codePane'>
+    {{#with activeAgent}}
+    <div>
+      <ul class="collapsible" data-collapsible="accordion">
+        <li>
+          <div class="collapsible-header"><i class="material-icons">settings</i>Settings</div>
+          <div class="collapsible-body">
+            {{> agentSettings}}
+          </div>
+        </li>
+        <li>
+          <div class="collapsible-header active"><i class="material-icons">code</i>Code</div>
+          <div class="collapsible-body">
+            {{> agentStatus}}
+          </div>
+        </li>
+      </ul>
+    </div>
+    {{/with}}
+  </div>
+</template>
+
+
+<template name="agentSettings">
+  <div class="row">
+    <div class="input-field col s6">
+      <input placeholder="Placeholder" id="script_name" type="text" class="validate" value="{{name}}">
+      <label class="active" for="script_name">Agent Name</label>
+    </div>
+  </div>
+</template>
+
+
+<!-- <template name="scriptingLayout">
+  <h1>Fusion360 Code Station</h1>
+  <div>
+    <h2>Script</h2> {{> scripting}}
+  </div>
+  <div>
+    <h2>Agents</h2> {{> agent_table }}
   </div>
 </template>
 
@@ -108,7 +207,7 @@
   <button id="send">Send JSON</button>
   <div>
     <h3>Response:</h3> {{ response }}
-    <!-- {{ #with response }} -->
+    {{ #with response }}
   </div>
 </template>
 
@@ -177,4 +276,4 @@
 
 <template name="parameters_browser">
   {{#with limbforge}} length: {{ length }} filet: {{ filet }} {{/with}}
-</template>
+</template> -->

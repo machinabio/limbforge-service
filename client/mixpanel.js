@@ -8,8 +8,9 @@ Meteor.startup(function() {
       "Name": user.emails[0].address,
 
       // special mixpanel property names
-      // "$created": user.createdAt.toISOString(),
+      "$created": user.createdAt.toISOString(),
       "$email": user.emails[0].address
+      // "$id": xxxxx.getAutodeskId(); // want to get the adsk user hash ... 
     }
 
     mixpanel.people.set(person);

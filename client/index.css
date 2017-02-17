@@ -13,15 +13,10 @@
 }
 
 #topbar {
-  position: fixed;
-  left: 0px;
-  top: 0px;
-  width: 100%;
-  height: 80px;
-  padding: 10px 10px 10px 10px;
+  padding: 15px;
 }
 
-#topbar h1{
+#topbar h1 {
   font-weight: 600;
   font-size: 60px;
   line-height: 0.9;
@@ -29,7 +24,7 @@
   margin: 0px 0px 0px 0px;
 }
 
-#topbar h2{
+#topbar h2 {
   font-weight: 200;
   font-size: 20px;
   margin: 0px 0px 0px 0px;
@@ -37,32 +32,34 @@
 
 #sidebar {
   position: fixed;
-  left: 0px;
-  top: 100px;
-  width: 140px;
+  width: 160px;
   height: 100%;
-  background: #CCCCCC;
   text-align: center;
   z-index: 1;
 }
 
 #body {
-  position: fixed;
-  left: 140px;
-  top: 100px;
-  width: 100%;
+  position: relative;
+  padding-left: 160px;
   height: 100%;
-  background: #EEEEEE;
+  width: 100%;
 }
 
-#loginContainer {
-  width: 140px;
-  text-align: center;
+#pin {
+  position: absolute;
+  bottom: 0px;
 }
 
 #scriptsPane {
-  background: #DDDDDD;
-  height: 100%;
+  /*position: absolute;*/
+
+  /*position: relative;*/
+  /*height: available;*/
+}
+
+#loginContainer {
+  width: 160px;
+  text-align: center;
 }
 
 #scriptsPaneHeading {
@@ -86,13 +83,20 @@
   text-align: center;
 }
 
+.sidebarNav .active {
+  background: #DDDDDD;
+}
+
 .sidebarNav img {
   display: block;
-  width: 140px;
+  width: 160px;
   padding: 30px 30px 10px 30px;
 }
 
-.CodeMirror {
+#scriptBody {
   height: 500px;
 }
 
+#cloud_params {
+  height: 100px;
+}
