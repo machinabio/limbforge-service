@@ -2,6 +2,7 @@ import { Class } from 'meteor/jagi:astronomy';
 import { Enum } from 'meteor/jagi:astronomy';
 import '/imports/fusionUtilities.js';
 import namor from 'namor';
+import { Session } from 'meteor/session'
 
 const Status = Enum.create({
   name: 'Status',
@@ -32,6 +33,14 @@ let Agent = Class.create({
     },
     online: {
       type: Boolean,
+      optional: true
+    },
+    remote: {
+      type: Boolean,
+      optional: true
+    },
+    ping: {
+      type: String,
       optional: true
     },
     userId: {
@@ -80,42 +89,63 @@ if (Meteor.isServer) {
 }
 
 if (Meteor.isFusion360) {
-  Agent._watchdogs = new Map();
-  Agent.checkWatchdog = function checkWatchdog(e) {
-    var id = e.currentTarget._id;
-    switch (Agent._watchdogs.get(id)) {
-      case true:
-        // It's only watchdog being reset, so don't reload anything on the client 
-        e.preventDefault();
-        break;
-      case false:
-        // It's something other than the watchdog, so proceed with the reload
-        break;
-      case undefined:
-        // There's no watchdog configured for this agent, so set one up
-        Agent._watchdogs.set(id, false);
-        var heartbeat = function heartbeat() {
-          // suppress reloading during the save
-          var agent = Agent.findOne(id);
-          agent.lastSeen = new Date();
+  //TODO Change the watchdog cycle so it's initiated from the server
+  // 1. the client should setup an Autorun.tracker on Agent._ping
+  // 2. The server sets the Agent._ping to a random value.
+  // 3. client sets agent.lastSeen;
 
-          Agent._watchdogs.set(id, true);
-          agent.save(() => { Agent._watchdogs.set(id, false); });
+  // Agent._watchdogs = new Map();
+  // Agent.checkWatchdog = function checkWatchdog(e) {
+  //   var id = e.currentTarget._id;
+  //   switch (Agent._watchdogs.get(id)) {
+  //     case true:
+  //       // It's only watchdog being reset, so don't reload anything on the client 
+  //       e.preventDefault();
+  //       break;
+  //     case false:
+  //       // It's something other than the watchdog, so proceed with the reload
+  //       break;
+  //     case undefined:
+  //       // There's no watchdog configured for this agent, so set one up
+  //       Agent._watchdogs.set(id, false);
+  //       var heartbeat = function heartbeat() {
+  //         // suppress reloading during the save
+  //         var agent = Agent.findOne(id);
+  //         agent.lastSeen = new Date();
 
-          Meteor.setTimeout(heartbeat, 3000);
-        }.bind(this);
-        heartbeat();
-        break;
-    };
-  }.bind(Agent);
+  //         Agent._watchdogs.set(id, true);
+  //         agent.save(() => { Agent._watchdogs.set(id, false); });
+
+  //         Meteor.setTimeout(heartbeat, 1000);
+  //       }.bind(this);
+  //       heartbeat();
+  //       break;
+  //   };
+  // }.bind(Agent);
+
+  var watchdog = function watchdog(id) {
+    console.log('called watchdog agent id ' + id);
+    let agent = Agent.findOne(id);
+    agent.lastSeen = new Date();
+    agent.save();
+  }
+
+  Agent.initialize = function initialize(id) {
+    console.log('initializing agent '+id);
+    Session.set('agentId', id);
+    Agent.find(id, { ping: true }).observeChanges({ changed: watchdog })
+  };
 
   Agent.extend({
     events: {
-      afterInit: Agent.checkWatchdog
+      // afterInit: Agent.checkWatchdog,
+      // afterFind: Agent.setupWatchdog
     },
     helpers: {}
   });
 
 }
+
+
 
 export default Agent;

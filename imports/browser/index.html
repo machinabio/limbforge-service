@@ -13,7 +13,7 @@
 </template>
 
 <template name="scriptList">
-  <div class="col s3 grey lighten-2 pinned" id='scriptsPane'>
+  <div class="col s3 grey lighten-2" id='scriptsPane'>
     <div id='scriptsPaneHeading'>
       Your scripts
       <a id='newScript' class="btn-floating waves-effect waves-light red"><i class="tiny material-icons">add</i></a>
@@ -81,6 +81,12 @@
 
 <template name="debug_api">
   <div class="row">
+    <label>Endpoint URL</label>
+    <div class="row">
+      <div class="col s12">
+        {{ url }}
+      </div>
+    </div>
     <label>Cloud agent</label>
     <div class="row">
       <div class="col s6">
@@ -136,7 +142,7 @@
 </template>
 
 <template name='topbar'>
-  <div id='topbar' class='pinned amber lighten-1'>
+  <div id='topbar' class='amber lighten-1'>
     <h1> shift </h1>
     <h2> microservices for additive design </h2>
   </div>

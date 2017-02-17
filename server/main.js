@@ -45,8 +45,45 @@ let Api = new Restivus({
 var microserverReady = true;
 
 Api.addRoute('healthcheck', {
-  get: function () {
-    return { statusCode:  microserverReady ? 200 : 404 };
+  get: function() {
+    if (microserverReady) {
+      return 'ok';
+    } else {
+      return {
+        statusCode: 503,
+        body: 'busy'
+      };
+    }
+  },
+  post: function() {
+    if (microserverReady) {
+      return 'ok';
+    } else {
+      return {
+        statusCode: 503,
+        body: 'busy'
+      };
+    }
+  }
+});
+
+Api.addRoute('rex/:hash', {
+  post: function() {
+    let script = Script.findOne({ _md5: this.urlParams.hash, published: true });
+    if (script) {
+      return "Called endpoint for " + script.name
+    } else {
+      return {
+        statusCode: 501,
+        body: 'Not found'
+      }
+    }
+  },
+  get: function() {
+    return {
+      statusCode: 405,
+      body: 'GET method not supported'
+    };
   }
 });
 
@@ -71,7 +108,7 @@ Api.addRoute('limbforge', {
     });
 
     // opn("fusion360://command=open&file=UUID.stl&id=mytester&privateInfo=" + EJSON.stringify(data));
-    return 'OK';
+    return 'ok';
   }
 });
 

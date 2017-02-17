@@ -6,17 +6,16 @@ import './index.html'
 if (Meteor.isFusion360) {
   // Loading the Fusion API's on a web browsers causes errors.
   import '/imports/fusion360/api/';
-  // Session.setDefault('agentId', null);
-  Session.set('agentId', null);
   Meteor.subscribe('fusion', adsk.core.Application.get().userName);
 };
 
 Template.fusionClientLayout.helpers({
   agent() {
-    let agent = Agent.findOne(Session.get('agentId'));
+    var agent = Agent.findOne(Session.get('agentId'));
     if (agent._runningScript) {
       agent._runningScript = false;
     }
+    agent.online = true;
     agent.save();
     return agent
   },
@@ -38,16 +37,6 @@ Template.fusionClientLayout.helpers({
       this._runningScript = false;
       this.save();
     }
-  }
-});
-
-Template.fusionClientLayout.onCreated(() => {
-  if (Session.equals('agentId', null)) {
-    Meteor.call("printLog", "...retrieving agentId");
-    HTTP.get('/api/retrieveId/' + adsk.core.Application.get().userName, (err, res) => {
-      // Session.setPersistent('agentId', res.content);
-      Session.set('agentId', res.content);
-    });
   }
 });
 

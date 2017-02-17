@@ -9,6 +9,8 @@ import './index.html';
 import moment from 'moment';
 import Params from '/imports/parameters.js';
 
+import md5 from 'md5';
+
 Session.setDefault('activeTab', 'scripting');
 
 Template.webClientLayout.onRendered(() => {
@@ -18,6 +20,14 @@ Template.webClientLayout.onRendered(() => {
     });
   });
 });
+
+// Template.topbar.onRendered(() => {
+//   this.$('#topbar').pushpin();
+// });
+
+// Template.topbar.onCreated(() => {
+//   this.pushpin();
+// });
 
 Template.scriptList.helpers({
   scripts() {
@@ -45,9 +55,9 @@ Template.scriptList.events({
 
 Template.code.events({
   'click #runScript' (event) {
-    var agent = Agent.findOne({});
+    var agent = Agent.findOne({remote: false});
     if (!agent) {
-      console.error('No connected agent found for autodesk ID ' + Meteor.user().emails[0].address);
+      console.error('No local agent found for autodesk ID ' + Meteor.user().emails[0].address);
       return;
     }
     agent._script = Session.get('scriptBody');
@@ -81,7 +91,6 @@ Template.code.helpers({
 
 Template.code.onRendered(() => {
   $('.collapsible').collapsible();
-  debugger
   CodeMirrors["scriptBody"].refresh();
 });
 
@@ -120,7 +129,7 @@ Template.agent_list.onRendered(() => {
 
 Template.agent_list.helpers({
   cloud_agents() {
-    return Agent.find({});
+    return Agent.find({remote: true, online: true});
   },
   status() {
     // return this.online;
@@ -139,8 +148,16 @@ Template.debug_api.helpers({
       },
       autofocus: true
     }
+  },
+  url() {
+    //TODO generate the MD5 in the astronomy class for scripts...
+    this._md5 = md5(this._id);;
+    this.save();
+
+    return 'http://fusion360.io/api/rex/'+this._md5;
   }
 });
+
 
 // Template.debug_api.onRendered(()=>{
 // });

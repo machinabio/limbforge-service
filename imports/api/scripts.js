@@ -24,6 +24,10 @@ const Script = Class.create({
     published: {
       type: Boolean,
       optional: true
+    },
+    _md5: {
+      type: String,
+      optional: true
     }
   },
   behaviors: {},
