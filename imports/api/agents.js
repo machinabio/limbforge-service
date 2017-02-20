@@ -133,7 +133,7 @@ if (Meteor.isFusion360) {
   Agent.initialize = function initialize(id) {
     console.log('initializing agent '+id);
     Session.set('agentId', id);
-    Agent.find(id, { ping: true }).observeChanges({ changed: watchdog })
+    Agent.find(id, {fields { ping: true }}).observeChanges({ changed: watchdog })
   };
 
   Agent.extend({
