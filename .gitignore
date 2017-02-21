@@ -2,5 +2,5 @@
 .AppleDouble
 .LSOverride
 
-settings.json
+settings*
 node_modules/

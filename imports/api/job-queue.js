@@ -7,10 +7,22 @@ jobs.rawCollection().ensureIndex('lockedAt', () => {});
 jobs.rawCollection().ensureIndex('name', () => {});
 jobs.rawCollection().ensureIndex('priority', () => {});
 
-export const Queue = new Agenda({
+const Queue = new Agenda({
   mongo: jobs.rawDatabase(),
   db: {
     collection: agendaCollectionNAme
   }
 });
+
+// Meteor.startup(function() {
+  Queue.on('ready', () => {
+    console.log('Starting Queue');
+    Queue.start();
+  });
+
+  Queue.on('error', (error) => {
+    console.log('Error starting Queue', error);
+  });
+// });
+export default Queue;
 
