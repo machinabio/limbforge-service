@@ -9,9 +9,9 @@ import { Random } from 'meteor/random';
 import humanInterval from 'human-interval';
 import Queue from '/imports/api/job-queue.js';
 
-const purgeLimit = humanInterval('17.5 seconds'); // seconds until an agent is considered "dead" and purged
-const agentWatchdogTick = humanInterval('5 seconds'); // check each active agent's status every 2 seconds 
-const agentTimeout = humanInterval('7.5 seconds'); // 5 seconds until an agent is considered "offline"
+const purgeLimit = humanInterval('5 minutes'); // seconds until an agent is considered "dead" and purged
+const agentWatchdogTick = humanInterval('1 seconds'); // check each active agent's status every 2 seconds 
+const agentTimeout = humanInterval('2.5 seconds'); // 5 seconds until an agent is considered "offline"
 
 if (Meteor.isClient) throw Error('tried importing agent-factory.js on client');
 
@@ -113,24 +113,29 @@ Api.addRoute('retrieveAgent', {
 });
 
 
+
+
 /**
 Tasks
 */
 
+Queue.processEvery('0.5 second');
 
-Queue.define('check_agents', Meteor.bindEnvironment((job, done) => {
-  agents = Agent.find({}).fetch();
-  console.log('checking watchdogs for ' + agents.length + ' agents');
-  agents.forEach((agent) => {
-    // console.log('...scheduling watchdog check: ', agent);
-    Queue.now('check_agent', agent._id);
-  });
-}));
+Queue.define(
+  'check_agents', 
+  { lockLifetime:  500},
+  Meteor.bindEnvironment((job, done) => {
+    agents = Agent.find({}).fetch();
+    console.log('checking watchdogs for ' + agents.length + ' agents');
+    agents.forEach((agent) => {
+      // console.log('...scheduling watchdog check: ', agent);
+      Queue.now('check_agent', agent._id);
+    });
+  }));
 
 Queue.define('check_agent', Meteor.bindEnvironment((job, done) => {
   console.log("Watchdog : ", job.attrs.data);
   let agent = Agent.findOne(job.attrs.data);
-  // let agent = job.attrs.data;
   let sinceLastSighting = new Date() - agent.lastSeen;
 
   console.log("Watchdog : " + agent._id);
@@ -139,13 +144,6 @@ Queue.define('check_agent', Meteor.bindEnvironment((job, done) => {
 
   if (sinceLastSighting > purgeLimit) {
     agent.remove();
-    job.remove((err) => {
-      if (!err) {
-        console.log("Successfully remove watchdog for agent id: " + job.attrs.data.agent_id);
-      } else {
-        console.error("Error removing watchdog for agent id: " + job.attrs.data.agent_id, err);
-      }
-    })
     return;
   }
 
@@ -159,5 +157,7 @@ Queue.define('check_agent', Meteor.bindEnvironment((job, done) => {
   agent.save();
 }));
 
-let job = Queue.every(agentWatchdogTick, 'check_agents');
-// console.log('setting up watchdog job: ', job);
+Queue.create('check_agents', {})
+  .unique({})
+  .repeatEvery(agentWatchdogTick)
+  .save();

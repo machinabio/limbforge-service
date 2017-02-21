@@ -14,15 +14,13 @@ const Queue = new Agenda({
   }
 });
 
-// Meteor.startup(function() {
-  Queue.on('ready', () => {
-    console.log('Starting Queue');
-    Queue.start();
-  });
+Queue.on('ready', () => {
+  console.log('Starting Queue');
+  Queue.start();
+});
 
-  Queue.on('error', (error) => {
-    console.log('Error starting Queue', error);
-  });
-// });
+Queue.on('error', (error) => {
+  console.log('Error starting Queue', error);
+});
+
 export default Queue;
-
