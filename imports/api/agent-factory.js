@@ -8,10 +8,11 @@ import Transaction from '/imports/models/transaction.js';
 import { Random } from 'meteor/random';
 import humanInterval from 'human-interval';
 import Queue from '/imports/api/job-queue.js';
+import Script from '/imports/api/scripts.js';
 
-const purgeLimit = humanInterval('5 minutes'); // seconds until an agent is considered "dead" and purged
-const agentWatchdogTick = humanInterval('1 seconds'); // check each active agent's status every 2 seconds 
-const agentTimeout = humanInterval('2.5 seconds'); // 5 seconds until an agent is considered "offline"
+const purgeLimit = humanInterval('30 seconds'); // seconds until an agent is considered "dead" and purged
+const agentWatchdogTick = humanInterval('3 seconds'); // check each active agent's status every 2 seconds 
+const agentTimeout = humanInterval('7 seconds'); // 5 seconds until an agent is considered "offline"
 
 if (Meteor.isClient) throw Error('tried importing agent-factory.js on client');
 
@@ -112,52 +113,100 @@ Api.addRoute('retrieveAgent', {
   }
 });
 
-
-
-
-/**
-Tasks
-*/
-
 Queue.processEvery('0.5 second');
-
 Queue.define(
-  'check_agents', 
-  { lockLifetime:  500},
+  'agent_check_all', { lockLifetime: 500 },
   Meteor.bindEnvironment((job, done) => {
     agents = Agent.find({}).fetch();
     console.log('checking watchdogs for ' + agents.length + ' agents');
     agents.forEach((agent) => {
-      // console.log('...scheduling watchdog check: ', agent);
-      Queue.now('check_agent', agent._id);
+      Queue.create('agent_check', agent._id)
+        .unique({ id: agent._id })
+        .schedule('now')
+        .save();
     });
   }));
 
-Queue.define('check_agent', Meteor.bindEnvironment((job, done) => {
-  console.log("Watchdog : ", job.attrs.data);
-  let agent = Agent.findOne(job.attrs.data);
-  let sinceLastSighting = new Date() - agent.lastSeen;
+Queue.define(
+  'agent_check',
+  Meteor.bindEnvironment((job, done) => {
+    let agent = Agent.findOne(job.attrs.data);
+    let sinceLastSighting = new Date() - agent.lastSeen;
 
-  console.log("Watchdog : " + agent._id);
-  console.log("...last seen at " + agent.lastSeen);
-  console.log('...' + sinceLastSighting + " ms ago");
+    // console.log("Watchdog : " + agent._id);
+    // console.log("...last seen at " + agent.lastSeen);
+    // console.log('...' + sinceLastSighting + " ms ago");
 
-  if (sinceLastSighting > purgeLimit) {
-    agent.remove();
-    return;
-  }
+    if (sinceLastSighting > purgeLimit) {
+      agent.remove();
+      job.remove();
+      return;
+    }
 
-  if (sinceLastSighting > agentTimeout) {
-    agent.online = false;
+    agent.ping = Random.id();
+    if (sinceLastSighting > agentTimeout) {
+      agent.online = false;
+    }
     agent.save();
+
     return;
+  })
+);
+
+Meteor.methods({
+  rex_enqueue(params) {
+    // if (!this.userId) {
+    //   throw Meteor.Error('User must be logged in to call "rex_enqueue"')
+    // }
+
+    console.log('MeteorMethod rex_enqueue', params);
+    let transaction = new Transaction();
+    transaction.data = params.data;
+    transaction.script_id = params.script_id;
+    transaction.user_id = Script.findOne(transaction.script_id).userId;
+    transaction.save();
+    console.log('MeteorMethod rex_enqueue transaction', transaction);
+    Queue.now('script_rex', transaction._id);
+    return transaction._id;
   }
+});
 
-  agent.ping = Random.id();
-  agent.save();
-}));
+Queue.define(
+  'script_rex',
+  Meteor.bindEnvironment((job, done) => {
+    console.log('Agenda scriptRex', job.attrs.data);
 
-Queue.create('check_agents', {})
+    //check for a free agent
+    let agents = Agent.find({ foreman: Meteor.settings.shift.foreman.name, remote: true, online: true, _runningScript: false }).fetch();
+
+    if (agents.length == 0) {
+      console.log('No free agents, rescheduling in 1 s');
+      job.schedule('in 1 second');
+      job.save();
+      return
+    }
+
+    // console.log('Found an agent, scheduling transaction ', job.attrs.data);
+
+    // There's a free agent... lets pick one and move on
+    let agent = agents[Math.floor(Math.random() * agents.length)];
+    let transaction = Transaction.findOne(job.attrs.data);
+
+    let script = Script.findOne(transaction.script_id);
+    let data = transaction.data;
+
+    transaction.agent = agent._id;
+    transaction.start = new Date();
+    transaction.save();
+    agent.transaction = job.attrs.data;
+    agent._script = script.code;
+    agent._runOnce = true;
+    agent.save();
+    job.remove();
+  })
+);
+
+Queue.create('agent_check_all', {})
   .unique({})
   .repeatEvery(agentWatchdogTick)
   .save();

@@ -24,7 +24,7 @@ import '/imports/api/agent-mock.js';
 import '/imports/api/job-queue.js';
 import Params from '/imports/parameters.js';
 import 'meteor/yogiben:mixpanel';
-
+import Transaction from '/imports/models/transaction.js';
 
 const settings = Meteor.settings.AWS;
 
@@ -69,20 +69,35 @@ Api.addRoute('healthcheck', {
 
 Api.addRoute('rex/:hash', {
   post: function() {
+    console.log('rex id:', this.urlParams.hash);
     let script = Script.findOne({ _md5: this.urlParams.hash, published: true });
     if (script) {
-      return "Called endpoint for " + script.name
+      var data = this.bodyParams ? this.bodyParams : {};
+      console.log('rex data:', data);
+      let params = {
+        script_id: script._id,
+        data: data
+      }
+      this.response.writeHead(200, 'retrieving id', {
+        'Content-Type': 'application/json'
+      });
+      Meteor.call('rex_enqueue', params, (error, result) => {
+        let transaction = Transaction.findOne(result);
+        console.log('rex_enqueue result was ', transaction);
+        this.response.write(EJSON.stringify(transaction));
+        this.done();
+      });
     } else {
       return {
         statusCode: 501,
-        body: 'Not found'
+        body: 'Script not found'
       }
     }
   },
   get: function() {
     return {
       statusCode: 405,
-      body: 'GET method not supported'
+      body: 'GET method not supported. Try POST instead.'
     };
   }
 });
@@ -112,11 +127,11 @@ Api.addRoute('limbforge', {
   }
 });
 
-Meteor.methods({
-  sendToFusion: function(data) {
-    console.log('Sending data: ', data);
-    HTTP.get('http://localhost:3000/api/limbforge', {
-      params: { parameters: EJSON.stringify(data) }
-    })
-  }
-});
+// Meteor.methods({
+//   sendToFusion: function(data) {
+//     console.log('Sending data: ', data);
+//     HTTP.get('http://localhost:3000/api/limbforge', {
+//       params: { parameters: EJSON.stringify(data) }
+//     })
+//   }
+// });

@@ -9,12 +9,33 @@ export default Transaction = Class.create({
   collection: transactions,
   fields: {
     data: {
+    	type: Object,
+    	optional: true
+    },
+    response: {
+      type: String,
+      optional: true,
+      default: undefined
+    },
+    script_id: {
     	type: String,
     	optional: true
     },
-    script: {
-    	type: String,
-    	optional: true
+    start : {
+      type: Date,
+      optional: true
+    },
+    finish: {
+      type: Date,
+      optional: true
+    },
+    agent: {
+      type: String,
+      optional: true
+    },
+    user_id: {
+      type: String,
+      optional: true
     }
   },
   secured: false

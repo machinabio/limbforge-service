@@ -1,6 +1,7 @@
 import Agent from '/imports/api/agents.js';
 import Params from '/imports/parameters.js';
 import namor from 'namor';
+import Transaction from '/imports/models/transaction.js';
 import './index.html'
 
 if (Meteor.isFusion360) {
@@ -26,13 +27,24 @@ Template.fusionClientLayout.helpers({
       this._runningScript = true;
       this.save();
       Meteor.call("printLog", 'running script ', this._script);
-
-      // Using eval() doesn't allow the console debugger to display source or set breakpoints
-      var e = document.createElement('script');
-      e.type = 'text/javascript';
-      e.src = 'data:text/javascript;charset=utf-8,' + encodeURI(this._script);
-      document.head.appendChild(e);
-      e.remove();
+      var transaction = Transaction.findOne(this.transaction);
+      console.log('transaction: ', transaction);
+      // Using eval() doesn't allow the console debugger to display source or set breakpoints'
+      global.Shift = {};
+      Shift.transaction = transaction ? transaction._id : null;
+      Shift.data = transaction ? transaction.data : null;
+      Shift.response = '';
+      // Function(this._script).bind(this)();
+      Function(this._script)();
+      // var e = document.createElement('script');
+      // e.type = 'text/javascript';
+      // e.src = 'data:text/javascript;charset=utf-8,' + encodeURI(this._script);
+      // document.head.appendChild(e);
+      // e.remove();
+      // save the Shift.response property to the transaction. Meteor.call?
+      transaction.finish = new Date();
+      transaction.response = Shift.response;
+      transaction.save();
 
       this._runningScript = false;
       this.save();

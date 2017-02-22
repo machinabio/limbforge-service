@@ -7,22 +7,21 @@
 </template>
 
 <template name="scripting">
-  <div class='row' style='height:available'>
+  <div class='row'>
     {{> scriptList}} {{> code}}
   </div>
 </template>
 
 <template name="scriptList">
-  <div class="col s3 grey lighten-2" id='scriptsPane'>
-    <div id='scriptsPaneHeading'>
-      Your scripts
+  <div class="col s3 grey lighten-2">
+    <div class='collectionHeading'>
+      Your Scripts
       <a id='newScript' class="btn-floating waves-effect waves-light red"><i class="tiny material-icons">add</i></a>
     </div>
     <div class="collection">
       {{ #each scripts}}
       <a href="#!" class="collection-item {{active}}">{{name}}</a> {{ /each}}
     </div>
-
   </div>
 </template>
 
@@ -42,7 +41,7 @@
           <div class="collapsible-body">
             <div style="margin:5px">
               <a id="runScript" class="waves-effect waves-light btn">
-                <i class="material-icons left">play_arrow</i>Run</a>
+                <i class="material-icons left">play_arrow</i>Run on Desktop</a>
             </div>
             <div> {{> CodeMirror id="scriptBody" name="scriptBody" options=codeEditorOptions reactiveVar="scriptBody"}}
             </div>
@@ -62,6 +61,7 @@
     </div>
   </div>
   <a id="deleteScript" class="waves-effect waves-light btn"><i class="material-icons left">delete</i>Delete</a>
+  <a id="copyScript" class="waves-effect waves-light btn">Copy</a>
   <div class="section">
     {{> script_publish}}
   </div>
@@ -87,34 +87,50 @@
         {{ url }}
       </div>
     </div>
-    <label>Cloud agent</label>
+    <label>Cloud agents</label>
     <div class="row">
       <div class="col s6">
-        {{> agent_list}}
+        {{> agent_count}}
       </div>
       <div class="col s6 valign-wrapper">
         <div style="margin:5px" class="valign">
           <a id="runCloudScript" class="waves-effect waves-light btn">
-            <i class="material-icons left">play_arrow</i>Run on cloud</a>
+            <i class="material-icons left">play_arrow</i>Run in Cloud</a>
         </div>
       </div>
     </div>
-    <label>Parameters for API call to script</label>
-    <div class="row input-field col s12">
-      <div class="row">
-        {{> CodeMirror id="cloud_params" name="cloud_params" options=paramEditorOptions reactiveVar="cloud_params"}}
+    <div class="row">
+      <label>Parameters for API call to script</label>
+      <div class="row input-field col s12">
+        <div class="row">
+          {{> CodeMirror id="cloud_params" name="cloud_params" options=paramEditorOptions reactiveVar="cloud_params"}}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <label>API Response</label>
+      <div class="row col s12">
+        <div class="row">
+          {{response}}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
-<template name="agent_list">
+<template name="agent_count">
+  {{count}} cloud agents available
+</template>
+
+<template name="agent_dropdown">
   <select id="cloud_agent">
     <option value="" disabled selected>Choose your agent</option>
-    {{#each cloud_agents}} {{#if status}}
-    <option value="{{_id}}">{{name}}</option>
-    {{/if}} {{/each}}
+    {{#each cloud_agents}} {{> agent_dropdown_item}} {{/each}}
   </select>
+</template>
+
+<template name="agent_dropdown_item">
+  <option value="{{_id}}">{{name}}</option>
 </template>
 
 <template name='navbar'>
@@ -149,36 +165,61 @@
 </template>
 
 <template name="workgang">
-  <div class="col s3 grey lighten-2 pinned" id='scriptsPane'>
-    <div id='scriptsPaneHeading'>
-      Your Agents
-      <a id='newAgent' class="btn-floating waves-effect waves-light red"><i class="tiny material-icons">add</i></a>
-    </div>
-    <div class="collection">
-      {{ #each agents}}
-      <a href="#!" class="collection-item {{active}}">{{name}}</a> {{ /each}}
-    </div>
+  <div class='row'>
+    {{> agentList}} {{> agent_details}}
   </div>
 </template>
 
-<template name='agentStatus'>
-  <div class="col s9" id='codePane'>
-    {{#with activeAgent}}
-    <div>
-      <ul class="collapsible" data-collapsible="accordion">
-        <li>
-          <div class="collapsible-header"><i class="material-icons">settings</i>Settings</div>
-          <div class="collapsible-body">
-            {{> agentSettings}}
-          </div>
-        </li>
-        <li>
-          <div class="collapsible-header active"><i class="material-icons">code</i>Code</div>
-          <div class="collapsible-body">
-            {{> agentStatus}}
-          </div>
-        </li>
-      </ul>
+<template name="agentList">
+  <div class="col s4 grey lighten-2">
+    <div class='collectionHeading'>
+      Your Agents
+      <a id='new_agent' class="btn-floating waves-effect waves-light red"><i class="tiny material-icons">add</i></a>
+    </div>
+    {{>agent_collection }}
+  </div>
+</template>
+
+<template name="agent_collection">
+  <div class="collection">
+    {{ #each agents}} {{> agent_collection_item}} {{ /each}}
+  </div>
+</template>
+
+<template name="agent_collection_item">
+  <a href="#!" class="collection-item {{active}}">{{name}}</a>
+</template>
+
+<template name='agent_details'>
+  <div class="col s8" id='codePane'>
+    {{#with agent}}
+    <label>Name</label>
+    <div class="row">
+      {{name}}
+    </div>
+    <label>Type</label>
+    <div class="row">
+      {{type}}
+    </div>
+    <label>Status</label>
+    <div class="row">
+      {{status}}
+    </div>
+    <label>Running a script</label>
+    <div class="row">
+      {{busy}}
+    </div>
+    <label>Last seen</label>
+    <div class="row">
+      {{last_seen}}
+    </div>
+    <label>Foreman</label>
+    <div class="row">
+      {{foreman}}
+    </div>
+    <label>agent ID</label>
+    <div class="row">
+      {{_id}}
     </div>
     {{/with}}
   </div>

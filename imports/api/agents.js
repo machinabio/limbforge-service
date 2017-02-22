@@ -4,6 +4,7 @@ import '/imports/fusionUtilities.js';
 import namor from 'namor';
 import { Session } from 'meteor/session';
 import { Random } from 'meteor/random';
+import opn from 'opn';
 
 const Status = Enum.create({
   name: 'Status',
@@ -48,13 +49,18 @@ let Agent = Class.create({
       type: String,
       optional: true
     },
+    transaction: {
+      type: String,
+      optional: true
+    },
     _script: {
       type: String,
       optional: true
     },
     _runningScript: {
       type: Boolean,
-      optional: true
+      optional: true,
+      default: false
     },
     _runOnce: {
       type: Boolean,
@@ -87,6 +93,30 @@ if (Meteor.isServer) {
   Agent.extend({
     events: {}
   });
+
+  Meteor.methods({
+    spawn_agent() {
+      var agent_count = Agent.find({ foreman: Meteor.settings.shift.foreman.name, remote: true }).fetch().length;
+
+      if (agent_count >= Meteor.settings.shift.foreman.maxWorkers) {
+        console.log('Too many agents!');
+        return false;
+      } else {
+        console.log('Spawn a new agent (TODO)');
+        return true;
+      }
+    }
+  });
+}
+
+if (Meteor.isClient) {
+  Agent.getLocal = function getLocal() {
+    return Agent.findOne({ online: true, remote: false });
+  };
+  Agent.getCloud = function getCloud() {
+    var ret = Agent.find({ remote: true });
+    return ret;
+  };
 }
 
 if (Meteor.isFusion360) {
@@ -95,7 +125,7 @@ if (Meteor.isFusion360) {
     let agent = Agent.findOne(id);
     agent.lastSeen = new Date();
     agent.save();
-  }
+  };
 
   Agent.initialize = function initialize(id) {
     console.log('initializing agent ' + id);
@@ -108,5 +138,9 @@ if (Meteor.isFusion360) {
     helpers: {}
   });
 }
+
+Agent.spawn = function spawn() {
+  Meteor.call('spawn_agent');
+};
 
 export default Agent;

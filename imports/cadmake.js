@@ -1,4 +1,4 @@
- export const CadMake = new Mongo.Collection('cadmake');
+ // export const CadMake = new Mongo.Collection('cadmake');
 
  // if (!CadMake.findOne({}) && Meteor.isServer) {
  //   console.log('Adding record to cadMake');

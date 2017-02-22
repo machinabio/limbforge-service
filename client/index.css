@@ -56,19 +56,12 @@
   bottom: 0px;
 }
 
-#scriptsPane {
-  /*position: absolute;*/
-
-  /*position: relative;*/
-  /*height: available;*/
-}
-
 #loginContainer {
   width: 160px;
   text-align: center;
 }
 
-#scriptsPaneHeading {
+.collectionHeading {
   font-weight: 300;
   font-size: 20px;
   margin: 5px 5px 5px 5px;
@@ -105,4 +98,8 @@
 
 #cloud_params {
   height: 100px;
+}
+
+#scriptBody {
+  height: 500px;
 }
