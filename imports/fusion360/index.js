@@ -4,6 +4,7 @@ import namor from 'namor';
 import Transaction from '/imports/models/transaction.js';
 import './index.html'
 import { check } from 'meteor/check'
+import { EJSON } from 'meteor/ejson';
 
 if (Meteor.isFusion360) {
   // Loading the Fusion API's on a web browsers causes errors.
@@ -38,7 +39,7 @@ Template.fusionClientLayout.helpers({
       global.Shift = {};
       Shift.transaction = transaction ? transaction._id : null;
       Shift.data = transaction ? transaction.data : null;
-      Shift.response = '';
+      Shift.response = {};
       transaction.start_time = new Date();
       // Function(this._script).bind(this)();
       Function(this._script)();
@@ -49,7 +50,8 @@ Template.fusionClientLayout.helpers({
       // e.remove();
       // save the Shift.response property to the transaction. Meteor.call?
       transaction.finish_time = new Date();
-      transaction.response = Shift.response;
+      transaction.response = EJSON.stringify(Shift.response);
+      console.log("response ", transaction.response)
       transaction.save();
     }
   }

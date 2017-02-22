@@ -69,11 +69,11 @@ Api.addRoute('healthcheck', {
 
 Api.addRoute('rex/:hash', {
   post: function() {
-    console.log('rex id:', this.urlParams.hash);
+    // console.log('rex id:', this.urlParams.hash);
     let script = Script.findOne({ _md5: this.urlParams.hash, published: true });
     if (script) {
       var data = this.bodyParams ? this.bodyParams : {};
-      console.log('rex data:', data);
+      // console.log('rex data:', data);
       let params = {
         script_id: script._id,
         data: data
@@ -81,12 +81,22 @@ Api.addRoute('rex/:hash', {
       this.response.writeHead(200, 'retrieving id', {
         'Content-Type': 'application/json'
       });
-      Meteor.call('rex_enqueue', params, (error, result) => {
-        let transaction = Transaction.findOne(result);
-        console.log('rex_enqueue result was ', transaction);
-        this.response.write(EJSON.stringify(transaction));
-        this.done();
-      });
+      let transaction_id = Meteor.call('rex_enqueue', params);
+      console.log('setting up observe for ', transaction_id);
+      var fiber = Fiber.current;
+      Transaction.find(transaction_id, { fields: { response: true } })
+        .observeChanges({
+          changed: () => {
+            console.log('observed change in response');
+            console.log(transaction_id);
+            let transaction = Transaction.findOne(transaction_id);
+            console.log(transaction);
+            this.response.write(transaction.response);
+            fiber.run(); 
+          }
+        });
+      Fiber.yield(); 
+      this.done();
     } else {
       return {
         statusCode: 501,

@@ -237,7 +237,6 @@ Template.debug_api.helpers({
   response() {
     let transaction = Transaction.findOne(Session.get('transaction_id'));
     if (!transaction) return 'No response';
-
     console.log('Transaction: ', transaction)
     return transaction.response;
   }
