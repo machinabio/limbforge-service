@@ -3,6 +3,7 @@ import Params from '/imports/parameters.js';
 import namor from 'namor';
 import Transaction from '/imports/models/transaction.js';
 import './index.html'
+import { check } from 'meteor/check'
 
 if (Meteor.isFusion360) {
   // Loading the Fusion API's on a web browsers causes errors.
@@ -13,6 +14,7 @@ if (Meteor.isFusion360) {
 Template.fusionClientLayout.helpers({
   agent() {
     var agent = Agent.findOne(Session.get('agentId'));
+    if (!agent) return;
     if (agent._runningScript) {
       agent._runningScript = false;
     }
@@ -23,17 +25,21 @@ Template.fusionClientLayout.helpers({
 
   runScript() {
     if (this._runOnce) {
+      Meteor.call("printLog", 'Fusion360 looking up transaction: ', this.transaction);
+      var transaction = Transaction.findOne(this.transaction);
+      if (!transaction) return;
+      Meteor.call("printLog", 'Fusion360 running transaction: ', transaction);
+      console.log('transaction: ', transaction);
+
       this._runOnce = false;
       this._runningScript = true;
       this.save();
-      Meteor.call("printLog", 'running script ', this._script);
-      var transaction = Transaction.findOne(this.transaction);
-      console.log('transaction: ', transaction);
       // Using eval() doesn't allow the console debugger to display source or set breakpoints'
       global.Shift = {};
       Shift.transaction = transaction ? transaction._id : null;
       Shift.data = transaction ? transaction.data : null;
       Shift.response = '';
+      transaction.start_time = new Date();
       // Function(this._script).bind(this)();
       Function(this._script)();
       // var e = document.createElement('script');
@@ -42,12 +48,9 @@ Template.fusionClientLayout.helpers({
       // document.head.appendChild(e);
       // e.remove();
       // save the Shift.response property to the transaction. Meteor.call?
-      transaction.finish = new Date();
+      transaction.finish_time = new Date();
       transaction.response = Shift.response;
       transaction.save();
-
-      this._runningScript = false;
-      this.save();
     }
   }
 });

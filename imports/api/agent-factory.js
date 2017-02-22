@@ -153,17 +153,25 @@ Queue.define(
   })
 );
 
+/**
+@params data      Object - this is passed to the script being run, accessed via `Shift.data.*`
+@params script_id String - The ID of the script to execute
+@params agent_id  String - (optional) The requested agent
+*/
 Meteor.methods({
   rex_enqueue(params) {
-    // if (!this.userId) {
-    //   throw Meteor.Error('User must be logged in to call "rex_enqueue"')
-    // }
+    if (!this.userId) {
+      console.warn('API REX call with no logged in user');
+
+      // throw Meteor.Error('User must be logged in to call "rex_enqueue"')
+    }
 
     console.log('MeteorMethod rex_enqueue', params);
     let transaction = new Transaction();
     transaction.data = params.data;
     transaction.script_id = params.script_id;
-    transaction.user_id = Script.findOne(transaction.script_id).userId;
+    transaction.user_id = this.userId || Script.findOne(transaction.script_id).userId;
+    transaction.agent_id = params.agent_id;
     transaction.save();
     console.log('MeteorMethod rex_enqueue transaction', transaction);
     Queue.now('script_rex', transaction._id);
@@ -174,33 +182,33 @@ Meteor.methods({
 Queue.define(
   'script_rex',
   Meteor.bindEnvironment((job, done) => {
-    console.log('Agenda scriptRex', job.attrs.data);
+    var transaction = Transaction.findOne(job.attrs.data);
+    var agent;
+    console.log('Agenda scriptRex transaction:', transaction);
+    if (transaction.agent_id) {
+      agent = Agent.findOne(transaction.agent_id);
+    } else {
+      var agents = Agent.find({ foreman: Meteor.settings.shift.foreman.name, remote: true, online: true, _runningScript: false }).fetch();
 
-    //check for a free agent
-    let agents = Agent.find({ foreman: Meteor.settings.shift.foreman.name, remote: true, online: true, _runningScript: false }).fetch();
-
-    if (agents.length == 0) {
-      console.log('No free agents, rescheduling in 1 s');
-      job.schedule('in 1 second');
-      job.save();
-      return
+      if (agents.length == 0) {
+        console.log('No free agents, rescheduling in 1 s');
+        job.schedule('in 1 second');
+        job.save();
+        return
+      }
+      agent = agents[Math.floor(Math.random() * agents.length)];
+      transaction.agent_id = agent._id;
     }
-
-    // console.log('Found an agent, scheduling transaction ', job.attrs.data);
-
-    // There's a free agent... lets pick one and move on
-    let agent = agents[Math.floor(Math.random() * agents.length)];
-    let transaction = Transaction.findOne(job.attrs.data);
-
     let script = Script.findOne(transaction.script_id);
     let data = transaction.data;
 
-    transaction.agent = agent._id;
-    transaction.start = new Date();
+    transaction.queued_time = new Date();
     transaction.save();
-    agent.transaction = job.attrs.data;
+    agent.transaction = transaction._id;
     agent._script = script.code;
     agent._runOnce = true;
+    console.log('Agenda scriptRex transaction:', transaction);
+
     agent.save();
     job.remove();
   })

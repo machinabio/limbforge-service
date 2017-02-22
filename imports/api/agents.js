@@ -120,22 +120,36 @@ if (Meteor.isClient) {
 }
 
 if (Meteor.isFusion360) {
-  let watchdog = function watchdog(id) {
-    console.log('called watchdog agent id ' + id);
-    let agent = Agent.findOne(id);
-    agent.lastSeen = new Date();
-    agent.save();
-  };
-
   Agent.initialize = function initialize(id) {
-    console.log('initializing agent ' + id);
-    Session.set('agentId', id);
-    Agent.find(id, { fields: { ping: true } }).observeChanges({ changed: watchdog })
+    Tracker.autorun((c) => {
+      let agent = Agent.findOne(id);
+      if (agent) {
+        console.log('found an agent! ', agent);
+        c.stop();
+        Meteor.defer(agent.initialize.bind(agent));
+      }
+    });
   };
 
   Agent.extend({
     events: {},
-    helpers: {}
+    helpers: {
+      initialize() {
+        // console.log('initializing agent ' + this);
+        Session.set('agentId', this._id);
+        let cursor = Agent.find(this._id, { fields: { ping: true } })
+        console.log('cursor ',cursor.fetch());
+        // cursor.observeChanges({changed: console.log('called watchdog')});
+        cursor.observeChanges({
+          changed: () => {
+            // console.log('called watchdog agent id ' + this._id);
+            let agent = Agent.findOne(this._id);
+            agent.lastSeen = new Date();
+            agent.save();
+          }
+        });
+      }
+    }
   });
 }
 

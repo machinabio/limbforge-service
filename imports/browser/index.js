@@ -50,17 +50,23 @@ Template.scriptList.events({
 
 Template.code.events({
   'click #runScript' (event) {
-    var agent = Agent.getLocal();
+    let agent = Agent.getLocal();
     if (!agent) {
       console.error('No local agent found for autodesk ID ' + Meteor.user().emails[0].address);
       return;
     }
-    agent._script = Session.get('scriptBody');
-    agent._runOnce = true;
     mixpanel.track('script.execute');
-    agent.save();
+    let params = {
+      script_id: Session.get('activeScript'),
+      agent_id: agent._id,
+      data: {}
+    };
+    Meteor.call('rex_enqueue', params);
+    // agent._script = Session.get('scriptBody');
+    // agent._runOnce = true;
+    // agent.save();
   }
-})
+});
 
 Template.code.helpers({
   activeScript() {
@@ -244,10 +250,9 @@ Template.debug_api.events({
     // var data = {foo:"bar"};
     var data = EJSON.parse(Session.get('cloud_params'));
     Meteor.call("rex_enqueue", { script_id: Session.get('activeScript'), data: data }, (error, result) => {
-      console.log('rex_enqueue result was ',result);
+      console.log('rex_enqueue result was ', result);
       Session.set('transaction_id', result)
-    } );
-    Meteor.call("printLog", 'running script on cloud. Script: ', script.name);
+    });
   }
 });
 

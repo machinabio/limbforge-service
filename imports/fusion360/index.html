@@ -4,13 +4,11 @@
   		Microserver name: {{ name }}
   		LastSeen: {{ lastSeen }}
   		Status: {{ status }}
-  		Script: {{ _script }}
-  		{{#if _runOnce}}
-  			RunOnce
-  			{{ runScript }}
-  		{{else}}
-  			Stopped
-  		{{/if}}
+  		Transaction: {{ transaction }}
+      Script: {{ _script }}ping
+      Ping: {{ ping }}
+      Run Once: {{_runOnce}}
+  		{{ runScript }}
   	{{/with}}
     {{> parameters_fusion }}
   </div>

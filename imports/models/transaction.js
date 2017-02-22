@@ -9,8 +9,8 @@ export default Transaction = Class.create({
   collection: transactions,
   fields: {
     data: {
-    	type: Object,
-    	optional: true
+      type: Object,
+      optional: true
     },
     response: {
       type: String,
@@ -18,18 +18,22 @@ export default Transaction = Class.create({
       default: undefined
     },
     script_id: {
-    	type: String,
-    	optional: true
+      type: String,
+      optional: true
     },
-    start : {
+    start_time: {
       type: Date,
       optional: true
     },
-    finish: {
+    finish_time: {
       type: Date,
       optional: true
     },
-    agent: {
+    queued_time: {
+      type: Date,
+      optional: true
+    },
+    agent_id: {
       type: String,
       optional: true
     },
