@@ -25,7 +25,7 @@ Template.webClientLayout.onRendered(() => {
 
 Template.scriptList.helpers({
   scripts() {
-    return Script.find({});
+    return Script.find({}, {sort: {name: 1}});
   },
   active() {
     return this._id == Session.get('activeScript') ? "active" : "";
