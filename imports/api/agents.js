@@ -1,10 +1,14 @@
-import { Class } from 'meteor/jagi:astronomy';
-import { Enum } from 'meteor/jagi:astronomy';
-import '/imports/fusionUtilities.js';
-import namor from 'namor';
+import { Meteor } from "meteor/meteor";
 import { Session } from 'meteor/session';
 import { Random } from 'meteor/random';
+
+import namor from 'namor';
 import opn from 'opn';
+
+import { Class } from 'meteor/jagi:astronomy';
+import { Enum } from 'meteor/jagi:astronomy';
+
+import '/imports/fusionUtilities.js';
 
 const Status = Enum.create({
   name: 'Status',

@@ -20,10 +20,9 @@ import Agent from '/imports/api/agents.js';
 import Script from '/imports/api/scripts.js';
 import '/imports/startup.js';
 import '/imports/api/agent-factory.js';
-import '/imports/api/agent-mock.js';
 import '/imports/api/job-queue.js';
 import Params from '/imports/parameters.js';
-import 'meteor/yogiben:mixpanel';
+import { analytics } from "meteor/okgrow:analytics";
 import Transaction from '/imports/models/transaction.js';
 
 const settings = Meteor.settings.AWS;

@@ -1,8 +1,13 @@
+import { Meteor } from "meteor/meteor";
+import { Tracker } from 'meteor/tracker'
+
+import { analytics } from "meteor/okgrow:analytics";
+
 Meteor.startup(function() {
   Tracker.autorun(function() {
     var user = Meteor.user();
     if (!user) return;
-    mixpanel.identify(user._id);
+    analytics.identify(user._id);
 
     person = {
       "Name": user.emails[0].address,
@@ -13,8 +18,8 @@ Meteor.startup(function() {
       // "$id": xxxxx.getAutodeskId(); // want to get the adsk user hash ... 
     }
 
-    mixpanel.people.set(person);
-    mixpanel.register({
+    analytics.people.set(person);
+    analytics.register({
       "autodesk_account": user.emails[0].address
     });
   });

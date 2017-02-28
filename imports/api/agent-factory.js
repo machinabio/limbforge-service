@@ -1,14 +1,19 @@
-import Agent from '/imports/api/agents.js';
-import namor from 'namor';
+import { Meteor } from "meteor/meteor";
 import { Accounts } from 'meteor/accounts-base'
-import mixpanel from 'mixpanel';
-import 'meteor/yogiben:mixpanel';
 import { EJSON } from 'meteor/ejson';
-import Transaction from '/imports/models/transaction.js';
 import { Random } from 'meteor/random';
+
+import namor from 'namor';
 import humanInterval from 'human-interval';
+
+import { analytics } from "meteor/okgrow:analytics";
+
+import Agent from '/imports/api/agents.js';
+import Transaction from '/imports/models/transaction.js';
 import Queue from '/imports/api/job-queue.js';
 import Script from '/imports/api/scripts.js';
+
+
 
 const purgeLimit = humanInterval('30 seconds'); // seconds until an agent is considered "dead" and purged
 const agentWatchdogTick = humanInterval('3 seconds'); // check each active agent's status every 2 seconds 
@@ -41,8 +46,8 @@ Api.addRoute('retrieveId', {
     console.log('local agent log in for user ', adskEmail);
 
     //TODO Figure out how to get mixpanel working on the server
-    // mixpanel('worker.checkin', { autodeskAccount: this.urlParams.adskEmail, ip: this.request.headers.host });
-    // mixpanel.track('worker.checkin');
+    // analytics('worker.checkin', { autodeskAccount: this.urlParams.adskEmail, ip: this.request.headers.host });
+    // analytics.track('worker.checkin');
 
     this.response.writeHead(200, 'retrieving id', {
       'Content-Type': 'application/json'
@@ -50,8 +55,8 @@ Api.addRoute('retrieveId', {
 
     var agent = Agent.findOne({ autodeskAccount: adskEmail });
     if (!agent) {
-      // mixpanel('worker.new', { autodeskAccount: adskEmail, ip: this.request.headers.host });
-      // mixpanel.track('worker.new');
+      // analytics('worker.new', { autodeskAccount: adskEmail, ip: this.request.headers.host });
+      // analytics.track('worker.new');
       agent = new Agent();
       agent.name = namor.generate({ words: 3, numbers: 4, manly: true });
       agent.autodeskAccount = adskEmail;
