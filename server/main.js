@@ -2,7 +2,8 @@ import { Meteor } from 'meteor/meteor';
 import { open } from 'openurl';
 import { HTTP } from 'meteor/http';
 import { EJSON } from 'meteor/ejson';
-import { Messages } from '/imports/messages.js';
+import { check } from 'meteor/check';
+
 import Request from 'request';
 import Archiver from 'archiver';
 import Fiber from 'fibers';
@@ -11,19 +12,17 @@ import tmp from 'tmp';
 import s3Zip from 's3-zip';
 import path from 'path';
 import AWS from 'aws-sdk';
-import send from 'send';
-import { Dashboard } from '/imports/dashboard.js';
-import { CadMake } from '/imports/cadmake.js';
-import { check } from 'meteor/check';
 import opn from 'opn';
+
+import { analytics } from "meteor/okgrow:analytics";
+
 import Agent from '/imports/api/agents.js';
 import Script from '/imports/api/scripts.js';
+import Transaction from '/imports/models/transaction.js';
+
 import '/imports/startup.js';
 import '/imports/api/agent-factory.js';
 import '/imports/api/job-queue.js';
-import Params from '/imports/parameters.js';
-import { analytics } from "meteor/okgrow:analytics";
-import Transaction from '/imports/models/transaction.js';
 
 const settings = Meteor.settings.AWS;
 
@@ -32,17 +31,21 @@ AWS.config.accessKeyId = settings.accessKeyId;
 AWS.config.secretAccessKey = settings.secretAccessKey;
 AWS.config.region = settings.AWS;
 
-Meteor.startup(() => {
+if (process.env.NODE_ENV === "development") {
+  METEORTOYSSHELL = true;
+}
 
+
+Meteor.startup(() => {
   // Whatever code is needed to startup the server goes here
 });
 
+//Restivus is a global. See https://github.com/kahmali/meteor-restivus
 let Api = new Restivus({
   prettyJson: true
 });
 
 var microserverReady = true;
-
 Api.addRoute('healthcheck', {
   get: function() {
     if (microserverReady) {
@@ -69,6 +72,7 @@ Api.addRoute('healthcheck', {
 Api.addRoute('rex/:hash', {
   post: function() {
     // console.log('rex id:', this.urlParams.hash);
+    //TODO add logging to analytics
     let script = Script.findOne({ _md5: this.urlParams.hash, published: true });
     if (script) {
       var data = this.bodyParams ? this.bodyParams : {};
@@ -110,37 +114,3 @@ Api.addRoute('rex/:hash', {
     };
   }
 });
-
-Api.addRoute('limbforge', {
-  get: function() {
-    var data = this.queryParams.parameters;
-    console.log('/api/submit #### data: ', data);
-
-    if (!Match.test(data, Object)) {}
-    console.log('...Object not found. Checking for URLEncoding');
-    try {
-      data = EJSON.parse(this.queryParams.parameters);
-      check(data, Object);
-      console.log('...Success! Found URLEncoded object.')
-    } catch (error) {
-      console.error('...Failure! No object data found');
-    }
-
-    Messages.insert({
-      content: EJSON.stringify(data),
-      time: new Date()
-    });
-
-    // opn("fusion360://command=open&file=UUID.stl&id=mytester&privateInfo=" + EJSON.stringify(data));
-    return 'ok';
-  }
-});
-
-// Meteor.methods({
-//   sendToFusion: function(data) {
-//     console.log('Sending data: ', data);
-//     HTTP.get('http://localhost:3000/api/limbforge', {
-//       params: { parameters: EJSON.stringify(data) }
-//     })
-//   }
-// });

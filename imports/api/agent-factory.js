@@ -13,8 +13,6 @@ import Transaction from '/imports/models/transaction.js';
 import Queue from '/imports/api/job-queue.js';
 import Script from '/imports/api/scripts.js';
 
-
-
 const purgeLimit = humanInterval('30 seconds'); // seconds until an agent is considered "dead" and purged
 const agentWatchdogTick = humanInterval('3 seconds'); // check each active agent's status every 2 seconds 
 const agentTimeout = humanInterval('7 seconds'); // 5 seconds until an agent is considered "offline"
@@ -38,16 +36,24 @@ let Api = new Restivus({
  */
 Api.addRoute('retrieveId', {
   get: function() {
-    var adskEmail = this.queryParams.adskEmail;
+    var adskEmail;
     var adskId = this.queryParams.adskId;
 
-    //TODO save the adskId to the User record so we can use that to lookup records
-
-    console.log('local agent log in for user ', adskEmail);
-
-    //TODO Figure out how to get mixpanel working on the server
-    // analytics('worker.checkin', { autodeskAccount: this.urlParams.adskEmail, ip: this.request.headers.host });
-    // analytics.track('worker.checkin');
+    // lookup account by adskId first
+    var user = Accounts.users.findOne({ autodesk_id: adskId });
+    if (user) {
+      adskEmail = user.emails[0].address;
+    } else {
+      // lookup account by email
+      user = Accounts.findUserByEmail(this.queryParams.adskEmail);
+      Meteor.users.update(user._id, {
+        $set: {
+          autodesk_id: adskId
+        }
+      });
+    };
+    if (!user) throw new Meteor.Error('failed to find a matching autodeskAccount');
+    console.log('cloud agent log in for user ', adskEmail);
 
     this.response.writeHead(200, 'retrieving id', {
       'Content-Type': 'application/json'
@@ -55,21 +61,21 @@ Api.addRoute('retrieveId', {
 
     var agent = Agent.findOne({ autodeskAccount: adskEmail });
     if (!agent) {
-      // analytics('worker.new', { autodeskAccount: adskEmail, ip: this.request.headers.host });
-      // analytics.track('worker.new');
+      analytics.track('worker.new', { autodeskAccount: adskEmail, ip: this.request.headers.host });
       agent = new Agent();
       agent.name = namor.generate({ words: 3, numbers: 4, manly: true });
       agent.autodeskAccount = adskEmail;
+      agent.userId = user._id;
+      agent.remote = false;
     }
-    try {
-      console.log('looking up account by email ' + agent.autodeskAccount);
-      agent.userId = Accounts.findUserByEmail(agent.autodeskAccount)._id;
-    } catch (e) {
-      console.error('failed to find a matching autodeskAccount');
-    }
-    agent.remote = false;
+    agent.lastSeen = new Date();
+
     agent.foreman = Meteor.settings.shift.foreman.name;
+
     agent.save(() => {
+      console.log('creating agent id ' + agent._id);
+      console.log('creating agent name ' + agent.name);
+
       this.response.write(EJSON.stringify({ agentId: agent._id }));
       this.done();
     });
@@ -91,22 +97,36 @@ Api.addRoute('retrieveId', {
  */
 Api.addRoute('retrieveAgent', {
   get: function() {
-    var adskEmail = this.queryParams.adskEmail;
+    var adskEmail;
+    var adskId = this.queryParams.adskId;
+
+    // lookup account by adskId first
+    var user = Accounts.users.findOne({ autodesk_id: adskId });
+    if (user) {
+      adskEmail = user.emails[0].address;
+    } else {
+      // lookup account by email
+      user = Accounts.findUserByEmail(this.queryParams.adskEmail);
+      Meteor.users.update(user._id, {
+        $set: {
+          autodesk_id: adskId
+        }
+      });
+    };
+    if (!user) throw new Meteor.Error('failed to find a matching autodeskAccount');
     console.log('cloud agent log in for user ', adskEmail);
+
     this.response.writeHead(200, 'retrieving id', {
       'Content-Type': 'application/json'
     });
+
     var agent = new Agent();
     agent.autodeskAccount = adskEmail;
+    agent.userId = user._id;
     agent.remote = true;
     agent.name = namor.generate({ words: 3, numbers: 4, manly: true });
     agent.lastSeen = new Date();
-    try {
-      console.log('looking up account by email ' + agent.autodeskAccount);
-      agent.userId = Accounts.findUserByEmail(agent.autodeskAccount)._id;
-    } catch (e) {
-      console.error('failed to find a matching autodeskAccount');
-    }
+
     agent.foreman = Meteor.settings.shift.foreman.name;
     agent.save(() => {
       console.log('creating agent id ' + agent._id);

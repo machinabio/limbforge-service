@@ -26,11 +26,11 @@ Meteor.publish("parameters", function() {
   return Parameter.find({ userId: this.userId });
 });
 
-Meteor.publish("fusion", function(adskAccount) {
-  var user_id = Accounts.findUserByEmail(adskAccount)._id;
-  console.log('publishing fusion for user:', user_id)
+Meteor.publish("fusion", function(adskId) {
+  var user = Accounts.users.findOne({autodesk_id: adskId});
+  console.log('publishing fusion for user:', user._id)
   return [
-    Agent.find({ autodeskAccount: adskAccount }),
-    Transaction.find({ user_id: user_id })
+    Agent.find({ user_id: user._id }),
+    Transaction.find({ user_id: user._id })
   ];
 });

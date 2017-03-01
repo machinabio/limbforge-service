@@ -9,7 +9,7 @@ import { EJSON } from 'meteor/ejson';
 if (Meteor.isFusion360) {
   // Loading the Fusion API's on a web browsers causes errors.
   import '/imports/fusion360/api/';
-  Meteor.subscribe('fusion', adsk.core.Application.get().userName);
+  Meteor.subscribe('fusion', adsk.core.Application.get().userId);
 };
 
 Template.fusionClientLayout.helpers({
