@@ -1,24 +1,78 @@
-# fusion-microservice-worker
+**fusion-microservice-worker**
+----
 
-## Installing on Windows Server
+This worker produces STLs generated from parametric CAD designs stored in Fusion360. Results are cached in S3 and future requests for the same parameters are served from the cache.
+
+This is the backend for the (Limbforge)[https://github.com/limbforge/Limbforge] web app.  Although this is basically a single-purpose sever, the underlying architecture can be extended to automate CAD-tasks in general.
+
+**Installation**
+----
 
 1. Install Meteor
 2. Install Git
 3. Install Fusion360
 3. `meteor npm install --global --production windows-build-tools` This takes ~5 minutes.
-4. 
+
+**API**
+----
+The API has two endpoints, `/preview` and `/print`, that both return STls. Both endpoints return either a single text-encoded STL or a ZIP-encoded archive containing multiple STL files.
+
+### /preview
+This endpoint returns the specified STL(s) in a low-resolution mesh suitable for on-screen preview.
+
+* **Method:**
+  
+  `GET`
+  
+* **Query Params**
+
+   The component and parameters are specified in the query string.
+
+   **Required:**
+ 
+   `handedness=[character]` <br />
+   This can be `L` or `R` depending on the desired handedness of the output.
+   
+   `component=[hash]` <br />
+   The component data is specified as a JSON object. The only required property is `id`, a GUID specifying a workflow that generates the desired component. Any additional properties included on the object are passed in as arguments to the workflow. *Multiple components are specified by including this parameter multiple times, ie. `/preview?component={id:foo,param1=2}&component={id:bar,paramX=Y}`*
 
 
-## Format
+* **Request Headers**
 
-The Fusion360 Worker accepts the following parameters in the URL
+  A valid request must include an authorization header.
+  
+  * **Header:** `Authorization` <br />
+    **Content:** String equal to "Bearer <SECRET>", ie. `Authorization=Bearer FAB395DEB7E0..."`
 
-* filename = Name of the worker script
-* id = UUID for callback URL. `localhost/api/incoming/:id`
-* privateInfo = JSON of data that's available to the worker script. This information is saved in the temp directory in a file.
+* **Success Response:**
+  
+  When a valid request is made, the server immediately responds with a header `Response_Delay` equal to the anticpated delay, in milliseconds, before fulfilling the request.
+
+  * **Code:** `200 OK`<br />
+    **Content:** text-encoded STL file. The header `Content-Type` is set to `application/vnd.ms-pkistl` or `application/zip` respectively if a single component or multiple components were requested.
+ 
+* **Error Response:**
+
+  An HTTP error code is used when the request cannot be fulfilled
+
+  * **Code:** `503 SERVICE UNAVAILABLE` <br />
+    **Reason:** The service has no available CAD agents to fufill the request.
+
+  * **Code:** `404 NOT FOUND` <br />
+    **Reason:** The service has no available CAD agents to fufill the request.
+
+* **Sample Call:**
+
+  <_TODO_> 
+  
+  * **URL**
+
+### /print
+This endpoint returns the specified component(s) in resoltion suitable for printing. Otherwise, this endpoint is identical to the `/preview` endpoint.
+
 
 # Credits
 
-Punched Card by Ralf Schmitzer from the Noun Project
-Robot by Oksana Latysheva from the Noun Project
-analysis by Gregor Cresnar from the Noun Project
+* Punched Card by Ralf Schmitzer from the Noun Project
+* Robot by Oksana Latysheva from the Noun Project
+* analysis by Gregor Cresnar from the Noun Project
