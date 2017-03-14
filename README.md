@@ -29,13 +29,10 @@ This endpoint returns the specified STL(s) in a low-resolution mesh suitable for
    The component and parameters are specified in the query string.
 
    **Required:**
- 
-   `handedness=[character]` <br />
-   This can be `L` or `R` depending on the desired handedness of the output.
-   
-   `component=[hash]` <br />
-   The component data is specified as a JSON object. The only required property is `id`, a GUID specifying a workflow that generates the desired component. Any additional properties included on the object are passed in as arguments to the workflow. *Multiple components are specified by including this parameter multiple times, ie. `/preview?component={id:foo,param1=2}&component={id:bar,paramX=Y}`*
 
+   `component=[stringifed JSON]` <br />
+   The component data is specified as a JSON object. The only required property is `id`, a GUID specifying a workflow that generates the desired component. Any additional properties included on the object are passed in as arguments to the workflow.<br />
+   *Multiple components are specified by including this parameter multiple times, ie. `/preview?component={"id":"foo","handedness":"L","param1":"2"}&component={"id":"bar","handedness":"L","paramX":"Y"}`*
 
 * **Request Headers**
 
