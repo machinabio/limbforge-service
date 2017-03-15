@@ -6,12 +6,11 @@ import Transaction from '/imports/models/transaction.js';
 import { Accounts } from 'meteor/accounts-base'
 
 Meteor.publish("agents", function() {
-  let user = this.userId;
-  if (user) {
-    console.log('publishing agents for userId: ', user);
+  if (this.userId) {
+    console.log('publishing agents for userId: ', this.userId);
     return [
-      Agent.find({ userId: user }),
-      Transaction.find({ user_id: user })
+      Agent.find({ user_id: this.userId }),
+      Transaction.find({ user_id: this.userId })
     ];
   } else {
     console.error('Not logged in');
@@ -29,6 +28,8 @@ Meteor.publish("parameters", function() {
 Meteor.publish("fusion", function(adskId) {
   var user = Accounts.users.findOne({autodesk_id: adskId});
   console.log('publishing fusion for user:', user._id)
+  console.log('publishing '+Agent.find({ user_id: user._id }).count()+" agents");
+  console.log('publishing '+Transaction.find({ user_id: user._id }).count()+" transactions");
   return [
     Agent.find({ user_id: user._id }),
     Transaction.find({ user_id: user._id })

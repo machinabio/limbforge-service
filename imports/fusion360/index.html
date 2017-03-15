@@ -10,24 +10,5 @@
       Run Once: {{_runOnce}}
   		{{ runScript }}
   	{{/with}}
-    {{> parameters_fusion }}
   </div>
-</template>
-
-<template  name="parameters_fusion">
-  <table>
-    <thead>
-      <th>Name</th>
-      <th>Value</th>
-    </thead>
-    <tbody>
-      {{ #each get_params}}
-      <tr>
-        <td> {{ name }} </td>
-        <td> {{ value }} </td>
-      </tr>
-      {{update}}
-      {{/each}}
-    </tbody>
-  </table>
 </template>

@@ -49,7 +49,7 @@ let Agent = Class.create({
       type: String,
       optional: true
     },
-    userId: {
+    user_id: {
       type: String,
       optional: true
     },
@@ -128,7 +128,7 @@ if (Meteor.isFusion360) {
     Tracker.autorun((c) => {
       let agent = Agent.findOne(id);
       if (agent) {
-        console.log('found an agent! ', agent);
+        // console.log('found an agent! ', agent);
         c.stop();
         Meteor.defer(agent.initialize.bind(agent));
       }
@@ -139,10 +139,10 @@ if (Meteor.isFusion360) {
     events: {},
     helpers: {
       initialize() {
-        // console.log('initializing agent ' + this);
-        Session.set('agentId', this._id);
+        console.log('initializing agent ', this);
+        Session.setPersistent('agentId', this._id);
         let cursor = Agent.find(this._id, { fields: { ping: true } })
-        console.log('cursor ',cursor.fetch());
+        // console.log('cursor ',cursor.fetch());
         // cursor.observeChanges({changed: console.log('called watchdog')});
         cursor.observeChanges({
           changed: () => {
@@ -157,8 +157,8 @@ if (Meteor.isFusion360) {
   });
 }
 
-Agent.spawn = function spawn() {
-  Meteor.call('spawn_agent');
-};
+// Agent.spawn = function spawn() {
+//   Meteor.call('spawn_agent');
+// };
 
 export default Agent;

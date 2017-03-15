@@ -53,7 +53,7 @@ Api.addRoute('retrieveId', {
       });
     };
     if (!user) throw new Meteor.Error('failed to find a matching autodeskAccount');
-    console.log('cloud agent log in for user ', adskEmail);
+    console.log('cloud agent log in for user ', user.emails[0].address);
 
     this.response.writeHead(200, 'retrieving id', {
       'Content-Type': 'application/json'
@@ -61,11 +61,11 @@ Api.addRoute('retrieveId', {
 
     var agent = Agent.findOne({ autodeskAccount: adskEmail });
     if (!agent) {
-      analytics.track('worker.new', { autodeskAccount: adskEmail, ip: this.request.headers.host });
+      //analytics.track('worker.new', { autodeskAccount: adskEmail, ip: this.request.headers.host });
       agent = new Agent();
       agent.name = namor.generate({ words: 3, numbers: 4, manly: true });
       agent.autodeskAccount = adskEmail;
-      agent.userId = user._id;
+      agent.user_id = user._id;
       agent.remote = false;
     }
     agent.lastSeen = new Date();
@@ -122,7 +122,7 @@ Api.addRoute('retrieveAgent', {
 
     var agent = new Agent();
     agent.autodeskAccount = adskEmail;
-    agent.userId = user._id;
+    agent.user_id = user._id;
     agent.remote = true;
     agent.name = namor.generate({ words: 3, numbers: 4, manly: true });
     agent.lastSeen = new Date();
@@ -232,7 +232,7 @@ Queue.define(
     agent.transaction = transaction._id;
     agent._script = script.code;
     agent._runOnce = true;
-    console.log('Agenda scriptRex transaction:', transaction);
+    // console.log('Agenda scriptRex transaction:', transaction);
 
     agent.save();
     job.remove();

@@ -24,17 +24,11 @@ import '/imports/startup.js';
 import '/imports/api/agent-factory.js';
 import '/imports/api/job-queue.js';
 
-const settings = Meteor.settings.AWS;
-
-AWS.config = new AWS.Config();
-AWS.config.accessKeyId = settings.accessKeyId;
-AWS.config.secretAccessKey = settings.secretAccessKey;
-AWS.config.region = settings.AWS;
+import '/imports/shift/server.js';
 
 if (process.env.NODE_ENV === "development") {
   METEORTOYSSHELL = true;
 }
-
 
 Meteor.startup(() => {
   // Whatever code is needed to startup the server goes here
