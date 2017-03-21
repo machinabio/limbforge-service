@@ -1679,6 +1679,81 @@
         return result ? result.value : undefined;
     };
 
+    //=========== HTMLEvent ============
+    // A HTMLEvent is fired when triggered from JavaScript code associated with HTML used in a palette.
+    adsk.core.HTMLEvent = function HTMLEvent(handle) {
+        if (!(this instanceof adsk.core.HTMLEvent)) {
+            return adsk.core.HTMLEvent.cast(handle);
+        }
+        adsk.core.Event.call(this, handle);
+    };
+    adsk.core.HTMLEvent.prototype = Object.create(adsk.core.Event.prototype);
+    adsk.core.HTMLEvent.prototype.constructor = adsk.core.HTMLEvent;
+    adsk.core.HTMLEvent.classType = function classType () {
+        return 'adsk::core::HTMLEvent';
+    };
+    adsk.core.HTMLEvent.interfaceId = 'adsk.core.HTMLEvent';
+    adsk.objectTypes['adsk.core.HTMLEvent'] = adsk.core.HTMLEvent;
+    adsk.core.HTMLEvent.cast = function (object) {
+        return object instanceof adsk.core.HTMLEvent ? object : null;
+    };
+
+    adsk.core.HTMLEvent.prototype.add = function (handler) {
+        if (typeof handler !== 'function') { throw new TypeError('handler must be a function'); }
+        return adsk.core.Event.prototype.add.call(this, handler, adsk.core.HTMLEventArgs);
+    };
+
+    //=========== HTMLEventArgs ============
+    // The HTMLEventArgs provides access to the information sent from the JavaScript that's associated with HTML being displayed within a palette.
+    adsk.core.HTMLEventArgs = function HTMLEventArgs(handle) {
+        if (!(this instanceof adsk.core.HTMLEventArgs)) {
+            return adsk.core.HTMLEventArgs.cast(handle);
+        }
+        adsk.core.EventArgs.call(this, handle);
+    };
+    adsk.core.HTMLEventArgs.prototype = Object.create(adsk.core.EventArgs.prototype);
+    adsk.core.HTMLEventArgs.prototype.constructor = adsk.core.HTMLEventArgs;
+    adsk.core.HTMLEventArgs.classType = function classType () {
+        return 'adsk::core::HTMLEventArgs';
+    };
+    adsk.core.HTMLEventArgs.interfaceId = 'adsk.core.HTMLEventArgs';
+    adsk.objectTypes['adsk.core.HTMLEventArgs'] = adsk.core.HTMLEventArgs;
+    adsk.core.HTMLEventArgs.cast = function (object) {
+        return object instanceof adsk.core.HTMLEventArgs ? object : null;
+    };
+
+    // The action string sent from the JavaScript associated with HTML displayed in the palette. The string can represent any type of data in any format but JSON is commonly used to pass more complex data.
+    Object.defineProperty(adsk.core.HTMLEventArgs.prototype, 'action', {
+        get : function () {
+            var result = this._execute('action');
+            return result ? result.value : undefined;
+        }
+    });
+
+    // The data string sent from the JavaScript associated with HTML displayed in the palette. The string can represent any type of data in any format but JSON is commonly used to pass more complex data.
+    Object.defineProperty(adsk.core.HTMLEventArgs.prototype, 'data', {
+        get : function () {
+            var result = this._execute('data');
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Set this property to return data back to the JavaScript that's associated with the HTML.
+    Object.defineProperty(adsk.core.HTMLEventArgs.prototype, 'returnData', {
+        get : function () {
+            var result = this._execute('returnData');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (value === undefined || value === null || value.constructor !== String) { throw new TypeError('value must be a string'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('returnData', args);
+            return result ? result.value : undefined;
+        }
+    });
+
     //=========== InputChangedEvent ============
     // An event endpoint that supports the connection to client implemented InputChangedEventHandlers.
     adsk.core.InputChangedEvent = function InputChangedEvent(handle) {
@@ -2312,6 +2387,400 @@
             return (result && result.value) ? adsk.createObject(result.value, adsk.core.Point2D) : null;
         }
     });
+
+    // Gets the coordinate of the mouse in viewport space, if the mouse is within a viewport. If the mouse is not over a viewport this property will return null.
+    Object.defineProperty(adsk.core.MouseEventArgs.prototype, 'viewportPosition', {
+        get : function () {
+            var result = this._execute('viewportPosition');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Point2D) : null;
+        }
+    });
+
+    // Returns the viewport where the mouse event occurred, if it was within a viewport. If the mouse is not over a viewport this property will return null.
+    Object.defineProperty(adsk.core.MouseEventArgs.prototype, 'viewport', {
+        get : function () {
+            var result = this._execute('viewport');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Viewport) : null;
+        }
+    });
+
+    //=========== Palette ============
+    // A Palette is a floating or docked dialog in Fusion. The browser is an example of a built-in palette. The contents of a custom palette are created by displaying an html file.
+    adsk.core.Palette = function Palette(handle) {
+        if (!(this instanceof adsk.core.Palette)) {
+            return adsk.core.Palette.cast(handle);
+        }
+        adsk.core.Base.call(this, handle);
+    };
+    adsk.core.Palette.prototype = Object.create(adsk.core.Base.prototype);
+    adsk.core.Palette.prototype.constructor = adsk.core.Palette;
+    adsk.core.Palette.classType = function classType () {
+        return 'adsk::core::Palette';
+    };
+    adsk.core.Palette.interfaceId = 'adsk.core.Palette';
+    adsk.objectTypes['adsk.core.Palette'] = adsk.core.Palette;
+    adsk.core.Palette.cast = function (object) {
+        return object instanceof adsk.core.Palette ? object : null;
+    };
+
+    // Gets The unique, language independent, ID of this palette.
+    Object.defineProperty(adsk.core.Palette.prototype, 'id', {
+        get : function () {
+            var result = this._execute('id');
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets whether this palette is currently being displayed in the user interface.
+    Object.defineProperty(adsk.core.Palette.prototype, 'isVisible', {
+        get : function () {
+            var result = this._execute('isVisible');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (typeof value !== 'boolean') { throw new TypeError('value must be a boolean'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('isVisible', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the URL to the html file currently being displayed. This can be local or on the web.
+    Object.defineProperty(adsk.core.Palette.prototype, 'htmlFileURL', {
+        get : function () {
+            var result = this._execute('htmlFileURL');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (value === undefined || value === null || value.constructor !== String) { throw new TypeError('value must be a string'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('htmlFileURL', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // This event is fired when the JavaScript associated with the HTML calls the window.neutronJavaScriptObject function. This allows the HTML to communicate with the add-in by passing information to the add-in.
+    Object.defineProperty(adsk.core.Palette.prototype, 'incomingFromHTML', {
+        get : function () {
+            var result = this._execute('incomingFromHTML');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.HTMLEvent) : null;
+        }
+    });
+
+    // This event is fired when the user clicks the "Close" button on the palette. You can choose if the "Close" button is available or not when you initially create the palette. When a palette is closed, it still exists but is change to invisible so you can still interact with it and retrieve any needed information and can make it visible again. Use the deleteMe method to delete the palette.
+    Object.defineProperty(adsk.core.Palette.prototype, 'closed', {
+        get : function () {
+            var result = this._execute('closed');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.UserInterfaceGeneralEvent) : null;
+        }
+    });
+
+    // Gets and set the name of the palette as seen in the user interface. The name of native palletes cannot be set.
+    Object.defineProperty(adsk.core.Palette.prototype, 'name', {
+        get : function () {
+            var result = this._execute('name');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (value === undefined || value === null || value.constructor !== String) { throw new TypeError('value must be a string'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('name', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Indicates if this is one of the standard Fusion palettes or a custom palette created through the API. If true, it is a standard Fusion palette and will have some restrictions on changing its properties and cannot be deleted.
+    Object.defineProperty(adsk.core.Palette.prototype, 'isNative', {
+        get : function () {
+            var result = this._execute('isNative');
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Defines the docking behavior for this palette. This controls how the user is allowed to dock the palette.
+    Object.defineProperty(adsk.core.Palette.prototype, 'dockingOption', {
+        get : function () {
+            var result = this._execute('dockingOption');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (!isFinite(value)) { throw new TypeError('value must be a number'); }
+            var args = {
+                value : Number(value)
+            };
+            var result = this._execute('dockingOption', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets how the palette is currented docked.
+    Object.defineProperty(adsk.core.Palette.prototype, 'dockingState', {
+        get : function () {
+            var result = this._execute('dockingState');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (!isFinite(value)) { throw new TypeError('value must be a number'); }
+            var args = {
+                value : Number(value)
+            };
+            var result = this._execute('dockingState', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the width of the palette. Setting this property may not always set the width. Depending on how the palette is docked or snapped, the width not be editable.
+    Object.defineProperty(adsk.core.Palette.prototype, 'width', {
+        get : function () {
+            var result = this._execute('width');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (!isFinite(value)) { throw new TypeError('value must be a number'); }
+            var args = {
+                value : Number(value)
+            };
+            var result = this._execute('width', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the height of the palette. Setting this property may not always set the height. Depending on how the palette is docked or snapped, the width not be editable.
+    Object.defineProperty(adsk.core.Palette.prototype, 'height', {
+        get : function () {
+            var result = this._execute('height');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (!isFinite(value)) { throw new TypeError('value must be a number'); }
+            var args = {
+                value : Number(value)
+            };
+            var result = this._execute('height', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the left side of the palette relative to screen space and in pixels. Because palettes can be positioned outside of the Fusion window, a value of zero indicates the left side of the screen and not the Fusion window.
+    Object.defineProperty(adsk.core.Palette.prototype, 'left', {
+        get : function () {
+            var result = this._execute('left');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (!isFinite(value)) { throw new TypeError('value must be a number'); }
+            var args = {
+                value : Number(value)
+            };
+            var result = this._execute('left', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Gets and sets the top of the palette relative to screen space and in pixels. Because palettes can be positioned outside of the Fusion window, a value of zero indicates the top of the screen and not the Fusion window.
+    Object.defineProperty(adsk.core.Palette.prototype, 'top', {
+        get : function () {
+            var result = this._execute('top');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (!isFinite(value)) { throw new TypeError('value must be a number'); }
+            var args = {
+                value : Number(value)
+            };
+            var result = this._execute('top', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // <p>Sends the string to the JavaScript associated with the loaded HTML. A variation of the event handler below should be implemented in the JavaScript associated with the HTML to receive the data. The event will be triggered by Fusion whenever the sendInfoToHTML method is called.</p> <pre class="api-code">window.neutronJavaScriptHandler = { handle: function(actionString, dataString){ confirm('Action from Fusion: ' + actionString); confirm('Data from Fusion: ' + dataString); // Build up JSON return string. var result = {}; result.status = 'OK'; var response = JSON.stringify(result); return response; } };</pre> <p>Your JavaScript code should always return something in response because an empty string response is assumed to be a failure.</p>
+    // action : The "action" string to pass to the JavaScript associated with the HTML. This string can be anything but will typically be JSON formatted information.
+    // data : The "data" string to pass to the JavaScript associated with the HTML. This string can be anything but will typically be JSON formatted information.
+    // Returns a string that can be anything that your JavaScript code generates. The JavaScript should always return some content because an empty string is used to indicate a failure.
+    adsk.core.Palette.prototype.sendInfoToHTML = function (action, data) {
+        if (action === undefined || action === null || action.constructor !== String) { throw new TypeError('action must be a string'); }
+        if (data === undefined || data === null || data.constructor !== String) { throw new TypeError('data must be a string'); }
+        var args = {
+            action : action,
+            data : data
+        };
+        var result = this._execute('sendInfoToHTML', args);
+        return result ? result.value : undefined;
+    };
+
+    // Deletes this palette. Fusion native palettes cannot be deleted. Use the isNative property to determine if this is a native or API created palette.
+    // Returns true if the delete was successful.
+    adsk.core.Palette.prototype.deleteMe = function () {
+        var result = this._execute('deleteMe');
+        return result ? result.value : undefined;
+    };
+
+    // Sets the position of the palette. If the palette is docked or snapped, this will result in changing it to be floating.
+    // left : The position of the left side of the palette relative to screen space and in pixels. Because palettes can be positioned outside of the Fusion window, a value of zero indicates the left side of the screen and not the Fusion window.
+    // top : The position of the top of the palette relative to screen space and in pixels. Because palettes can be positioned outside of the Fusion window, a value of zero indicates the top of the screen and not the Fusion window.
+    // Returns true if setting the position was successful.
+    adsk.core.Palette.prototype.setPosition = function (left, top) {
+        if (!isFinite(left)) { throw new TypeError('left must be a number'); }
+        if (!isFinite(top)) { throw new TypeError('top must be a number'); }
+        var args = {
+            left : Number(left),
+            top : Number(top)
+        };
+        var result = this._execute('setPosition', args);
+        return result ? result.value : undefined;
+    };
+
+    // Sets the size of the palette. This is best used for a floating palette because either the width or height can be locked when a palette is docked.
+    // width : Specifies the width of the palette. Depending on how the palette is docked or snapped, the width may not be editable.
+    // height : Specifies the height of the palette. Depending on how the palette is docked or snapped, the height may not be editable.
+    // Returns true if the sizing was succesful. It is still considered a success even if the width or height could not be changed because of how the palette is docked or snapped.
+    adsk.core.Palette.prototype.setSize = function (width, height) {
+        if (!isFinite(width)) { throw new TypeError('width must be a number'); }
+        if (!isFinite(height)) { throw new TypeError('height must be a number'); }
+        var args = {
+            width : Number(width),
+            height : Number(height)
+        };
+        var result = this._execute('setSize', args);
+        return result ? result.value : undefined;
+    };
+
+    // Snaps this palette to another palette.
+    // palette : Specifies the palette to snap to.
+    // snapOption : Specifies how this palette should be snapped to the other palette.
+    // Returns true if the palette was successfully snapped to the other palette.
+    adsk.core.Palette.prototype.snapTo = function (palette, snapOption) {
+        if (palette !== null && !(palette instanceof adsk.core.Palette)) { throw new TypeError('palette must be a adsk.core.Palette'); }
+        if (!isFinite(snapOption)) { throw new TypeError('snapOption must be a number'); }
+        var args = {
+            palette : (palette === null ? palette : palette.handle),
+            snapOption : Number(snapOption)
+        };
+        var result = this._execute('snapTo', args);
+        return result ? result.value : undefined;
+    };
+
+    //=========== PaletteDockingOptions ============
+    // Defines the different options available when docking a palette to the Fusion main window area.
+    adsk.core.PaletteDockingOptions = {
+        PaletteDockOptionsNone : 0,
+        PaletteDockOptionsToVerticalOnly : 1,
+        PaletteDockOptionsToHorizontalOnly : 2,
+        PaletteDockOptionsToVerticalAndHorizontal : 3
+    };
+
+    //=========== PaletteDockingStates ============
+    // Defines the various docking states that a palette can be in.
+    adsk.core.PaletteDockingStates = {
+        PaletteDockStateFloating : 0,
+        PaletteDockStateTop : 1,
+        PaletteDockStateBottom : 2,
+        PaletteDockStateLeft : 3,
+        PaletteDockStateRight : 4
+    };
+
+    //=========== Palettes ============
+    // Provides access to a set of palettes, which are docked or floating windows that display html.
+    adsk.core.Palettes = function Palettes(handle) {
+        if (!(this instanceof adsk.core.Palettes)) {
+            return adsk.core.Palettes.cast(handle);
+        }
+        adsk.core.Base.call(this, handle);
+    };
+    adsk.core.Palettes.prototype = Object.create(adsk.core.Base.prototype);
+    adsk.core.Palettes.prototype.constructor = adsk.core.Palettes;
+    adsk.core.Palettes.classType = function classType () {
+        return 'adsk::core::Palettes';
+    };
+    adsk.core.Palettes.interfaceId = 'adsk.core.Palettes';
+    adsk.objectTypes['adsk.core.Palettes'] = adsk.core.Palettes;
+    adsk.core.Palettes.cast = function (object) {
+        return object instanceof adsk.core.Palettes ? object : null;
+    };
+
+    // Gets the number of Palettes.
+    Object.defineProperty(adsk.core.Palettes.prototype, 'count', {
+        get : function () {
+            var result = this._execute('count');
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Creates a new Palette.
+    // id : The unique id for this palette. The id must be unique with respect to all of the palettes.
+    // name : The displayed name of this palette. This is the name visible in the user interface.
+    // htmlFileURL : Specifies the url to the HTML file that will be displayed in the pallete. This can be a local file or on the web.
+    // isVisible : Specifies if the palette is initially visible or not. It's useful to create it invisisibly, change other desired properties and then use the isVisible property to finally make it visible to the user.
+    // showCloseButton : Specifies if a "Close" button should be displayed on the palette to allow the user to easily close it.
+    // isResizable : Specifies if the palette can be resized by the user or not.
+    // width : Specifies the width of the palette in pixels. If no width is specified a default width will be used.
+    // height : Specifies the height of the palette in pixels. If no height is specified a default height will be used.
+    // Returns the newly created palette or null in the case the creation failed.
+    adsk.core.Palettes.prototype.add = function (id, name, htmlFileURL, isVisible, showCloseButton, isResizable, width, height) {
+        if (id === undefined || id === null || id.constructor !== String) { throw new TypeError('id must be a string'); }
+        if (name === undefined || name === null || name.constructor !== String) { throw new TypeError('name must be a string'); }
+        if (htmlFileURL === undefined || htmlFileURL === null || htmlFileURL.constructor !== String) { throw new TypeError('htmlFileURL must be a string'); }
+        if (typeof isVisible !== 'boolean') { throw new TypeError('isVisible must be a boolean'); }
+        if (typeof showCloseButton !== 'boolean') { throw new TypeError('showCloseButton must be a boolean'); }
+        if (typeof isResizable !== 'boolean') { throw new TypeError('isResizable must be a boolean'); }
+        if (width === null || (width !== undefined && !isFinite(width))) { throw new TypeError('width must be a number'); }
+        if (height === null || (height !== undefined && !isFinite(height))) { throw new TypeError('height must be a number'); }
+        var args = {
+            id : id,
+            name : name,
+            htmlFileURL : htmlFileURL,
+            isVisible : isVisible,
+            showCloseButton : showCloseButton,
+            isResizable : isResizable
+        };
+        if (width !== undefined) {
+            args.width = Number(width);
+        }
+        if (height !== undefined) {
+            args.height = Number(height);
+        }
+        var result = this._execute('add', args);
+        return (result && result.value) ? adsk.createObject(result.value, adsk.core.Palette) : null;
+    };
+
+    // Returns the specified palette using an index into the collection.
+    // index : The index of the item within the collection to return. The first item in the collection has an index of 0.
+    // Returns the specified item or null if an invalid index was specified.
+    adsk.core.Palettes.prototype.item = function (index) {
+        if (!isFinite(index)) { throw new TypeError('index must be a number'); }
+        var args = {
+            index : Number(index)
+        };
+        var result = this._execute('item', args);
+        return (result && result.value) ? adsk.createObject(result.value, adsk.core.Palette) : null;
+    };
+
+    // Returns the palette at the specified ID.
+    // id : The Id of the palette within the collection to return.
+    // Returns the palette of the specified id or null if no palette has the specified id.
+    adsk.core.Palettes.prototype.itemById = function (id) {
+        if (id === undefined || id === null || id.constructor !== String) { throw new TypeError('id must be a string'); }
+        var args = {
+            id : id
+        };
+        var result = this._execute('itemById', args);
+        return (result && result.value) ? adsk.createObject(result.value, adsk.core.Palette) : null;
+    };
+
+    //=========== PaletteSnapOptions ============
+    // Defines the various positions that a palette can be snapped to another palette.
+    adsk.core.PaletteSnapOptions = {
+        PaletteSnapOptionsTop : 0,
+        PaletteSnapOptionsLeft : 1,
+        PaletteSnapOptionsRight : 2,
+        PaletteSnapOptionsBottom : 3
+    };
 
     //=========== ProgressDialog ============
     // Provides access to the progress dialog.
@@ -3668,6 +4137,14 @@
         }
     });
 
+    // Returns the collection object that provides access to all of the existing palettes and provides the functionality to create new custom palettes.
+    Object.defineProperty(adsk.core.UserInterface.prototype, 'palettes', {
+        get : function () {
+            var result = this._execute('palettes');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Palettes) : null;
+        }
+    });
+
     // Display a modal message box with the provided text.
     // text : The message text to display in the dialog.
     // title : If the optional title argument is provided, it sets the title for the dialog, otherwise the default product name is used.
@@ -3780,6 +4257,49 @@
     adsk.core.UserInterface.prototype.createProgressDialog = function () {
         var result = this._execute('createProgressDialog');
         return (result && result.value) ? adsk.createObject(result.value, adsk.core.ProgressDialog) : null;
+    };
+
+    //=========== UserInterfaceGeneralEvent ============
+    // A UserInterfaceGeneralEvent is used for user-interface related events that don't require any additional information beyond getting the event itself.
+    adsk.core.UserInterfaceGeneralEvent = function UserInterfaceGeneralEvent(handle) {
+        if (!(this instanceof adsk.core.UserInterfaceGeneralEvent)) {
+            return adsk.core.UserInterfaceGeneralEvent.cast(handle);
+        }
+        adsk.core.Event.call(this, handle);
+    };
+    adsk.core.UserInterfaceGeneralEvent.prototype = Object.create(adsk.core.Event.prototype);
+    adsk.core.UserInterfaceGeneralEvent.prototype.constructor = adsk.core.UserInterfaceGeneralEvent;
+    adsk.core.UserInterfaceGeneralEvent.classType = function classType () {
+        return 'adsk::core::UserInterfaceGeneralEvent';
+    };
+    adsk.core.UserInterfaceGeneralEvent.interfaceId = 'adsk.core.UserInterfaceGeneralEvent';
+    adsk.objectTypes['adsk.core.UserInterfaceGeneralEvent'] = adsk.core.UserInterfaceGeneralEvent;
+    adsk.core.UserInterfaceGeneralEvent.cast = function (object) {
+        return object instanceof adsk.core.UserInterfaceGeneralEvent ? object : null;
+    };
+
+    adsk.core.UserInterfaceGeneralEvent.prototype.add = function (handler) {
+        if (typeof handler !== 'function') { throw new TypeError('handler must be a function'); }
+        return adsk.core.Event.prototype.add.call(this, handler, adsk.core.UserInterfaceGeneralEventArgs);
+    };
+
+    //=========== UserInterfaceGeneralEventArgs ============
+    // The UserInterfaceGeneralEventArgs is passed when a UserInterfaceGeneralEvent is fired.
+    adsk.core.UserInterfaceGeneralEventArgs = function UserInterfaceGeneralEventArgs(handle) {
+        if (!(this instanceof adsk.core.UserInterfaceGeneralEventArgs)) {
+            return adsk.core.UserInterfaceGeneralEventArgs.cast(handle);
+        }
+        adsk.core.EventArgs.call(this, handle);
+    };
+    adsk.core.UserInterfaceGeneralEventArgs.prototype = Object.create(adsk.core.EventArgs.prototype);
+    adsk.core.UserInterfaceGeneralEventArgs.prototype.constructor = adsk.core.UserInterfaceGeneralEventArgs;
+    adsk.core.UserInterfaceGeneralEventArgs.classType = function classType () {
+        return 'adsk::core::UserInterfaceGeneralEventArgs';
+    };
+    adsk.core.UserInterfaceGeneralEventArgs.interfaceId = 'adsk.core.UserInterfaceGeneralEventArgs';
+    adsk.objectTypes['adsk.core.UserInterfaceGeneralEventArgs'] = adsk.core.UserInterfaceGeneralEventArgs;
+    adsk.core.UserInterfaceGeneralEventArgs.cast = function (object) {
+        return object instanceof adsk.core.UserInterfaceGeneralEventArgs ? object : null;
     };
 
     //=========== ValidateInputsEvent ============

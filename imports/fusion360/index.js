@@ -21,9 +21,6 @@ if (Meteor.isFusion360) {
   import '/imports/fusion360/api/';
   Meteor.subscribe('fusion', adsk.core.Application.get().userId);
   Meteor.call("printLog", 'Fusion360 agent capabilities:', navigator.userAgent);
-  Session.set('set', 'ug');
-  Session.setPersistent('persistant', 'foobar');
-  Session.setTemp('temp', 'barfoo');
 };
 
 Template.fusionClientLayout.helpers({
@@ -52,14 +49,13 @@ Template.fusionClientLayout.helpers({
       // delete global.Shift;
       Shift = new shift(transaction ? transaction._id : null)
       transaction.start_time = new Date();
-      Function(this._script).bind(this)();
+      // Function(this._script).bind(this)();
       // console.log('running script ', this._script);
-      // Function(this._script)();
-      // var e = document.createElement('script');
-      // e.type = 'text/javascript';
-      // e.src = 'data:text/javascript;charset=utf-8,' + encodeURI(this._script);
-      // document.head.appendChild(e);
-      // e.remove();
+      var e = document.createElement('script');
+      e.type = 'text/javascript';
+      e.src = 'data:text/javascript;charset=utf-8,' + encodeURI(this._script);
+      document.head.appendChild(e);
+      e.remove();
       // save the Shift.response property to the transaction. Meteor.call?
       transaction.finish_time = new Date();
       transaction.response = EJSON.stringify(Shift.response);

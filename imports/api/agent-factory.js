@@ -13,7 +13,7 @@ import Transaction from '/imports/models/transaction.js';
 import Queue from '/imports/api/job-queue.js';
 import Script from '/imports/api/scripts.js';
 
-const purgeLimit = humanInterval('30 seconds'); // seconds until an agent is considered "dead" and purged
+const purgeLimit = humanInterval('5 minutes'); // seconds until an agent is considered "dead" and purged
 const agentWatchdogTick = humanInterval('3 seconds'); // check each active agent's status every 2 seconds 
 const agentTimeout = humanInterval('7 seconds'); // 5 seconds until an agent is considered "offline"
 
@@ -59,7 +59,7 @@ Api.addRoute('retrieveId', {
       'Content-Type': 'application/json'
     });
 
-    var agent = Agent.findOne({ autodeskAccount: adskEmail });
+    var agent = Agent.findOne({ autodeskAccount: adskEmail , remote: false});
     if (!agent) {
       //analytics.track('worker.new', { autodeskAccount: adskEmail, ip: this.request.headers.host });
       agent = new Agent();
@@ -163,7 +163,9 @@ Queue.define(
     // console.log('...' + sinceLastSighting + " ms ago");
 
     if (sinceLastSighting > purgeLimit) {
-      agent.remove();
+      if (agent.remote) {
+        agent.remove();
+      }
       job.remove();
       return;
     }

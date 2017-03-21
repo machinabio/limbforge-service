@@ -1,12 +1,16 @@
 import { Meteor } from "meteor/meteor";
 import { Session } from 'meteor/session';
 
+import humanInterval from 'human-interval';
+
 import '/imports/browser';
 import '/imports/fusion360';
 import '/imports/demo';
 import '/imports/startup.js';
 
 import Agent from '/imports/api/agents.js';
+
+const timeout = humanInterval('2 seconds'); // seconds we retry fetching an agent ID
 
 FlowRouter.route('/', {
   action: function(params) {
@@ -28,7 +32,10 @@ FlowRouter.route('/fusion360', {
       adskEmail: adsk.core.Application.get().userName,
       adskId: adsk.core.Application.get().userId
     }
+    // console.log('setting retry timeout for agent id');
+    // let retry_handle = Meteor.setTimeout(window.location.reload, timeout)
     HTTP.get('/api/retrieveId', { params: queryParams }, (err, res) => {
+      // Meteor.clearTimeout(retry_handle);
       Agent.initialize(res.data.agentId);
     });
     BlazeLayout.render("App_body", { main: "fusionClientLayout" });

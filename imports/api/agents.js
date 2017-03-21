@@ -4,11 +4,14 @@ import { Random } from 'meteor/random';
 
 import namor from 'namor';
 import opn from 'opn';
+import humanInterval from 'human-interval';
 
 import { Class } from 'meteor/jagi:astronomy';
 import { Enum } from 'meteor/jagi:astronomy';
 
 import '/imports/fusionUtilities.js';
+
+const timeout = humanInterval('10 seconds'); // seconds until an agent reloads the pages
 
 const Status = Enum.create({
   name: 'Status',
@@ -128,9 +131,8 @@ if (Meteor.isFusion360) {
     Tracker.autorun((c) => {
       let agent = Agent.findOne(id);
       if (agent) {
-        // console.log('found an agent! ', agent);
-        c.stop();
         Meteor.defer(agent.initialize.bind(agent));
+        c.stop();
       }
     });
   };
@@ -141,24 +143,21 @@ if (Meteor.isFusion360) {
       initialize() {
         console.log('initializing agent ', this);
         Session.setPersistent('agentId', this._id);
-        let cursor = Agent.find(this._id, { fields: { ping: true } })
-        // console.log('cursor ',cursor.fetch());
-        // cursor.observeChanges({changed: console.log('called watchdog')});
+        let cursor = Agent.find(this._id, { fields: { ping: true } });
+        // let watchdog = Meteor.setTimeout(window.location.reload, timeout);
         cursor.observeChanges({
           changed: () => {
             // console.log('called watchdog agent id ' + this._id);
             let agent = Agent.findOne(this._id);
             agent.lastSeen = new Date();
             agent.save();
+            // Meteor.clearTimeout(watchdog);
+            // watchdog = Meteor.setTimeout(window.location.reload, timeout);
           }
         });
       }
     }
   });
 }
-
-// Agent.spawn = function spawn() {
-//   Meteor.call('spawn_agent');
-// };
 
 export default Agent;

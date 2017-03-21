@@ -2338,6 +2338,23 @@
         return (result && result.value) ? adsk.createObject(result.value, adsk.fusion.Sketch) : null;
     };
 
+    // Creates a new sketch on the specified planar entity. If a BRepFace is provided, the edges of the face are not projected into the sketch so the result of creating a new sketch with this method will always be a new empty sketch.
+    // planarEntity : A construction plane or planar face that defines the sketch plane.
+    // occurrenceForCreation : A creation occurrence is needed if the planarEntity is in another component AND the sketch is not in the root component. The occurrenceForCreation is analogous to the active occurrence in the UI.
+    // Returns the newly created Sketch or null if the creation failed.
+    adsk.fusion.Sketches.prototype.addWithoutEdges = function (planarEntity, occurrenceForCreation) {
+        if (planarEntity !== null && !(planarEntity instanceof adsk.core.Base)) { throw new TypeError('planarEntity must be a adsk.core.Base'); }
+        if (occurrenceForCreation === null || (occurrenceForCreation !== undefined && occurrenceForCreation !== null && !(occurrenceForCreation instanceof adsk.fusion.Occurrence))) { throw new TypeError('occurrenceForCreation must be a adsk.fusion.Occurrence'); }
+        var args = {
+            planarEntity : (planarEntity === null ? planarEntity : planarEntity.handle)
+        };
+        if (occurrenceForCreation !== undefined) {
+            args.occurrenceForCreation = (occurrenceForCreation === null ? occurrenceForCreation : occurrenceForCreation.handle);
+        }
+        var result = this._execute('addWithoutEdges', args);
+        return (result && result.value) ? adsk.createObject(result.value, adsk.fusion.Sketch) : null;
+    };
+
     //=========== SketchFittedSplines ============
     // The collection of fitted splines in a sketch. This provides access to the existing fitted splines and supports the methods to create new fitted splines.
     adsk.fusion.SketchFittedSplines = function SketchFittedSplines(handle) {

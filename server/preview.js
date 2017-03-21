@@ -1,4 +1,4 @@
-import hash from 'object-hash';
+// import hash from 'object-hash';
 // import stringify from 'json-stable-stringify';
 import hasha from 'hasha';
 import { EJSON } from 'meteor/ejson'
@@ -55,16 +55,16 @@ function round_to_half(number) {
 }
 
 function parse_and_normalize(stringified_parameters) {
-  console.log("s: ", stringified_parameters);
+  // console.log("s: ", stringified_parameters);
   let cleaned_parameters = EJSON.parse(stringified_parameters);
-  console.log("p: ", cleaned_parameters)
+  // console.log("p: ", cleaned_parameters)
   for (key in cleaned_parameters) {
-    console.log(' k: ', key)
+    // console.log(' k: ', key)
     if (isNaN(parseFloat(cleaned_parameters[key]))) {
-      console.log(" s:", cleaned_parameters[key]);
+      // console.log(" s:", cleaned_parameters[key]);
       cleaned_parameters.id = String(cleaned_parameters.id);
     } else {
-      console.log(" n:", cleaned_parameters[key]);
+      // console.log(" n:", cleaned_parameters[key]);
       cleaned_parameters[key] = round_to_half(cleaned_parameters[key]);
     }
   }

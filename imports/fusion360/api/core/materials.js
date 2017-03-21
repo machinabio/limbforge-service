@@ -570,6 +570,18 @@
         return (result && result.value) ? adsk.createObject(result.value, adsk.core.MaterialLibrary) : null;
     };
 
+    // Loads the specified existing local material library. Fusion remembers which libraries have been loaded from one session to the next so you should check to see if the local library is already loaded or not before loading it again.
+    // filename : The full filename of the .adsklib material file.
+    // Returns the MaterialLibrary object representing the opened library or null in the case of failure.
+    adsk.core.MaterialLibraries.prototype.load = function (filename) {
+        if (filename === undefined || filename === null || filename.constructor !== String) { throw new TypeError('filename must be a string'); }
+        var args = {
+            filename : filename
+        };
+        var result = this._execute('load', args);
+        return (result && result.value) ? adsk.createObject(result.value, adsk.core.MaterialLibrary) : null;
+    };
+
     //=========== MaterialLibrary ============
     // A material library.
     adsk.core.MaterialLibrary = function MaterialLibrary(handle) {
@@ -620,6 +632,21 @@
             return (result && result.value) ? adsk.createObject(result.value, adsk.core.Materials) : null;
         }
     });
+
+    // Gets if this is a native material library. Native libraries are those that are delivered with Fusion and are always available. And non-native libraries are user created. If This returns True then there are some limitations to what can be done with the library. For example, if this is a native material library it cannot be unloaded.
+    Object.defineProperty(adsk.core.MaterialLibrary.prototype, 'isNative', {
+        get : function () {
+            var result = this._execute('isNative');
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Unloads this material from Fusion. Only non-native material libraries can be unloaded. You can determine this by checking the isNative property.
+    // Returns True if the library was successfully unloaded.
+    adsk.core.MaterialLibrary.prototype.unload = function () {
+        var result = this._execute('unload');
+        return result ? result.value : undefined;
+    };
 
     //=========== Materials ============
     // Collection of materials within a Library or Design.

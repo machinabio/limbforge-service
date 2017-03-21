@@ -2270,7 +2270,7 @@
     // sideTwoExtent : An ExtentDefinition object that defines how the extent of the extrusion towards side two is defined. This can be a specified distance (DistanceExtentDefinition), to an entity (ToEntityExtent), or through-all (AllExtentDefinition). These objects can be obtained by using the static create method on the appropriate class.
     // sideOneTaperAngle : Optional argument that specifies the taper angle for side one. If omitted a taper angle of 0 is used.
     // sideTwoTaperAngle : Optional argument that specifies the taper angle for side two. If omitted a taper angle of 0 is used.
-    //
+    // Returns true is setting the extent was successful.
     adsk.fusion.ExtrudeFeatureInput.prototype.setTwoSidesExtent = function (sideOneExtent, sideTwoExtent, sideOneTaperAngle, sideTwoTaperAngle) {
         if (sideOneExtent !== null && !(sideOneExtent instanceof adsk.fusion.ExtentDefinition)) { throw new TypeError('sideOneExtent must be a adsk.fusion.ExtentDefinition'); }
         if (sideTwoExtent !== null && !(sideTwoExtent instanceof adsk.fusion.ExtentDefinition)) { throw new TypeError('sideTwoExtent must be a adsk.fusion.ExtentDefinition'); }
@@ -2294,7 +2294,7 @@
     // distance : The distance of the extrusions. This is either the full length of half of the length of the final extrusion depending on the value of the isFullLength property.
     // isFullLength : Defines if the value defines the full length of the extrusion or half of the length. A value of true indicates it defines the full length.
     // taperAngle : Optional argument that specifies the taper angle. The same taper angle is used for both sides for a symmetric extrusion. If omitted a taper angle of 0 is used.
-    //
+    // Returns true is setting the extent was successful.
     adsk.fusion.ExtrudeFeatureInput.prototype.setSymmetricExtent = function (distance, isFullLength, taperAngle) {
         if (distance !== null && !(distance instanceof adsk.core.ValueInput)) { throw new TypeError('distance must be a adsk.core.ValueInput'); }
         if (typeof isFullLength !== 'boolean') { throw new TypeError('isFullLength must be a boolean'); }
@@ -2557,6 +2557,14 @@
     adsk.fusion.Feature.prototype.dissolve = function () {
         var result = this._execute('dissolve');
         return result ? result.value : undefined;
+    };
+
+    //=========== FeatureExtentTypes ============
+    // Used to indicate which type of extent is used for a feature.
+    adsk.fusion.FeatureExtentTypes = {
+        OneSideFeatureExtentType : 0,
+        TwoSidesFeatureExtentType : 1,
+        SymmetricFeatureExtentType : 2
     };
 
     //=========== FeatureList ============
@@ -7505,7 +7513,7 @@
         }
     });
 
-    // Gets and sets the entity(s) that define the splitting tool(s). The splitting tool can consist of one or more of the following: BRepBody, ConstructionPlane, BRepFace, sketch curve that extends or can be extended beyond the extents of the face. The input for this argument can be one of the valid types or an ObjectCollection in the case where multiple splitting tools are being defined.
+    // Gets and sets the entity(s) that define the splitting tool(s). The splitting tool can be a single entity or an ObjectCollection containing solid and/or open bodies, construction planes, faces, or sketch curves that partially or fully intersect the faces that are being split.
     Object.defineProperty(adsk.fusion.SplitFaceFeatureInput.prototype, 'splittingTool', {
         get : function () {
             var result = this._execute('splittingTool');
@@ -7592,10 +7600,10 @@
         return (result && result.value) ? adsk.createObject(result.value, adsk.fusion.SplitFaceFeature) : null;
     };
 
-    // Creates a SplitFaceFeatureInput object. Use properties and methods on this object to define the split face you want to create and then use the Add method, passing in the SplitFaceFeatureInput object.
-    // facesToSplit : Input the faces to be split. The collection can contain one or more faces selected from solid and/or open bodies.
-    // splittingTool : Input entity that defines the splitting tool. The splitting tool is a single entity that can be either a solid body, open body, construction plane, face, or sketch curve that partially or fully intersects the facesToSplit.
-    // isSplittingToolExtended : A boolean value for setting whether or not the splittingTool is to be automatically extended (if possible) so as to completely intersect the faces that are to be split.
+    // Creates a SplitFaceFeatureInput object. Use properties and methods on this object to define the split face you want to create and then use the Add method, passing in the SplitFaceFeatureInput object. A newly created SplitFaceFeatureInput object defaults to creating a split face feature using the "Split with Surface" option. You can use functions on the SplitFaceFeatureInput object to define a different type of split type.
+    // facesToSplit : Input the faces to be split. The collection can contain one or more faces from solid and/or open bodies.
+    // splittingTool : Input entity(s) that defines the splitting tool. The splitting tool can be a single entity or an ObjectCollection containing solid and/or open bodies, construction planes, faces, or sketch curves that partially or fully intersect the faces that are being split.
+    // isSplittingToolExtended : A boolean value for setting whether or not the splittingTool is to be automatically extended (if possible) so as to completely intersect the faces that are to be split. This is only used when the split type is "split with surface" which is the default type when a new createInput is created. Use functions on the returned SplitFaceFeatureInput to define a different type of split type.
     // Returns the newly created SplitFaceFeatureInput object or null if the creation failed.
     adsk.fusion.SplitFaceFeatures.prototype.createInput = function (facesToSplit, splittingTool, isSplittingToolExtended) {
         if (facesToSplit !== null && !(facesToSplit instanceof adsk.core.ObjectCollection)) { throw new TypeError('facesToSplit must be a adsk.core.ObjectCollection'); }
@@ -10817,6 +10825,22 @@
         }
     });
 
+    // Returns a value indicating how the extent is defined for this extrude.
+    Object.defineProperty(adsk.fusion.ExtrudeFeature.prototype, 'extentType', {
+        get : function () {
+            var result = this._execute('extentType');
+            return result ? result.value : undefined;
+        }
+    });
+
+    // If the current extent of the feautre is defined as a symmetric extent, this property returns the SymmericExtentDefinition object that provides access to the information defining the symmetric extent. If the current extent is not symmetric, this property returns null. You can determine the type of extent by using the extentType property. To change the extent of a feature to symmetric extent you can use the setSymmetricExtent method.
+    Object.defineProperty(adsk.fusion.ExtrudeFeature.prototype, 'symmetricExtent', {
+        get : function () {
+            var result = this._execute('symmetricExtent');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.fusion.SymmetricExtentDefinition) : null;
+        }
+    });
+
     // Sets the extrusion extents option to 'Distance'.
     // isSymmetric : Set to 'true' for an extrusion symmetrical about the profile plane
     // distance : ValueInput object that defines the extrude distance. If the isSymmetric argument is 'false', a positive or negative distance can be used to control the direction.
@@ -11301,9 +11325,7 @@
         }
     });
 
-    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection.
-    // When setting or getting this property, you must roll the timeline back to just before the feature
-    // so that the model is in the state just before the feature is computed.
+    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection. When setting or getting this property, you must roll the timeline back to just before the feature so that the model is in the state just before the feature is computed.
     Object.defineProperty(adsk.fusion.HoleFeature.prototype, 'participantBodies', {
         get : function () {
             var result = this._execute('participantBodies');
@@ -13262,9 +13284,7 @@
         }
     });
 
-    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection.
-    // When setting or getting this property, you must roll the timeline back to just before the feature
-    // so that the model is in the state just before the feature is computed.
+    // Gets and sets the list of bodies that will participate in the feature when the operation is a cut or intersection. When setting or getting this property, you must roll the timeline back to just before the feature so that the model is in the state just before the feature is computed.
     Object.defineProperty(adsk.fusion.RevolveFeature.prototype, 'participantBodies', {
         get : function () {
             var result = this._execute('participantBodies');
@@ -13938,7 +13958,7 @@
         }
     });
 
-    // Gets and sets the entity(s) that define the splitting tool(s). The splitting tool can consist of one or more of the following: BRepBody, ConstructionPlane, BRepFace, sketch curve that extends or can be extended beyond the extents of the face.
+    // Gets and sets the entity(s) that define the splitting tool(s). The splitting tool can consist of one or more of the following: BRepBody, ConstructionPlane, BRepFace, sketch curve that extends or can be extended beyond the extents of the face. To set the splitting tool, use one of the set methods to also define the split type.
     Object.defineProperty(adsk.fusion.SplitFaceFeature.prototype, 'splittingTool', {
         get : function () {
             var result = this._execute('splittingTool');
@@ -13946,7 +13966,7 @@
         }
     });
 
-    // Gets whether or not the setting to automatically extend the splittingTool was set when the feature was created.
+    // Gets whether or not the setting to automatically extend the splittingTool was set when the feature was created. This property is valid only when the splitType property returns surfaceIntersectionSplitType.
     Object.defineProperty(adsk.fusion.SplitFaceFeature.prototype, 'isSplittingToolExtended', {
         get : function () {
             var result = this._execute('isSplittingToolExtended');
@@ -13954,11 +13974,7 @@
         }
     });
 
-    // Functionality common to all objects that can act as a proxy.
-    // A Proxy is the native object in the context of an assembly (or occurrence).
-    // Information from the assembly context is automatically
-    // applied to the proxy - e.g. the assembly transform is applied to geometry.
-    // **
+    // The NativeObject is the object outside the context of an assembly and in the context of it's parent component. Returns null in the case where this object is not in the context of an assembly but is already the native object.
     Object.defineProperty(adsk.fusion.SplitFaceFeature.prototype, 'nativeObject', {
         get : function () {
             var result = this._execute('nativeObject');
@@ -14052,11 +14068,7 @@
         }
     });
 
-    // Functionality common to all objects that can act as a proxy.
-    // A Proxy is the native object in the context of an assembly (or occurrence).
-    // Information from the assembly context is automatically
-    // applied to the proxy - e.g. the assembly transform is applied to geometry.
-    // **
+    // The NativeObject is the object outside the context of an assembly and in the context of it's parent component. Returns null in the case where this object is not in the context of an assembly but is already the native object.
     Object.defineProperty(adsk.fusion.StitchFeature.prototype, 'nativeObject', {
         get : function () {
             var result = this._execute('nativeObject');
