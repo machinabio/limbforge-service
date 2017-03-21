@@ -171,6 +171,8 @@ Queue.define(
     agent.ping = Random.id();
     if (sinceLastSighting > agentTimeout) {
       agent.online = false;
+    } else {
+      agent.online = true;
     }
     agent.save();
 

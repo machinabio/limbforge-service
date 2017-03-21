@@ -26,7 +26,7 @@ Template.webClientLayout.onRendered(() => {
 
 Template.scriptList.helpers({
   scripts() {
-    return Script.find({}, {sort: {name: 1}});
+    return Script.find({}, { sort: { name: 1 } });
   },
   active() {
     return this._id == Session.get('activeScript') ? "active" : "";
@@ -47,7 +47,7 @@ Template.scriptList.events({
       Session.set('activeScript', script._id);
     });
   }
-})
+});
 
 Template.code.events({
   'click #runScript' (event) {
@@ -148,7 +148,6 @@ Template.agent_count.helpers({
   }
 });
 
-
 Template.agent_collection.helpers({
   agents() {
     var agent_list = [];
@@ -214,7 +213,6 @@ Template.agent_collection_item.helpers({
   }
 });
 
-
 Template.debug_api.helpers({
   paramEditorOptions() {
     return {
@@ -239,7 +237,6 @@ Template.debug_api.helpers({
     return transaction.response;
   }
 });
-
 
 Template.debug_api.events({
   'click #runCloudScript' (event) {

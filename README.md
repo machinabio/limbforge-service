@@ -55,8 +55,11 @@ This endpoint returns the specified STL(s) in a low-resolution mesh suitable for
   * **Code:** `503 SERVICE UNAVAILABLE` <br />
     **Reason:** The service has no available CAD agents to fufill the request.
 
+  * **Code:** `400 BAD REQUEST` <br />
+    **Reason:** There was a problem parsing the query parameters.
+
   * **Code:** `404 NOT FOUND` <br />
-    **Reason:** The service has no available CAD agents to fufill the request.
+  **Reason:** The service has no available CAD agents to fufill the request.
 
 * **Sample Call:**
 
