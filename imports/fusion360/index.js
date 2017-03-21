@@ -46,16 +46,16 @@ Template.fusionClientLayout.helpers({
       this._runningScript = true;
       this.save();
       // Using eval() doesn't allow the console debugger to display source or set breakpoints'
-      // delete global.Shift;
-      Shift = new shift(transaction ? transaction._id : null)
+      delete global.Shift;
+      global.Shift = new shift(transaction ? transaction._id : null)
       transaction.start_time = new Date();
-      // Function(this._script).bind(this)();
+      Function(this._script).bind(this)();
       // console.log('running script ', this._script);
-      var e = document.createElement('script');
-      e.type = 'text/javascript';
-      e.src = 'data:text/javascript;charset=utf-8,' + encodeURI(this._script);
-      document.head.appendChild(e);
-      e.remove();
+      // var e = document.createElement('script');
+      // e.type = 'text/javascript';
+      // e.src = 'data:text/javascript;charset=utf-8,' + encodeURI(this._script);
+      // document.head.appendChild(e);
+      // e.remove();
       // save the Shift.response property to the transaction. Meteor.call?
       transaction.finish_time = new Date();
       transaction.response = EJSON.stringify(Shift.response);

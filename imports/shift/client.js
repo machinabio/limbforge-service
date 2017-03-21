@@ -17,6 +17,7 @@ export default Shift = class Shift {
     }
     
     this.response = {};
+    console.log('Transaction: ', this);
   }
 
   cache(stlBuffer, path) {
@@ -24,14 +25,8 @@ export default Shift = class Shift {
     console.log('stl : ', TextDecoder.decode(stlBuffer));
     Meteor.call('shift.cache', stlBuffer, path);
   }
+
+  log(arg) {
+    console.log(arg);
+  }
 };
-
-
-/*
-
-Loading Threejs geometery from a ArrayBuffer in JS 
-http://n-e-r-v-o-u-s.com/blog/?p=2738
-
-
-
-*/

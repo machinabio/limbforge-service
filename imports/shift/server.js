@@ -43,14 +43,4 @@ Meteor.methods({
     });
     future.wait();
   }
-})
-
-
-/*
-
-Loading Threejs geometery from a ArrayBuffer in JS 
-http://n-e-r-v-o-u-s.com/blog/?p=2738
-
-
-
-*/
+});
