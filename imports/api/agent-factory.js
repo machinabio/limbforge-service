@@ -13,7 +13,7 @@ import Transaction from '/imports/models/transaction.js';
 import Queue from '/imports/api/job-queue.js';
 import Script from '/imports/api/scripts.js';
 
-const purgeLimit = humanInterval('5 minutes'); // seconds until an agent is considered "dead" and purged
+const purgeLimit = humanInterval('1 minute'); // seconds until an agent is considered "dead" and purged
 const agentWatchdogTick = humanInterval('3 seconds'); // check each active agent's status every 2 seconds 
 const agentTimeout = humanInterval('7 seconds'); // 5 seconds until an agent is considered "offline"
 
@@ -139,6 +139,7 @@ Api.addRoute('retrieveAgent', {
 });
 
 Queue.processEvery('0.5 second');
+
 Queue.define(
   'agent_check_all', { lockLifetime: 500 },
   Meteor.bindEnvironment((job, done) => {
@@ -169,14 +170,17 @@ Queue.define(
       job.remove();
       return;
     }
-
-    agent.ping = Random.id();
+    
     if (sinceLastSighting > agentTimeout) {
       agent.online = false;
     } else {
       agent.online = true;
     }
+
+    agent.ping = Random.id();
     agent.save();
+    
+    job.remove();
 
     return;
   })
