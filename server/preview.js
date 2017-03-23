@@ -1,9 +1,17 @@
-// import hash from 'object-hash';
-// import stringify from 'json-stable-stringify';
-import hasha from 'hasha';
+import { Meteor } from 'meteor/meteor';
 import { EJSON } from 'meteor/ejson'
+import { check } from 'meteor/check';
+
+import hasha from 'hasha';
+import knox from 'knox';
 
 const quality = 'preview';
+const settings = Meteor.settings.storage;
+const storage_client = knox.createClient({
+  key: settings.accessKeyId,
+  secret: settings.secretAccessKey,
+  bucket: settings.bucket
+});
 
 //Restivus is a global. See https://github.com/kahmali/meteor-restivus
 const Api = new Restivus({
@@ -29,16 +37,18 @@ Api.addRoute('preview', {
         const id = parsed.id;
         const cache_id = get_hash(parsed);
         delete parsed.id;
-        operations.push({ id, cache_id, params: parsed });
+        operations.push({ id, cache_id, parameters: parsed });
       });
-    }
-    catch (error) {
+      // console.log('ops: ', operations)
+      operations.forEach(get_STL);
+
+    } catch (error) {
+      console.error(error);
       return {
         statusCode: 400,
-        body: 'Can\'t parse query'
+        body: error
       }
     }
-    let urls = [];
 
     return operations;
   },
@@ -73,7 +83,39 @@ function parse_and_normalize(stringified_parameters) {
 }
 
 function get_hash(parameters) {
-  let object_string = EJSON.stringify({...parameters, quality }, {cannonical: true});
-  return hasha(object_string, {algorithm: "sha512"});
+  let object_string = EJSON.stringify({...parameters, quality }, { cannonical: true });
+  return hasha(object_string, { algorithm: "sha512" });
+}
+
+//TODO Clean up the commented code. Here just for short-term reference 
+function get_STL({ id, cache_id, parameters }) {
+  console.log(`ID: ${id}, cache_id? ${cache_id}`);
+  // storage_client.headFile(cache_id, (error, response) => {
+  //   console.log('results: ', response.statusCode);
+  //   if (response.statusCode === 200) {
+  //     console.log('--success!');
+  //     // return HTTP.
+  //   } else {
+  //     console.log('--failure!');
+  //   }
+  // });
+
+  const status = Meteor.wrapAsync(storage_client.headFile, storage_client)(cache_id);
+  const cached = (status === 200);
+  let request;
+  if (cached) {
+    return request
+      .get(storage_client.https(cache_id))
+      .on('response', function(response) {
+        console.log(response.statusCode) // 200 
+        console.log(response.headers['content-type']) // 'image/png' 
+      })
+  } else {
+    // enqueu
+  }
+  console.log(`ID: ${id}, status? ${status.statusCode}`);
+  i
+  return status;
+  // console.log('results: ', cached.statusCode);
 }
 

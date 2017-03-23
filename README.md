@@ -6,9 +6,10 @@ This worker produces STLs generated from parametric CAD designs stored in Fusion
 This is the backend for the (Limbforge)[https://github.com/limbforge/Limbforge] web app.  Although this is basically a single-purpose sever, the underlying architecture can be extended to automate CAD-tasks in general.
 
 **Current Status**
-[] Set Fusion360 parameters from Shift.data.params.
-[] Call /api/rex from preview.js for each operation.
-[] Return the combined streams in the response.
+
+* [] Call /api/rex from preview.js for each operation (`process_operation()` in /server/preview.js)
+* [] Return the combined streams in the response.
+* [] make a `print` endpoint (copy + modify preview.js)
 
 
 **Installation**
