@@ -15,18 +15,21 @@ export default Shift = class Shift {
       this.transaction = this._transaction_doc._id;
       this.data = this._transaction_doc.data;
     }
-    
     this.response = {};
-    console.log('Transaction: ', this);
+    // console.log('Processing transaction: ', this);
   }
 
   cache(stlBuffer, path) {
     analytics.track('shift.cache', { path: path, size: stlBuffer.length });
-    console.log('stl : ', TextDecoder.decode(stlBuffer));
+    // console.log('stl : ', TextDecoder.decode(stlBuffer));
     Meteor.call('shift.cache', stlBuffer, path);
   }
 
-  log(arg) {
-    console.log(arg);
+  sleep(ms) {
+    const start = new Date().getTime();
+    const expire = start + ms;
+    while (new Date().getTime() < expire) {}
+    return;
   }
 };
+
