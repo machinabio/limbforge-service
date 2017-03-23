@@ -49,20 +49,27 @@ Template.fusionClientLayout.helpers({
       delete global.Shift;
       global.Shift = new shift(transaction ? transaction._id : null)
       transaction.start_time = new Date();
-      Function(this._script).bind(this)();
-      // console.log('running script ', this._script);
-      // var e = document.createElement('script');
-      // e.type = 'text/javascript';
-      // e.src = 'data:text/javascript;charset=utf-8,' + encodeURI(this._script);
-      // document.head.appendChild(e);
-      // e.remove();
-      // save the Shift.response property to the transaction. Meteor.call?
-      transaction.finish_time = new Date();
-      transaction.response = EJSON.stringify(Shift.response);
-      // console.log("response ", transaction.response)
-      transaction.save();
+
+      // let script = this._script + '\nShift.done();';
+
+      // Function(this._script).bind(this)();
+      // console.log('running script ', script);
+      let e = document.createElement('script');
+      e.type = 'text/javascript';
+      e.addEventListener("load", () => {
+        // console.log('in script loaded callback');
+        e.remove();
+        transaction.finish_time = new Date();
+        transaction.response = EJSON.stringify(Shift.response);
+        transaction.save();
+      });
+      e.src = 'data:text/javascript;charset=utf-8,' + encodeURI(this._script);
+      document.head.appendChild(e);
+      // console.log('script ran!');
+      // transaction.finish_time = new Date();
+      // transaction.response = EJSON.stringify(Shift.response);
+      // transaction.save();
     }
   }
 });
-
 
