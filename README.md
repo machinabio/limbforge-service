@@ -37,7 +37,8 @@ This endpoint returns the specified STL(s) in a low-resolution mesh suitable for
    **Required:**
 
    `component=[stringifed JSON]` <br />
-   The component data is specified as a JSON object. The only required property is `id`, a GUID specifying a workflow that generates the desired component. Any additional properties included on the object are passed in as arguments to the workflow.<br />
+   The component data is specified as a JSON object. The only required property is `id`, a GUID specifying a workflow that generates the desired component. Any additional properties included on the object are passed in as arguments to the workflow. Units can be specified (i.e. `3 mm`)
+   in any standard units. If no units are specified, millimeters (mm) are the assumed unit.<br />
    *Multiple components are specified by including this parameter multiple times, ie. `/preview?component={"id":"foo","handedness":"L","param1":"2"}&component={"id":"bar","handedness":"L","paramX":"Y"}`*
 
 * **Request Headers**
