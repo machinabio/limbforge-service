@@ -28,27 +28,27 @@
 <template name="code">
   <div class="col s9" id='codePane'>
     {{#with activeScript}}
-    <div>
-      <ul class="collapsible" data-collapsible="accordion">
-        <li>
-          <div class="collapsible-header"><i class="material-icons">settings</i>Settings</div>
-          <div class="collapsible-body">
-            {{> codeSettings}}
-          </div>
-        </li>
-        <li>
-          <div class="collapsible-header active"><i class="material-icons">code</i>Code</div>
-          <div class="collapsible-body">
-            <div style="margin:5px">
-              <a id="runScript" class="waves-effect waves-light btn">
-                <i class="material-icons left">play_arrow</i>Run on Desktop</a>
+      <div>
+        <ul class="collapsible" data-collapsible="accordion">
+          <li>
+            <div class="collapsible-header"><i class="material-icons">settings</i>Settings</div>
+            <div class="collapsible-body">
+              {{> codeSettings}}
             </div>
-            <div> {{> CodeMirror id="scriptBody" name="scriptBody" options=codeEditorOptions reactiveVar="scriptBody"}}
+          </li>
+          <li>
+            <div class="collapsible-header active"><i class="material-icons">code</i>Code</div>
+            <div class="collapsible-body">
+              <div style="margin:5px">
+                <a id="runScript" class="waves-effect waves-light btn">
+                  <i class="material-icons left">play_arrow</i>Run on Desktop</a>
+              </div>
+              <div> {{> CodeMirror id="scriptBody" name="scriptBody" options=codeEditorOptions reactiveVar="scriptBody"}}
+              </div>
             </div>
-          </div>
-        </li>
-      </ul>
-    </div>
+          </li>
+        </ul>
+      </div>
     {{/with}}
   </div>
 </template>
@@ -72,7 +72,7 @@
   <div class="switch row">
     <label>
       Off
-      <input type="checkbox" id="script_published" checked={{published}}>
+      <input type="checkbox" id="script_published" checked= {{published}}>
       <span class="lever"></span> On
     </label>
   </div>
@@ -149,6 +149,12 @@
         </a>
       </div>
     </div>
+    <div class='row'>  
+    </div>
+    <div class='row'>
+      <a class='downloadLink' href='/plugins/shift.zip' download>Download desktop plugin</a>
+      <a class='downloadLink' href='/plugins/shift-agent.zip' download>Download agent plugin</a>
+    </div>
     <div class='row'>
       <div id='loginContainer'>
         {{> loginButtons}}
@@ -185,7 +191,6 @@
     {{ #each agents}} {{> agent_collection_item}} {{ /each}}
   </div>
 </template>
-
 <template name="agent_collection_item">
   <a href="#!" class="collection-item {{active}}">{{name}}</a>
 </template>
@@ -193,38 +198,37 @@
 <template name='agent_details'>
   <div class="col s8" id='codePane'>
     {{#with agent}}
-    <label>Name</label>
-    <div class="row">
-      {{name}}
-    </div>
-    <label>Type</label>
-    <div class="row">
-      {{type}}
-    </div>
-    <label>Status</label>
-    <div class="row">
-      {{status}}
-    </div>
-    <label>Running a script</label>
-    <div class="row">
-      {{busy}}
-    </div>
-    <label>Last seen</label>
-    <div class="row">
-      {{last_seen}}
-    </div>
-    <label>Foreman</label>
-    <div class="row">
-      {{foreman}}
-    </div>
-    <label>agent ID</label>
-    <div class="row">
-      {{_id}}
-    </div>
+      <label>Name</label>
+      <div class="row">
+        {{name}}
+      </div>
+      <label>Type</label>
+      <div class="row">
+        {{type}}
+      </div>
+      <label>Status</label>
+      <div class="row">
+        {{status}}
+      </div>
+      <label>Running a script</label>
+      <div class="row">
+        {{busy}}
+      </div>
+      <label>Last seen</label>
+      <div class="row">
+        {{last_seen}}
+      </div>
+      <label>Foreman</label>
+      <div class="row">
+        {{foreman}}
+      </div>
+      <label>agent ID</label>
+      <div class="row">
+        {{_id}}
+      </div>
     {{/with}}
   </div>
 </template>
-
 
 <template name="agentSettings">
   <div class="row">
@@ -235,92 +239,3 @@
   </div>
 </template>
 
-
-<!-- <template name="scriptingLayout">
-  <h1>Fusion360 Code Station</h1>
-  <div>
-    <h2>Script</h2> {{> scripting}}
-  </div>
-  <div>
-    <h2>Agents</h2> {{> agent_table }}
-  </div>
-</template>
-
-<template name="api_test">
-  <div>
-    <textarea type="textarea" id="data" placeholder="Enter JSON to send" cols="60" rows="10">
-    </textarea>
-  </div>
-  <button id="send">Send JSON</button>
-  <div>
-    <h3>Response:</h3> {{ response }}
-    {{ #with response }}
-  </div>
-</template>
-
-<template name="scripting">
-  <div>
-    <textarea type="textarea" id="script" placeholder="// enter your Fusion360 script here" cols="60" rows="10">{{default_script}}
-    </textarea>
-  </div>
-  {{> agent_dropdown}}
-  <button id="send">Run Script</button>
-</template>
-
-<template name="agent_dropdown">
-  <select class="form-control" id="select_agent">
-    <option disabled="disabled" selected="selected" value="NA">Please Select</option>
-    {{#each agents}} {{#if status}}
-    <option value="{{_id}}">{{name}}</option>
-    {{/if}} {{/each}}
-  </select>
-</template>
-
-<template name="monitor_api">
-  <div>
-    <table>
-      <thead>
-        <th>Reception time</th>
-        <th>Content</th>
-      </thead>
-      <tbody>
-        {{ #each last_messages}}
-        <tr>
-          <td> {{ time }} </td>
-          <td> {{ content }} </td>
-        </tr>
-        {{ /each}}
-      </tbody>
-    </table>
-  </div>
-</template>
-
-
-<template name="agent_table">
-  <div>
-    <table>
-      <thead>
-        <th>Name</th>
-        <th>Status</th>
-        <th>Last Seen</th>
-        <th>Factory</th>
-        <th>Foreman</th>
-      </thead>
-      <tbody>
-        {{ #each agents}}
-        <tr>
-          <td> {{ name }} </td>
-          <td style="text-align:center"> {{ status }} </td>
-          <td> {{ formattedLastSeen }} </td>
-          <td> {{ factory }} </td>
-          <td> {{ foreman }} </td>
-        </tr>
-        {{ /each}}
-      </tbody>
-    </table>
-  </div>
-</template>
-
-<template name="parameters_browser">
-  {{#with limbforge}} length: {{ length }} filet: {{ filet }} {{/with}}
-</template> -->

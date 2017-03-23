@@ -92,6 +92,10 @@
   padding: 30px 30px 10px 30px;
 }
 
+.downloadLink {
+  font-size: x-small;
+}
+
 #scriptBody {
   height: 500px;
 }
