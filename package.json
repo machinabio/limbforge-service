@@ -11,9 +11,12 @@
     "bcrypt": "^0.8.7",
     "meteor-node-stubs": "~0.2.0",
     "multistream": "^2.1.0",
+    "openurl": "^1.1.1",
     "opn": "^4.0.2",
     "request": "^2.79.0",
+    "s3-zip": "0.0.13",
     "s3fs": "^2.5.0",
+    "send": "^0.15.1",
     "temp": "^0.8.3",
     "tempfile": "^1.1.1",
     "tmp": "0.0.31"

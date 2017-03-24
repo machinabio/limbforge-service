@@ -4,3 +4,6 @@
 
 settings.json
 node_modules/
+.idea
+settings
+settings-dev.json

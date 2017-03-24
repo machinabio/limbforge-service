@@ -15,8 +15,8 @@ import AWS from 'aws-sdk';
 import send from 'send';
 
 AWS.config = new AWS.Config();
-AWS.config.accessKeyId = "AKIAJMQ3NQ364UPGGBOA";
-AWS.config.secretAccessKey = "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";
+AWS.config.accessKeyId = "AKIAJBQQSLZ3BW4Q63BQ";
+AWS.config.secretAccessKey = "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";
 AWS.config.region = "us-east-1";
 
 Meteor.startup(() => {
@@ -33,9 +33,9 @@ Api.addRoute('healthcheck', {
   }
 });
 
-Api.addRoute('submit', {
+Api.addRoute('limbforge', {
   get: function() {
-    console.log('/api/submit #### data: ', this.queryParams.parameters);
+    console.log('/api/limbforge #### data: ', this.queryParams.parameters);
     var data = EJSON.parse(this.queryParams.parameters);
     Messages.insert({
       content: EJSON.stringify(data),
@@ -142,3 +142,6 @@ Meteor.methods({
       // openurl('fusion360://command=open&file=/dev/null.f3d&privateInfo=' + JSON.stringify(data));
   }
 });
+
+
+//curl -LX GET "http://fusion360.io/api/submit?parameters=%7B%22component%22%3A%221%22%2C%22orientation%22%3A%22left%22%2C%22C4%22%3A220%2C%22L1%22%3A220%2C%22TD%22%3A%22phone%22%7D"
