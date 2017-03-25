@@ -1,5 +1,4 @@
 import { Meteor } from 'meteor/meteor';
-import { open } from 'openurl';
 import { HTTP } from 'meteor/http';
 import { EJSON } from 'meteor/ejson';
 import { check } from 'meteor/check';
@@ -12,7 +11,6 @@ import tmp from 'tmp';
 import s3Zip from 's3-zip';
 import path from 'path';
 import AWS from 'aws-sdk';
-import opn from 'opn';
 
 import { analytics } from "meteor/okgrow:analytics";
 
