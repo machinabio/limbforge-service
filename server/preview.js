@@ -4,6 +4,7 @@ import { check } from 'meteor/check';
 
 import hasha from 'hasha';
 import knox from 'knox';
+import request from 'request';
 
 const quality = 'preview';
 const settings = Meteor.settings.storage;
@@ -70,7 +71,7 @@ function parse_and_normalize(stringified_parameters) {
   // console.log("p: ", cleaned_parameters)
   for (key in cleaned_parameters) {
     // console.log(' k: ', key)
-    if (isNaN(parseFloat(cleaned_parameters[key]))) {
+    if (isNaN(parseFloat(cleaned_parameters[key])) || key === 'id') {
       // console.log(" s:", cleaned_parameters[key]);
       cleaned_parameters.id = String(cleaned_parameters.id);
     } else {
@@ -102,19 +103,27 @@ function get_STL({ id, cache_id, parameters }) {
 
   const status = Meteor.wrapAsync(storage_client.headFile, storage_client)(cache_id);
   const cached = (status === 200);
-  let request;
   if (cached) {
+    const url = storage_client.https(cache_id);
+    console.log('-- already cached at $url}!');
     return request
-      .get(storage_client.https(cache_id))
+      .get(url)
       .on('response', function(response) {
         console.log(response.statusCode) // 200 
         console.log(response.headers['content-type']) // 'image/png' 
       })
   } else {
-    // enqueu
+    const data = { cache_id, parameters };
+    const url = `http://localhost:3000/api/rex/${id}`
+    console.log(`-- generating part ID ${id}, passing parameters ${EJSON.stringify(data)} to ${url}`);
+    return request
+      .post(url)
+      .json(data)
+      .on('response', function(response) {
+        console.log(response.statusCode) // 200 
+        console.log(response.headers['content-type']) // 'image/png' 
+      })
   }
-  console.log(`ID: ${id}, status? ${status.statusCode}`);
-  i
   return status;
   // console.log('results: ', cached.statusCode);
 }
