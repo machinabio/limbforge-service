@@ -35,7 +35,7 @@ Meteor.methods({
   'shift.cache' (stl, path) {
     this.unblock();
     console.log('METHOD shift.cache to path ',path );
-    future = new Future();
+    const future = new Future();
     console.log('...with buffer', TextDecoder.decode(stl).slice(0,100));
     var stl_buffer = toBuffer(stl);
     storage_client.putBuffer(stl_buffer, path, {'Content-Type': 'application/vnd.ms-pkistl'}, ()=>{
