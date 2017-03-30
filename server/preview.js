@@ -25,15 +25,15 @@ const Api = new Restivus({
 
 Api.addRoute('preview', {
   get() {
-    console.log('preview endpoint', this.queryParams);
+    console.log('*** preview endpoint', this.queryParams);
     let operations = [];
     let components;
     try {
       if (typeof this.queryParams.component === 'object') {
-        console.log('array');
+        console.log('*** found an array of components');
         components = [...this.queryParams.component];
       } else {
-        console.log('single');
+        console.log('*** found a single component');
         components = [this.queryParams.component];
       }
       components.forEach((component) => {
@@ -47,6 +47,7 @@ Api.addRoute('preview', {
       let archive = archiver('zip');
       operations.forEach((operation) => {
         const name = Random.id(4);
+        console.log(`*** using "${name}" as the name for component ${operation.id}`);
         archive.append(get_STL(operation), { name });
       });
       var fiber = Fiber.current;
