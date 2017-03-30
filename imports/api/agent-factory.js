@@ -142,7 +142,7 @@ Queue.define(
   'agent_check_all', { lockLifetime: 500 },
   Meteor.bindEnvironment((job, done) => {
     agents = Agent.find({}).fetch();
-    console.log('checking watchdogs for ' + agents.length + ' agents');
+    // console.log('checking watchdogs for ' + agents.length + ' agents');
     agents.forEach((agent) => {
       Queue.create('agent_check', agent._id)
         .unique({ id: agent._id })
