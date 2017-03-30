@@ -79,6 +79,10 @@ This endpoint returns the specified STL(s) in a low-resolution mesh suitable for
 This endpoint returns the specified component(s) in resoltion suitable for printing. Otherwise, this endpoint is identical to the `/preview` endpoint.
 
 
+# Deploy command
+
+`DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy fusion360.io`
+
 # Credits
 
 * Punched Card by Ralf Schmitzer from the Noun Project
