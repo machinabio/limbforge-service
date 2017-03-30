@@ -15,9 +15,9 @@ import AWS from 'aws-sdk';
 import send from 'send';
 
 AWS.config = new AWS.Config();
-AWS.config.accessKeyId = "AKIAJBQQSLZ3BW4Q63BQ";
-AWS.config.secretAccessKey = "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";
-AWS.config.region = "us-east-1";
+AWS.config.accessKeyId = Meteor.settings.storage.accessKeyId;
+AWS.config.secretAccessKey = Meteor.settings.storage.secretAccessKey;
+AWS.config.region = Meteor.settings.storage.region;
 
 Meteor.startup(() => {
   // Whatever code is needed to startup the server goes here
