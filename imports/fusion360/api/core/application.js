@@ -3516,6 +3516,30 @@
         return (result && result.value) ? adsk.createObject(result.value, adsk.core.Point3D) : null;
     };
 
+    // Converts a 2D screen point into the equivalent viewport coordinate.
+    // screenCoordinate : A 2D coordinate in screen space. (0,0) indicates the upper-left corner of the entire screen.
+    // Returns the equivalent point in the viewport. This can return null in the case where the input screen point does not lie within the viewport.
+    adsk.core.Viewport.prototype.screenToView = function (screenCoordinate) {
+        if (screenCoordinate !== null && !(screenCoordinate instanceof adsk.core.Point2D)) { throw new TypeError('screenCoordinate must be a adsk.core.Point2D'); }
+        var args = {
+            screenCoordinate : (screenCoordinate === null ? screenCoordinate : screenCoordinate.handle)
+        };
+        var result = this._execute('screenToView', args);
+        return (result && result.value) ? adsk.createObject(result.value, adsk.core.Point2D) : null;
+    };
+
+    // Converts a 2D viewPort point into the equivalent screen coordinate.
+    // viewCoordinate : A 2D coordinate in the viewport. (0,0) indicates the upper-left corner of the viewport.
+    // Returns the equivalent point in the screen. This can return null in the case where the input point is outside the bounds of the screen, which also means it's outside any viewport.
+    adsk.core.Viewport.prototype.viewToScreen = function (viewCoordinate) {
+        if (viewCoordinate !== null && !(viewCoordinate instanceof adsk.core.Point2D)) { throw new TypeError('viewCoordinate must be a adsk.core.Point2D'); }
+        var args = {
+            viewCoordinate : (viewCoordinate === null ? viewCoordinate : viewCoordinate.handle)
+        };
+        var result = this._execute('viewToScreen', args);
+        return (result && result.value) ? adsk.createObject(result.value, adsk.core.Point2D) : null;
+    };
+
     //=========== VisualStyles ============
     // A list of the support visual styles that Fusion uses when rendering the model.
     adsk.core.VisualStyles = {

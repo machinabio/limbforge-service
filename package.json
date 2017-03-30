@@ -2,7 +2,8 @@
   "name": "fusion-microservice-worker",
   "private": true,
   "scripts": {
-    "start": "meteor run"
+    "start": "meteor run",
+    "update": "rsync -crvvh $HOME/Library/Application\\ Support/Autodesk/Autodesk\\ Fusion\\ 360/API/JavaScript/src/adsk/ ./imports/fusion360/api/"
   },
   "dependencies": {
     "agenda": "^0.9.0",
@@ -24,3 +25,4 @@
     "typedarray-to-buffer": "^3.1.2"
   }
 }
+

@@ -2463,7 +2463,7 @@
         }
     });
 
-    // This event is fired when the JavaScript associated with the HTML calls the window.neutronJavaScriptObject function. This allows the HTML to communicate with the add-in by passing information to the add-in.
+    // This event is fired when the JavaScript associated with the HTML calls the adsk.fusionSendData function. This allows the HTML to communicate with the add-in by passing information to the add-in.
     Object.defineProperty(adsk.core.Palette.prototype, 'incomingFromHTML', {
         get : function () {
             var result = this._execute('incomingFromHTML');
@@ -2535,7 +2535,7 @@
         }
     });
 
-    // Gets and sets the width of the palette. Setting this property may not always set the width. Depending on how the palette is docked or snapped, the width not be editable.
+    // Gets and sets the width of the palette. Setting this property may not always set the width. Depending on how the palette is docked or snapped, the width may not be editable.
     Object.defineProperty(adsk.core.Palette.prototype, 'width', {
         get : function () {
             var result = this._execute('width');
@@ -2551,7 +2551,7 @@
         }
     });
 
-    // Gets and sets the height of the palette. Setting this property may not always set the height. Depending on how the palette is docked or snapped, the width not be editable.
+    // Gets and sets the height of the palette. Setting this property may not always set the height. Depending on how the palette is docked or snapped, the height may not be editable.
     Object.defineProperty(adsk.core.Palette.prototype, 'height', {
         get : function () {
             var result = this._execute('height');
@@ -2599,7 +2599,7 @@
         }
     });
 
-    // <p>Sends the string to the JavaScript associated with the loaded HTML. A variation of the event handler below should be implemented in the JavaScript associated with the HTML to receive the data. The event will be triggered by Fusion whenever the sendInfoToHTML method is called.</p> <pre class="api-code">window.neutronJavaScriptHandler = { handle: function(actionString, dataString){ confirm('Action from Fusion: ' + actionString); confirm('Data from Fusion: ' + dataString); // Build up JSON return string. var result = {}; result.status = 'OK'; var response = JSON.stringify(result); return response; } };</pre> <p>Your JavaScript code should always return something in response because an empty string response is assumed to be a failure.</p>
+    // <p>Sends the string to the JavaScript associated with the loaded HTML. A variation of the event handler below should be implemented in the JavaScript associated with the HTML to receive the data. The event will be triggered by Fusion whenever the sendInfoToHTML method is called.</p> <pre class="api-code">window.fusionJavaScriptHandler = { handle: function(actionString, dataString){ confirm('Action from Fusion: ' + actionString); confirm('Data from Fusion: ' + dataString); // Build up JSON return string. var result = {}; result.status = 'OK'; var response = JSON.stringify(result); return response; } };</pre> <p>Your JavaScript code should always return something in response because an empty string response is assumed to be a failure.</p>
     // action : The "action" string to pass to the JavaScript associated with the HTML. This string can be anything but will typically be JSON formatted information.
     // data : The "data" string to pass to the JavaScript associated with the HTML. This string can be anything but will typically be JSON formatted information.
     // Returns a string that can be anything that your JavaScript code generates. The JavaScript should always return some content because an empty string is used to indicate a failure.
