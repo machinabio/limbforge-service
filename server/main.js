@@ -24,7 +24,8 @@ Meteor.startup(() => {
 });
 
 let Api = new Restivus({
-  prettyJson: true
+  prettyJson: true,
+  enableCors: true
 });
 
 Api.addRoute('healthcheck', {
@@ -46,7 +47,6 @@ Api.addRoute('limbforge', {
     // PARSE PARAMETERS...
     ///////////////////////////////////
     var archiveFilename = 'limbforge.zip';
-
 
     var files = [];
     /////////////////////////////////// 
@@ -125,8 +125,12 @@ Api.addRoute('limbforge', {
     send(this.request, archivePath)
       .on('headers', (response) => {
         response.setHeader('Content-Disposition', 'attachment; filename=' + archiveFilename);
+        response.setHeader('Content-Type', 'application/zip');
+        response.setHeader('Access-Control-Allow-Origin', '*');
+        response.setHeader('Access-Control-Allow-Headers', 'Origin, Access-Control-Allow-Origin');
+        response.setHeader('Access-Control-Allow-Methods', 'GET, POST');
       })
-      .on('end', (response) => {
+      .on('end', () => {
         fiber.run();
       })
       .pipe(this.response)
@@ -143,5 +147,5 @@ Meteor.methods({
   }
 });
 
-
 //curl -LX GET "http://fusion360.io/api/submit?parameters=%7B%22component%22%3A%221%22%2C%22orientation%22%3A%22left%22%2C%22C4%22%3A220%2C%22L1%22%3A220%2C%22TD%22%3A%22phone%22%7D"
+
