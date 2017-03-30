@@ -105,23 +105,24 @@ function get_STL({ id, cache_id, parameters }) {
   const cached = (status === 200);
   if (cached) {
     const url = storage_client.https(cache_id);
-    console.log('-- already cached at $url}!');
+    console.log('// already cached at $url}!');
     return request
       .get(url)
       .on('response', function(response) {
-        console.log(response.statusCode) // 200 
-        console.log(response.headers['content-type']) // 'image/png' 
+        console.log(response.statusCode); // 200 
+        console.log(response.headers['content-type']);
       })
   } else {
     const data = { cache_id, parameters };
     const url = `http://localhost:3000/api/rex/${id}`
-    console.log(`-- generating part ID ${id}, passing parameters ${EJSON.stringify(data)} to ${url}`);
+    console.log(`// generating part ID ${id}, passing parameters ${EJSON.stringify(data)} to ${url}`);
     return request
       .post(url)
       .json(data)
       .on('response', function(response) {
-        console.log(response.statusCode) // 200 
-        console.log(response.headers['content-type']) // 'image/png' 
+        console.log(`// response code ${response.statusCode}`); // 200 
+        console.log(`// content type ${response.headers['content-type']}`);
+        console.log(`// content length ${response.headers['content-length']}`);
       })
   }
   return status;

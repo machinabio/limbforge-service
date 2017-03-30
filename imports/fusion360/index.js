@@ -27,9 +27,6 @@ Template.fusionClientLayout.helpers({
   agent() {
     var agent = Agent.findOne(Session.get('agentId'));
     if (!agent) return;
-    if (agent._runningScript) {
-      agent._runningScript = false;
-    }
     agent.online = true;
     agent.save();
     return agent

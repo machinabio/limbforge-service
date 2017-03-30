@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { HTTP } from 'meteor/http';
 import { EJSON } from 'meteor/ejson';
 import { check } from 'meteor/check';
+import { Random } from 'meteor/random'
 
 import Request from 'request';
 import Archiver from 'archiver';
@@ -23,6 +24,10 @@ import '/imports/api/agent-factory.js';
 import '/imports/api/job-queue.js';
 
 import '/imports/shift/server.js';
+
+import humanInterval from 'human-interval';
+
+const job_timeout = humanInterval(`45 seconds`);
 
 if (process.env.NODE_ENV === "development") {
   METEORTOYSSHELL = true;
@@ -63,34 +68,38 @@ Api.addRoute('healthcheck', {
 
 Api.addRoute('rex/:hash', {
   post: function() {
-    // console.log('rex id:', this.urlParams.hash);
+    const id = Random.id(4);
+    console.log(`-- Transaction ${id}: Receieved POST at /rex/${this.urlParams.hash}`);
     //TODO add logging to analytics
-    let script = Script.findOne({ _md5: this.urlParams.hash, published: true });
+    const script = Script.findOne({ _md5: this.urlParams.hash, published: true });
     if (script) {
-      var data = this.bodyParams ? this.bodyParams : {};
+      const data = this.bodyParams ? this.bodyParams : {};
       // console.log('rex data:', data);
-      let params = {
+      const params = {
         script_id: script._id,
         data: data
       }
-      this.response.writeHead(200, 'retrieving id', {
-        'Content-Type': 'application/json'
-      });
-      let transaction_id = Meteor.call('rex_enqueue', params);
-      console.log('setting up observe for ', transaction_id);
-      var fiber = Fiber.current;
-      Transaction.find(transaction_id, { fields: { response: true } })
+      this.response.setHeader('Content-Type', 'application/vnd.ms-pkistl');
+      const transaction_id = Meteor.call('rex_enqueue', params);
+      const fiber = Fiber.current;
+      const query_handle = Transaction.find(transaction_id, { fields: { response: true } })
         .observeChanges({
           changed: () => {
-            console.log('observed change in response');
-            console.log(transaction_id);
-            let transaction = Transaction.findOne(transaction_id);
-            console.log(transaction);
+            console.log(`-- Transaction ${id}: observed change in response`);
+            // console.log(transaction_id);
+            const transaction = Transaction.findOne(transaction_id);
+            // console.log(transaction);
             this.response.write(transaction.response);
-            fiber.run(); 
+            fiber.run();
           }
         });
-      Fiber.yield(); 
+      const watchog_handle = Meteor.setTimeout(() => {
+        console.log(`-- Transaction ${id}: no response from Fusion360 agent before timeout`);
+        query_handle.stop();
+      }, job_timeout);
+      Fiber.yield();
+      Meteor.clearTimeout(watchog_handle);
+      query_handle.stop();
       this.done();
     } else {
       return {
@@ -106,3 +115,4 @@ Api.addRoute('rex/:hash', {
     };
   }
 });
+

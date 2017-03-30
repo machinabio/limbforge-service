@@ -94,7 +94,6 @@ let Agent = Class.create({
   secured: false
 });
 
-
 /// Persistant server-side controllers for Agents
 if (Meteor.isServer) {
   Agent.extend({
@@ -150,6 +149,10 @@ if (Meteor.isFusion360) {
             // console.log('called watchdog agent id ' + this._id);
             let agent = Agent.findOne(this._id);
             agent.lastSeen = new Date();
+            if (agent._runningScript) {
+              console.log('reseting _runningScript flag');
+              agent._runningScript = false;
+            }
             agent.save();
             // Meteor.clearTimeout(watchdog);
             // watchdog = Meteor.setTimeout(window.location.reload, timeout);
@@ -161,3 +164,4 @@ if (Meteor.isFusion360) {
 }
 
 export default Agent;
+

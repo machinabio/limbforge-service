@@ -59,7 +59,7 @@ Api.addRoute('retrieveId', {
       'Content-Type': 'application/json'
     });
 
-    var agent = Agent.findOne({ autodeskAccount: adskEmail , remote: false});
+    var agent = Agent.findOne({ autodeskAccount: adskEmail, remote: false });
     if (!agent) {
       //analytics.track('worker.new', { autodeskAccount: adskEmail, ip: this.request.headers.host });
       agent = new Agent();
@@ -81,8 +81,6 @@ Api.addRoute('retrieveId', {
     });
   }
 });
-
-
 
 /**
  *  Used by cloud agents reporting in to their Foreman.
@@ -170,7 +168,7 @@ Queue.define(
       job.remove();
       return;
     }
-    
+
     if (sinceLastSighting > agentTimeout) {
       agent.online = false;
     } else {
@@ -179,7 +177,7 @@ Queue.define(
 
     agent.ping = Random.id();
     agent.save();
-    
+
     job.remove();
 
     return;
@@ -215,23 +213,30 @@ Meteor.methods({
 Queue.define(
   'script_rex',
   Meteor.bindEnvironment((job, done) => {
-    var transaction = Transaction.findOne(job.attrs.data);
-    var agent;
-    // console.log('Agenda scriptRex transaction:', transaction);
+    const id = job.attrs.data.slice(0,4);
+    const transaction = Transaction.findOne(job.attrs.data);
+    let agent;
+    console.log(`## Job ${id} - Starting transaction ${transaction._id}`);
     if (transaction.agent_id) {
+      console.log(`## Job ${id} - An agent is already assigned`);
       agent = Agent.findOne(transaction.agent_id);
+      agent._runningScript = true;
+      agent.save();
     } else {
-      var agents = Agent.find({ foreman: Meteor.settings.shift.foreman.name, remote: true, online: true, _runningScript: false }).fetch();
+      let agents = Agent.find({ foreman: Meteor.settings.shift.foreman.name, remote: true, online: true, _runningScript: false }).fetch();
 
       if (agents.length == 0) {
-        console.log('No free agents, rescheduling in 1 s');
+        console.log(`## Job ${id} - No free agents, rescheduling in 1 s`);
         job.schedule('in 1 second');
         job.save();
         return
       }
       agent = agents[Math.floor(Math.random() * agents.length)];
+      agent._runningScript = true;
+      agent.save();
       transaction.agent_id = agent._id;
     }
+    console.log(`## Job ${id} - Using agent ${agent._id}, _runningScript:${agent._runningScript}`);
     let script = Script.findOne(transaction.script_id);
     let data = transaction.data;
 
@@ -240,10 +245,13 @@ Queue.define(
     agent.transaction = transaction._id;
     agent._script = script.code;
     agent._runOnce = true;
+
     // console.log('Agenda scriptRex transaction:', transaction);
 
     agent.save();
     job.remove();
+    console.log(`## Job ${id} - Job successfully delegated to agent ${agent._id}, _runningScript:${agent._runningScript}`);
+    // console.log(agent);
   })
 );
 
@@ -251,3 +259,4 @@ Queue.create('agent_check_all', {})
   .unique({})
   .repeatEvery(agentWatchdogTick)
   .save();
+
