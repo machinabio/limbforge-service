@@ -216,7 +216,7 @@ Queue.define(
     const id = job.attrs.data.slice(0,4);
     const transaction = Transaction.findOne(job.attrs.data);
     let agent;
-    console.log(`## Job ${id} - Starting transaction ${transaction._id}`);
+    console.log(`## Job ${id} - Starting with transaction ${transaction._id}`);
     if (transaction.agent_id) {
       console.log(`## Job ${id} - An agent is already assigned`);
       agent = Agent.findOne(transaction.agent_id);
@@ -236,7 +236,7 @@ Queue.define(
       agent.save();
       transaction.agent_id = agent._id;
     }
-    console.log(`## Job ${id} - Using agent ${agent._id}, _runningScript:${agent._runningScript}`);
+    console.log(`## Job ${id} - Using agent ${agent._id}`);
     let script = Script.findOne(transaction.script_id);
     let data = transaction.data;
 
@@ -250,7 +250,7 @@ Queue.define(
 
     agent.save();
     job.remove();
-    console.log(`## Job ${id} - Job successfully delegated to agent ${agent._id}, _runningScript:${agent._runningScript}`);
+    console.log(`## Job ${id} - Job successfully delegated to agent ${agent._id}`);
     // console.log(agent);
   })
 );

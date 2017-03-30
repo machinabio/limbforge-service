@@ -1,10 +1,13 @@
 import { Meteor } from 'meteor/meteor';
 import { EJSON } from 'meteor/ejson'
 import { check } from 'meteor/check';
+import { Random } from 'meteor/random';
 
 import hasha from 'hasha';
 import knox from 'knox';
 import request from 'request';
+import archiver from 'archiver';
+import Fiber from 'fibers';
 
 const quality = 'preview';
 const settings = Meteor.settings.storage;
@@ -41,7 +44,24 @@ Api.addRoute('preview', {
         operations.push({ id, cache_id, parameters: parsed });
       });
       // console.log('ops: ', operations)
-      operations.forEach(get_STL);
+      let archive = archiver('zip');
+      operations.forEach((operation) => {
+        const name = Random.id(4);
+        archive.append(get_STL(operation), { name });
+      });
+      var fiber = Fiber.current;
+
+      archive.on('end', () => {
+        console.log('on end!');
+        this.response.write('foo');
+        fiber.run();
+
+      });
+      this.response.writeHead(200, {
+        'Content-Type': 'application/zip'
+      });
+      Fiber.yield();
+      this.done();
 
     } catch (error) {
       console.error(error);
@@ -101,31 +121,32 @@ function get_STL({ id, cache_id, parameters }) {
   //   }
   // });
 
-  const status = Meteor.wrapAsync(storage_client.headFile, storage_client)(cache_id);
-  const cached = (status === 200);
+  const response = Meteor.wrapAsync(storage_client.headFile, storage_client)(cache_id);
+  const cached = (response.statusCode === 200);
   if (cached) {
     const url = storage_client.https(cache_id);
-    console.log('// already cached at $url}!');
+    console.log(`// already cached at ${url}`);
     return request
       .get(url)
-      .on('response', function(response) {
-        console.log(response.statusCode); // 200 
-        console.log(response.headers['content-type']);
-      })
-  } else {
-    const data = { cache_id, parameters };
-    const url = `http://localhost:3000/api/rex/${id}`
-    console.log(`// generating part ID ${id}, passing parameters ${EJSON.stringify(data)} to ${url}`);
-    return request
-      .post(url)
-      .json(data)
       .on('response', function(response) {
         console.log(`// response code ${response.statusCode}`); // 200 
         console.log(`// content type ${response.headers['content-type']}`);
         console.log(`// content length ${response.headers['content-length']}`);
+        // console.log(response);
       })
   }
-  return status;
+  const data = { cache_id, parameters };
+  const url = `http://localhost:3000/api/rex/${id}`
+  console.log(`// generating part ID ${id}, passing parameters ${EJSON.stringify(data)} to ${url}`);
+  return request
+    .post(url)
+    .json(data)
+    .on('response', function(response) {
+      console.log(`// response code ${response.statusCode}`); // 200 
+      console.log(`// content type ${response.headers['content-type']}`);
+      console.log(`// content length ${response.headers['content-length']}`);
+      // console.log(response);
+    })
+
   // console.log('results: ', cached.statusCode);
 }
-
