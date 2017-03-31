@@ -109,19 +109,8 @@ function get_hash(parameters) {
   return hasha(object_string, { algorithm: "sha512" });
 }
 
-//TODO Clean up the commented code. Here just for short-term reference 
 function get_STL({ id, cache_id, parameters }) {
   console.log(`ID: ${id}, cache_id? ${cache_id}`);
-  // storage_client.headFile(cache_id, (error, response) => {
-  //   console.log('results: ', response.statusCode);
-  //   if (response.statusCode === 200) {
-  //     console.log('--success!');
-  //     // return HTTP.
-  //   } else {
-  //     console.log('--failure!');
-  //   }
-  // });
-
   const response = Meteor.wrapAsync(storage_client.headFile, storage_client)(cache_id);
   const cached = (response.statusCode === 200);
   if (cached) {
@@ -137,7 +126,7 @@ function get_STL({ id, cache_id, parameters }) {
       })
   }
   const data = { cache_id, parameters };
-  const url = `http://localhost:3000/api/rex/${id}`
+  const url = `http://${Meteor.settings.shift.harbormaster_url}/api/rex/${id}`
   console.log(`// generating part ID ${id}, passing parameters ${EJSON.stringify(data)} to ${url}`);
   return request
     .post(url)
@@ -148,6 +137,4 @@ function get_STL({ id, cache_id, parameters }) {
       console.log(`// content length ${response.headers['content-length']}`);
       // console.log(response);
     })
-
-  // console.log('results: ', cached.statusCode);
 }
