@@ -50,19 +50,20 @@ Api.addRoute('preview', {
         console.log(`*** using "${name}" as the name for component ${operation.id}`);
         archive.append(get_STL(operation), { name });
       });
-      var fiber = Fiber.current;
-
+      const fiber = Fiber.current;
+      archive.finalize();
       archive.on('end', () => {
         console.log('on end!');
-        this.response.write('foo');
+        // this.response.write('foo');
         fiber.run();
-
       });
-      this.response.writeHead(200, {
-        'Content-Type': 'application/zip'
-      });
+      // this.response.writeHead(200, {
+      //   'Content-Type': 'application/zip'
+      // });
       Fiber.yield();
       this.done();
+
+      return operations;
 
     } catch (error) {
       console.error(error);
@@ -71,8 +72,6 @@ Api.addRoute('preview', {
         body: error
       }
     }
-
-    return operations;
   },
   post() {
     return {
