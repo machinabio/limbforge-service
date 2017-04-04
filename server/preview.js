@@ -122,8 +122,8 @@ function get_STL({ id, cache_id, parameters }) {
     return request
       .get(url)
       .on('response', function(response) {
-        console.log(`// response code ${response.statusCode}`); // 200 
-        console.log(`// content type ${response.headers['content-type']}`);
+        // console.log(`// response code ${response.statusCode}`); // 200 
+        // console.log(`// content type ${response.headers['content-type']}`);
         console.log(`// content length ${response.headers['content-length']}`);
         // console.log(response);
       })
@@ -135,8 +135,8 @@ function get_STL({ id, cache_id, parameters }) {
     .post(url)
     .json(data)
     .on('response', function(response) {
-      console.log(`// response code ${response.statusCode}`); // 200 
-      console.log(`// content type ${response.headers['content-type']}`);
+      // console.log(`// response code ${response.statusCode}`); // 200 
+      // console.log(`// content type ${response.headers['content-type']}`);
       console.log(`// content length ${response.headers['content-length']}`);
       // console.log(response);
     })
