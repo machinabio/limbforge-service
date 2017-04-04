@@ -9,6 +9,8 @@ import request from 'request';
 import archiver from 'archiver';
 import Fiber from 'fibers';
 
+import filenames from '/imports/components.js';
+
 const quality = 'preview';
 const settings = Meteor.settings.storage;
 const storage_client = knox.createClient({
@@ -43,10 +45,18 @@ Api.addRoute('preview', {
         delete parsed.id;
         operations.push({ id, cache_id, parameters: parsed });
       });
+
+      this.response.writeHead(200, {
+        'Content-Type': 'application/zip',
+        'Content-disposition': 'attachment; filename=Limbforge.zip'
+      });
       // console.log('ops: ', operations)
       let archive = archiver('zip');
+      archive.pipe(this.response);
+
       operations.forEach((operation) => {
-        const name = Random.id(4);
+        // const name = Random.id(4);
+        const name = filenames.findOne({component_id: operation.id}).filename;
         console.log(`*** using "${name}" as the name for component ${operation.id}`);
         archive.append(get_STL(operation), { name });
       });
@@ -54,17 +64,11 @@ Api.addRoute('preview', {
       archive.finalize();
       archive.on('end', () => {
         console.log('on end!');
-        // this.response.write('foo');
         fiber.run();
       });
-      // this.response.writeHead(200, {
-      //   'Content-Type': 'application/zip'
-      // });
+
       Fiber.yield();
       this.done();
-
-      return operations;
-
     } catch (error) {
       console.error(error);
       return {
