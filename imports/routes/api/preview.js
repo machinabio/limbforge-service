@@ -9,7 +9,7 @@ import request from 'request';
 import archiver from 'archiver';
 import Fiber from 'fibers';
 
-import filenames from '/imports/components.js';
+import filenames from '/imports/collections/components.js';
 
 const quality = 'preview';
 const settings = Meteor.settings.storage;

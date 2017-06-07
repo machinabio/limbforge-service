@@ -15,15 +15,15 @@ import AWS from 'aws-sdk';
 
 import { analytics } from "meteor/okgrow:analytics";
 
-import Agent from '/imports/api/agents.js';
-import Script from '/imports/api/scripts.js';
-import Transaction from '/imports/models/transaction.js';
+import Agent from '/imports/collections/agents.js';
+import Script from '/imports/collections/scripts.js';
+import Transaction from '/imports/collections/transactions.js';;
 
-import '/imports/startup.js';
+import '/imports/startup/server.js';
 import '/imports/api/agent-factory.js';
 import '/imports/api/job-queue.js';
 
-import '/imports/shift/server.js';
+import '/imports/api/shift/server.js';
 
 import humanInterval from 'human-interval';
 

@@ -1,8 +1,6 @@
-import Agent from '/imports/api/agents.js';
-import Params from '/imports/parameters.js';
-import Script from '/imports/api/scripts.js';
-import Parameter from '/imports/parameters.js';
-import Transaction from '/imports/models/transaction.js';
+import Agent from '/imports/collections/agents.js';
+import Script from '/imports/collections/scripts.js';
+import Transaction from '/imports/collections/transactions.js';;
 import { Accounts } from 'meteor/accounts-base'
 
 Meteor.publish("agents", function() {
@@ -19,10 +17,6 @@ Meteor.publish("agents", function() {
 
 Meteor.publish("scripts", function() {
   return Script.find({ userId: this.userId });
-});
-
-Meteor.publish("parameters", function() {
-  return Parameter.find({ userId: this.userId });
 });
 
 Meteor.publish("fusion", function(adskId) {

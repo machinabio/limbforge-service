@@ -3,12 +3,11 @@ import { Session } from 'meteor/session';
 
 import humanInterval from 'human-interval';
 
-import '/imports/browser';
-import '/imports/fusion360';
-import '/imports/demo';
-import '/imports/startup.js';
+import '/imports/ui/browser';
+import '/imports/ui/fusion360';
+import '/imports/startup/client.js';
 
-import Agent from '/imports/api/agents.js';
+import Agent from '/imports/collections/agents.js';
 
 const timeout = humanInterval('2 seconds'); // seconds we retry fetching an agent ID
 

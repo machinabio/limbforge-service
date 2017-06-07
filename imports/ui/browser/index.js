@@ -7,10 +7,9 @@ import md5 from 'md5';
 
 import { analytics } from "meteor/okgrow:analytics";
 
-import Agent from '/imports/api/agents.js';
-import Script from '/imports/api/scripts.js';
-import Params from '/imports/parameters.js';
-import Transaction from '/imports/models/transaction.js';
+import Agent from '/imports/collections/agents.js';
+import Script from '/imports/collections/scripts.js';
+import Transaction from '/imports/collections/transactions.js';;
 
 import './index.html';
 

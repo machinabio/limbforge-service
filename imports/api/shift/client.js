@@ -4,9 +4,8 @@ import { EJSON } from 'meteor/ejson';
 
 import { analytics } from "meteor/okgrow:analytics";
 
-import Agent from '/imports/api/agents.js';
-import Params from '/imports/parameters.js';
-import Transaction from '/imports/models/transaction.js';
+import Agent from '/imports/collections/agents.js';
+import Transaction from '/imports/collections/transactions.js';;
 
 export default Shift = class Shift {
   constructor(transaction_id) {

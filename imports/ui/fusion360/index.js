@@ -6,10 +6,9 @@ import text_encoding from 'text-encoding';
 
 import { analytics } from "meteor/okgrow:analytics";
 
-import Agent from '/imports/api/agents.js';
-import Params from '/imports/parameters.js';
-import Transaction from '/imports/models/transaction.js';
-import shift from '/imports/shift/client.js';
+import Agent from '/imports/collections/agents.js';
+import Transaction from '/imports/collections/transactions.js';;
+import shift from '/imports/api/shift/client.js';
 
 import './index.html';
 
@@ -18,7 +17,7 @@ global.TextEncoder = new text_encoding.TextEncoder();
 
 if (Meteor.isFusion360) {
   // Loading the Fusion API's on a web browsers causes errors.
-  import '/imports/fusion360/api/';
+  import '/imports/api/fusion360js/';
   Meteor.subscribe('fusion', adsk.core.Application.get().userId);
   Meteor.call("printLog", 'Fusion360 agent capabilities:', navigator.userAgent);
 };

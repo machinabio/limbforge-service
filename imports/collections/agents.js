@@ -9,7 +9,7 @@ import humanInterval from 'human-interval';
 import { Class } from 'meteor/jagi:astronomy';
 import { Enum } from 'meteor/jagi:astronomy';
 
-import '/imports/fusionUtilities.js';
+import '/imports/api/fusionUtilities.js';
 
 const timeout = humanInterval('10 seconds'); // seconds until an agent reloads the pages
 

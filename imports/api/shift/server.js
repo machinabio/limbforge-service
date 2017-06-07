@@ -12,16 +12,15 @@ import path from 'path';
 import knox from 'knox';
 import opn from 'opn';
 import toBuffer from 'typedarray-to-buffer';
+import text_encoding from 'text-encoding';
 
 import { analytics } from "meteor/okgrow:analytics";
 
-import Agent from '/imports/api/agents.js';
-import Params from '/imports/parameters.js';
-import Transaction from '/imports/models/transaction.js';
-import text_encoding from 'text-encoding';
+import Agent from '/imports/collections/agents.js';
+import Transaction from '/imports/collections/transactions.js';;
 
-global.TextDecoder = new text_encoding.TextDecoder();
-global.TextEncoder = new text_encoding.TextEncoder();
+// requires the polyfill for global.TextDecoder and TextEncoder. Check latest build of Fusion360 to 
+// confirm it's still needed.
 
 const settings = Meteor.settings.storage;
 
