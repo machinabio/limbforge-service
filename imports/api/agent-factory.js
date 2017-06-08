@@ -38,13 +38,16 @@ Api.addRoute('retrieveId', {
   get: function() {
     var adskEmail;
     var adskId = this.queryParams.adskId;
+    console.log(this.queryParams);
 
     // lookup account by adskId first
     var user = Accounts.users.findOne({ autodesk_id: adskId });
     if (user) {
+      console.log('found existing user with autodesk id');
       adskEmail = user.emails[0].address;
     } else {
       // lookup account by email
+      console.log('trying to match user by autodesk email');
       user = Accounts.findUserByEmail(this.queryParams.adskEmail);
       Meteor.users.update(user._id, {
         $set: {
@@ -53,6 +56,7 @@ Api.addRoute('retrieveId', {
       });
     };
     if (!user) throw new Meteor.Error('failed to find a matching autodeskAccount');
+    
     console.log('cloud agent log in for user ', user.emails[0].address);
 
     this.response.writeHead(200, 'retrieving id', {
