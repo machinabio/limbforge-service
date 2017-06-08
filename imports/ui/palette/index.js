@@ -15,6 +15,12 @@ Template.paletteLayout.helpers({
     var agent = Agent.findOne(agent_id);
     return agent
   },
+
+  status() {
+    if (this._runningScript) return "Running a script";
+    if (this.online) return "Online and idle";
+    return "Not connected";
+  }
 });
 
 Meteor.setTimeout(() => {
