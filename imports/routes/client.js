@@ -18,13 +18,27 @@ FlowRouter.route('/', {
   }
 });
 
+FlowRouter.route('/palette/:agent_id', {
+  action(params) {
+    if (!Meteor.isFusion360) {
+      window.location.replace(Meteor.absoluteUrl('', { replaceLocalhost: true }));
+    };
+    const agent_id = params.agent_id;
+    Meteor.call("printLog", "...connection on /palette route from agent id "+agent_id);
+    Session.setPersistent('agentId', agent_id);
+    import '/imports/ui/palette';
+    BlazeLayout.render("App_body", { main: "paletteLayout" });
+  }
+});
+
 FlowRouter.route('/fusion360', {
   action(params) {
     if (!Meteor.isFusion360) {
       window.location.replace(Meteor.absoluteUrl('', { replaceLocalhost: true }));
     };
-    import '/imports/ui/fusion360';
     import Agent from '/imports/collections/agents.js';
+    import '/imports/api/fusion360js';
+    import '/imports/ui/fusion360';
     Meteor.call("printLog", "...connection on /fusion360 route");
     let queryParams = {
       adskEmail: adsk.core.Application.get().userName,
@@ -46,6 +60,7 @@ FlowRouter.route('/agent', {
       window.location.replace(Meteor.absoluteUrl('', { replaceLocalhost: true }));
     };
     Meteor.call("printLog", "...connection on /agent route");
+    import '/imports/api/fusion360js';
     import '/imports/ui/fusion360';
     import Agent from '/imports/collections/agents.js';
     let queryParams = {
@@ -59,13 +74,4 @@ FlowRouter.route('/agent', {
   }
 });
 
-FlowRouter.route('/palette', {
-  action(params) {
-    if (!Meteor.isFusion360) {
-      window.location.replace(Meteor.absoluteUrl('', { replaceLocalhost: true }));
-    };
-    Meteor.call("printLog", "...connection on /palette route");
-    import '/imports/ui/fusion360';
-    BlazeLayout.render("App_body", { main: "fusionClientLayout" });
-  }
-});
+
