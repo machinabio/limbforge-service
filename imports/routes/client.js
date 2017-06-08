@@ -3,29 +3,28 @@ import { Session } from 'meteor/session';
 
 import humanInterval from 'human-interval';
 
-import '/imports/ui/browser';
-import '/imports/ui/fusion360';
 import '/imports/startup/client.js';
-
-import Agent from '/imports/collections/agents.js';
 
 const timeout = humanInterval('2 seconds'); // seconds we retry fetching an agent ID
 
 FlowRouter.route('/', {
-  action: function(params) {
+  action(params) {
     if (Meteor.isFusion360) {
       window.location.replace(Meteor.absoluteUrl('fusion360', { replaceLocalhost: true }));
     };
+    import '/imports/ui/browser';
     Meteor.call("printLog", "...connection on / route");
     BlazeLayout.render("App_body", { main: "webClientLayout" });
   }
 });
 
 FlowRouter.route('/fusion360', {
-  action: function(params) {
+  action(params) {
     if (!Meteor.isFusion360) {
       window.location.replace(Meteor.absoluteUrl('', { replaceLocalhost: true }));
     };
+    import '/imports/ui/fusion360';
+    import Agent from '/imports/collections/agents.js';
     Meteor.call("printLog", "...connection on /fusion360 route");
     let queryParams = {
       adskEmail: adsk.core.Application.get().userName,
@@ -42,11 +41,13 @@ FlowRouter.route('/fusion360', {
 });
 
 FlowRouter.route('/agent', {
-  action: function(params) {
+  action(params) {
     if (!Meteor.isFusion360) {
       window.location.replace(Meteor.absoluteUrl('', { replaceLocalhost: true }));
     };
     Meteor.call("printLog", "...connection on /agent route");
+    import '/imports/ui/fusion360';
+    import Agent from '/imports/collections/agents.js';
     let queryParams = {
       adskEmail: adsk.core.Application.get().userName,
       adskId: adsk.core.Application.get().userId
@@ -58,3 +59,13 @@ FlowRouter.route('/agent', {
   }
 });
 
+FlowRouter.route('/palette', {
+  action(params) {
+    if (!Meteor.isFusion360) {
+      window.location.replace(Meteor.absoluteUrl('', { replaceLocalhost: true }));
+    };
+    Meteor.call("printLog", "...connection on /palette route");
+    import '/imports/ui/fusion360';
+    BlazeLayout.render("App_body", { main: "fusionClientLayout" });
+  }
+});
