@@ -335,7 +335,7 @@
     };
 
     // Promotes this version to be the latest version. If this is the latest version, nothing happens.
-    //
+    // Returns true if successful.
     adsk.core.DataFile.prototype.promote = function () {
         var result = this._execute('promote');
         return result ? result.value : undefined;

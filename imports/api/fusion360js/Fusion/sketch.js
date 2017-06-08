@@ -1311,7 +1311,7 @@
     // startPoint : The start point of the arc. This can be either an existing SketchPoint or a Point3D object.
     // point : A point along the arc. This is a Point3D object.
     // endPoint : The end point of the arc. This can be either an existing SketchPoint or a Point3D object.
-    //
+    // Returns the newly created SketchArc or null in the case of a failure.
     adsk.fusion.SketchArcs.prototype.addByThreePoints = function (startPoint, point, endPoint) {
         if (startPoint !== null && !(startPoint instanceof adsk.core.Base)) { throw new TypeError('startPoint must be a adsk.core.Base'); }
         if (point !== null && !(point instanceof adsk.core.Point3D)) { throw new TypeError('point must be a adsk.core.Point3D'); }
@@ -4201,7 +4201,7 @@
 
     // Moves the sketch geometry using the specified transform. Move respects any constraints that would normally prohibit the move. This will fail in the case where the IsReference property is true.
     // translation : The vector that defines the distance and direction to move.
-    //
+    // Returns true if moving the sketch point was successful.
     adsk.fusion.SketchPoint.prototype.move = function (translation) {
         if (translation !== null && !(translation instanceof adsk.core.Vector3D)) { throw new TypeError('translation must be a adsk.core.Vector3D'); }
         var args = {

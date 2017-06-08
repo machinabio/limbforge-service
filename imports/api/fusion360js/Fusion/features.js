@@ -7561,6 +7561,45 @@
         }
     });
 
+    // Returns the type of split type currently defined.
+    Object.defineProperty(adsk.fusion.SplitFaceFeatureInput.prototype, 'splitType', {
+        get : function () {
+            var result = this._execute('splitType');
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Sets the split type to project the splitting tool along the direction defined by the specified entity.
+    // directionEntity : An entity that defines the direction of projection of the splitting tool. This can be a linear BRepEdge, SketchLine, ConstructionLine, or a planar face where the face normal is used.
+    // Returns true is setting the split type was successful.
+    adsk.fusion.SplitFaceFeatureInput.prototype.setAlongVectorSplitType = function (directionEntity) {
+        if (directionEntity !== null && !(directionEntity instanceof adsk.core.Base)) { throw new TypeError('directionEntity must be a adsk.core.Base'); }
+        var args = {
+            directionEntity : (directionEntity === null ? directionEntity : directionEntity.handle)
+        };
+        var result = this._execute('setAlongVectorSplitType', args);
+        return result ? result.value : undefined;
+    };
+
+    // Sets the split type to be a curve that defined by projecting the splitting curve to the closest point on the surface.
+    // Returns true is setting the split type was successful.
+    adsk.fusion.SplitFaceFeatureInput.prototype.setClosestPointSplitType = function () {
+        var result = this._execute('setClosestPointSplitType');
+        return result ? result.value : undefined;
+    };
+
+    // Set the split type to be a surface to surface intersection. If the split tool is a curve it will be extruded into a surface to use in the split. If it's a surface, the surface will be used and optionally extended to fully intersect the faces to be split.
+    // isSplittingToolExtended : Specifies if the splitting tool should be extended so that is fully intersects the faces to be split.
+    // Returns true is setting the split type was successful.
+    adsk.fusion.SplitFaceFeatureInput.prototype.setSurfaceIntersectionSplitType = function (isSplittingToolExtended) {
+        if (typeof isSplittingToolExtended !== 'boolean') { throw new TypeError('isSplittingToolExtended must be a boolean'); }
+        var args = {
+            isSplittingToolExtended : isSplittingToolExtended
+        };
+        var result = this._execute('setSurfaceIntersectionSplitType', args);
+        return result ? result.value : undefined;
+    };
+
     //=========== SplitFaceFeatures ============
     // Collection that provides access to all of the existing split face features in a component and supports the ability to create new split face features.
     adsk.fusion.SplitFaceFeatures = function SplitFaceFeatures(handle) {
@@ -7640,6 +7679,14 @@
         };
         var result = this._execute('itemByName', args);
         return (result && result.value) ? adsk.createObject(result.value, adsk.fusion.SplitFaceFeature) : null;
+    };
+
+    //=========== SplitFaceSplitTypes ============
+    // List of the ways to split a face using the split face feature.
+    adsk.fusion.SplitFaceSplitTypes = {
+        surfaceIntersectionSplitType : 0,
+        alongVectorSplitType : 1,
+        closestPointSplitType : 2
     };
 
     //=========== StitchFeatureInput ============
@@ -10958,7 +11005,7 @@
     // sideTwoExtent : An ExtentDefinition object that defines how the extent of the extrusion towards side two is defined. This can be a specified distance (DistanceExtentDefinition), to an entity (ToEntityExtent), or through-all (AllExtentDefinition). These objects can be obtained by using the static create method on the appropriate class.
     // sideOneTaperAngle : Optional argument that specifies the taper angle for side one. If omitted a taper angle of 0 is used.
     // sideTwoTaperAngle : Optional argument that specifies the taper angle for side two. If omitted a taper angle of 0 is used.
-    //
+    // Returns true, if the call was successful.
     adsk.fusion.ExtrudeFeature.prototype.setTwoSidesExtent = function (sideOneExtent, sideTwoExtent, sideOneTaperAngle, sideTwoTaperAngle) {
         if (sideOneExtent !== null && !(sideOneExtent instanceof adsk.fusion.ExtentDefinition)) { throw new TypeError('sideOneExtent must be a adsk.fusion.ExtentDefinition'); }
         if (sideTwoExtent !== null && !(sideTwoExtent instanceof adsk.fusion.ExtentDefinition)) { throw new TypeError('sideTwoExtent must be a adsk.fusion.ExtentDefinition'); }
@@ -10982,7 +11029,7 @@
     // distance : The distance of the extrusions. This is either the full length of half of the length of the final extrusion depending on the value of the isFullLength property.
     // isFullLength : Defines if the value defines the full length of the extrusion or half of the length. A value of true indicates it defines the full length.
     // taperAngle : Optional argument that specifies the taper angle. The same taper angle is used for both sides for a symmetric extrusion. If omitted a taper angle of 0 is used.
-    //
+    // Returns true, if the call was successful.
     adsk.fusion.ExtrudeFeature.prototype.setSymmetricExtent = function (distance, isFullLength, taperAngle) {
         if (distance !== null && !(distance instanceof adsk.core.ValueInput)) { throw new TypeError('distance must be a adsk.core.ValueInput'); }
         if (typeof isFullLength !== 'boolean') { throw new TypeError('isFullLength must be a boolean'); }
@@ -12159,7 +12206,7 @@
 
     // Statically creates a new OffsetStartDefinition object. This is used as input when create a new feature and defining the starting condition.
     // offset : An input ValueInput objects that defines the offset distance. The offset can be positive or negative. A positive value indicates an offset in the same direction as the z axis of the profile plane.
-    //
+    // Returns the newly created OffsetStartDefinition object or null in the case of failure.
     adsk.fusion.OffsetStartDefinition.create = function (offset) {
         if (offset !== null && !(offset instanceof adsk.core.ValueInput)) { throw new TypeError('offset must be a adsk.core.ValueInput'); }
         var args = {
@@ -13982,6 +14029,22 @@
         }
     });
 
+    // Gets the direction entity when the split type is along a vector. If the split type is not alongVectorSplitType this property will return null. To set the direction entity use the setAsAlongVectorSplitType method.
+    Object.defineProperty(adsk.fusion.SplitFaceFeature.prototype, 'directionEntity', {
+        get : function () {
+            var result = this._execute('directionEntity');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.Base) : null;
+        }
+    });
+
+    // Returns the type of split type currently defined. To change the split type, use one of the set methods.
+    Object.defineProperty(adsk.fusion.SplitFaceFeature.prototype, 'splitType', {
+        get : function () {
+            var result = this._execute('splitType');
+            return result ? result.value : undefined;
+        }
+    });
+
     // Sets the splitting tool used for the feature.
     // splittingTool : Input entity that defines the splitting tool. The splitting tool is a single entity that can be either a solid body, open body, construction plane, face, or sketch curve that partially or fully intersects the facesToSplit. The input for this argument can be one of the valid types or an ObjectCollection in the case where multiple splitting tools are being defined.
     // isSplittingToolExtended : A boolean value for setting whether or not the splittingTool is to be automatically extended (if possible) so as to completely intersect the facesToSplit.
@@ -14007,6 +14070,48 @@
         };
         var result = this._execute('createForAssemblyContext', args);
         return (result && result.value) ? adsk.createObject(result.value, adsk.fusion.SplitFaceFeature) : null;
+    };
+
+    // Set the split type to be a surface to surface intersection. If the split tool is a curve it will be extruded into a surface to use in the split. If it's a surface, the surface will be used and optionally extended to fully intersect the faces to be split.
+    // splittingTool : Input entity(s) that defines the splitting tool. The splitting tool can be a single entity or an ObjectCollection containing solid and/or open bodies, construction planes, faces, or sketch curves that partially or fully intersect the faces that are being split.
+    // isSplittingToolExtended : Specifies if the splitting tool should be extended so that is fully intersects the faces to be split.
+    // Returns true is setting the split type was successful.
+    adsk.fusion.SplitFaceFeature.prototype.setAsSurfaceIntersectionSplitType = function (splittingTool, isSplittingToolExtended) {
+        if (splittingTool !== null && !(splittingTool instanceof adsk.core.Base)) { throw new TypeError('splittingTool must be a adsk.core.Base'); }
+        if (typeof isSplittingToolExtended !== 'boolean') { throw new TypeError('isSplittingToolExtended must be a boolean'); }
+        var args = {
+            splittingTool : (splittingTool === null ? splittingTool : splittingTool.handle),
+            isSplittingToolExtended : isSplittingToolExtended
+        };
+        var result = this._execute('setAsSurfaceIntersectionSplitType', args);
+        return result ? result.value : undefined;
+    };
+
+    // Sets the split type to project the splitting tool along the direction defined by the specified entity.
+    // splittingTool : Input entity(s) that defines the splitting tool. The splitting tool can be a single entity or an ObjectCollection containing faces or sketch curves. If faces are input, the edges of the face are used as the splitting tool.
+    // directionEntity : An entity that defines the direction of projection of the splitting tool. This can be a linear BRepEdge, SketchLine, ConstructionLine, or a planar face where the face normal is used.
+    // Returns true is setting the split type was successful.
+    adsk.fusion.SplitFaceFeature.prototype.setAsAlongVectorSplitType = function (splittingTool, directionEntity) {
+        if (splittingTool !== null && !(splittingTool instanceof adsk.core.Base)) { throw new TypeError('splittingTool must be a adsk.core.Base'); }
+        if (directionEntity !== null && !(directionEntity instanceof adsk.core.Base)) { throw new TypeError('directionEntity must be a adsk.core.Base'); }
+        var args = {
+            splittingTool : (splittingTool === null ? splittingTool : splittingTool.handle),
+            directionEntity : (directionEntity === null ? directionEntity : directionEntity.handle)
+        };
+        var result = this._execute('setAsAlongVectorSplitType', args);
+        return result ? result.value : undefined;
+    };
+
+    // Sets the split type to be a curve that defined by projecting the splitting curve to the closest point on the surface.
+    // splittingTool : Input entity(s) that defines the splitting tool. The splitting tool can be a single entity or an ObjectCollection containing faces or sketch curves. If faces are input, the edges of the face are used as the splitting tool.
+    // Returns true if setting the closest point split type was successful.
+    adsk.fusion.SplitFaceFeature.prototype.setAsClosestPointSplitType = function (splittingTool) {
+        if (splittingTool !== null && !(splittingTool instanceof adsk.core.Base)) { throw new TypeError('splittingTool must be a adsk.core.Base'); }
+        var args = {
+            splittingTool : (splittingTool === null ? splittingTool : splittingTool.handle)
+        };
+        var result = this._execute('setAsClosestPointSplitType', args);
+        return result ? result.value : undefined;
     };
 
     //=========== StitchFeature ============

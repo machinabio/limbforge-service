@@ -371,7 +371,7 @@
 
     // Determines the relationship of the input point with respect to this body.
     // point : The point to do the containment check for.
-    //
+    // Returns a value from the PointContainment enum indicating the relationship of the input point to the body.
     adsk.fusion.BRepBody.prototype.pointContainment = function (point) {
         if (point !== null && !(point instanceof adsk.core.Point3D)) { throw new TypeError('point must be a adsk.core.Point3D'); }
         var args = {
@@ -815,7 +815,7 @@
         }
     });
 
-    // Returns the temporary ID of this edge. This ID is good as long as the owning BRepBody is not modified in any way. The getEntityFromTempId method of the BRepBody will return the entity in the body with the given ID.
+    // Returns the temporary ID of this edge. This ID is only good while the document remains open and as long as the owning BRepBody is not modified in any way. The findByTempId method of the BRepBody will return the entity in the body with the given ID.
     Object.defineProperty(adsk.fusion.BRepEdge.prototype, 'tempId', {
         get : function () {
             var result = this._execute('tempId');
@@ -1045,7 +1045,7 @@
         }
     });
 
-    // Returns the temporary ID of this face. This ID is good as long as the owning BRepBody is not modified in any way. The getEntityFromTempId method of the BRepBody will return the entity in the body with the given ID.
+    // Returns the temporary ID of this face. This ID is only good while the document remains open and as long as the owning BRepBody is not modified in any way. The findByTempId method of the BRepBody will return the entity in the body with the given ID.
     Object.defineProperty(adsk.fusion.BRepFace.prototype, 'tempId', {
         get : function () {
             var result = this._execute('tempId');
@@ -1367,7 +1367,7 @@
 
     // Determines the relationship of the input point with respect to this lump.
     // point : The point to do the containment check for.
-    //
+    // Returns a value from the PointContainment enum indicating the relationship of the input point to the lump.
     adsk.fusion.BRepLump.prototype.pointContainment = function (point) {
         if (point !== null && !(point instanceof adsk.core.Point3D)) { throw new TypeError('point must be a adsk.core.Point3D'); }
         var args = {
@@ -1553,7 +1553,7 @@
 
     // Determines the relationship of the input point with respect to this shell.
     // point : The point to do the containment check for.
-    //
+    // Returns a value from the PointContainment enum indicating the relationship of the input point to the shell.
     adsk.fusion.BRepShell.prototype.pointContainment = function (point) {
         if (point !== null && !(point instanceof adsk.core.Point3D)) { throw new TypeError('point must be a adsk.core.Point3D'); }
         var args = {
@@ -1713,7 +1713,7 @@
         }
     });
 
-    // Returns the temporary ID of this vertex. This ID is good as long as the owning BRepBody is not modified in any way. The getEntityFromTempId method of the BRepBody will return the entity in the body with the given ID.
+    // Returns the temporary ID of this vertex. This ID is only good while the document remains open and as long as the owning BRepBody is not modified in any way. The findByTempId method of the BRepBody will return the entity in the body with the given ID.
     Object.defineProperty(adsk.fusion.BRepVertex.prototype, 'tempId', {
         get : function () {
             var result = this._execute('tempId');

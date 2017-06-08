@@ -317,6 +317,22 @@
         }
     });
 
+    // Gets and sets whether this command will automatically execute if no command inputs have been defined. If any command inputs have been created, the value of this property is ignored and the command dialog will be displayed and the command will execute when the user clicks 'OK'. if no command inputs have been defined and this is set to False, then the command will not execute but will remain running. The default value for this property is true so that the command will execute if no command inputs have been defined.
+    Object.defineProperty(adsk.core.Command.prototype, 'isAutoExecute', {
+        get : function () {
+            var result = this._execute('isAutoExecute');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (typeof value !== 'boolean') { throw new TypeError('value must be a boolean'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('isAutoExecute', args);
+            return result ? result.value : undefined;
+        }
+    });
+
     // Sets the initial size of the dialog when it is first displayed. If this is not set, Fusion will use a default size for the dialog.
     // width : The width of the dialog in pixels.
     // height : The height of the dialog in pixels.
@@ -344,6 +360,25 @@
             height : Number(height)
         };
         var result = this._execute('setDialogMinimumSize', args);
+        return result ? result.value : undefined;
+    };
+
+    // Causes the execution of this command which results in the execute event being fired. This is the same effect as the user clicking the "OK" button in the command dialog and is most useful when there is no command dialog (no command inputs where created) and the isAutoExecute property has been set to False. This allows you to execute the command through code.
+    // terminate : In the case where there isn't a command dialog you can also use the terminate argument to specify if the command should terminate after execution or continue running. This is similar to the sketch line command where each line placement results in the creation of an undoable line but the command continues to run to allow additional lines to be placed.
+    // Returns true if the execution of the command was successful.
+    adsk.core.Command.prototype.doExecute = function (terminate) {
+        if (typeof terminate !== 'boolean') { throw new TypeError('terminate must be a boolean'); }
+        var args = {
+            terminate : terminate
+        };
+        var result = this._execute('doExecute', args);
+        return result ? result.value : undefined;
+    };
+
+    // Causes the executePreview event of this command to be fired. This is most useful when there is no command dialog (no command inputs where created) and the isAutoExecute property has been set to False. This allows you to force the preview to be generated instead of relying on changing command inputs.
+    // Returns true if the execute Preview event was successfully fired..
+    adsk.core.Command.prototype.doExecutePreview = function () {
+        var result = this._execute('doExecutePreview');
         return result ? result.value : undefined;
     };
 
@@ -2202,7 +2237,7 @@
     };
 
     //=========== MarkingMenuEvent ============
-    // A MarkingMenuEvent is fired when the marking menu and context menu are displayed. For exampele, in response to the markingMenuDisplaying event.
+    // A MarkingMenuEvent is fired when the marking menu and context menu are displayed. For example, in response to the markingMenuDisplaying event.
     adsk.core.MarkingMenuEvent = function MarkingMenuEvent(handle) {
         if (!(this instanceof adsk.core.MarkingMenuEvent)) {
             return adsk.core.MarkingMenuEvent.cast(handle);
@@ -2663,6 +2698,36 @@
             snapOption : Number(snapOption)
         };
         var result = this._execute('snapTo', args);
+        return result ? result.value : undefined;
+    };
+
+    // Sets the minimum size of the palette. The user cannot resize it to be smaller than this size. This does not change the current size of the palette unless the palette is already smaller than this size. Calling this method and setting the width and height to zero, removes the minimum size restriction.
+    // width : Specifies the minimum width of the palette.
+    // height : Specifies the minimum height of the palette.
+    // Returns true if setting the minimum size was succesful.
+    adsk.core.Palette.prototype.setMinimumSize = function (width, height) {
+        if (!isFinite(width)) { throw new TypeError('width must be a number'); }
+        if (!isFinite(height)) { throw new TypeError('height must be a number'); }
+        var args = {
+            width : Number(width),
+            height : Number(height)
+        };
+        var result = this._execute('setMinimumSize', args);
+        return result ? result.value : undefined;
+    };
+
+    // Sets the maximum size of the palette. The user cannot resize it to be larger than this size. This does not change the current size of the palette unless the palette is already larger than this size. Calling this method and setting the width and height to zero, removes the maximum size restriction.
+    // width : Specifies the maximum width of the palette.
+    // height : Specifies the maximum height of the palette.
+    // Returns true if setting the maximum size was succesful.
+    adsk.core.Palette.prototype.setMaximumSize = function (width, height) {
+        if (!isFinite(width)) { throw new TypeError('width must be a number'); }
+        if (!isFinite(height)) { throw new TypeError('height must be a number'); }
+        var args = {
+            width : Number(width),
+            height : Number(height)
+        };
+        var result = this._execute('setMaximumSize', args);
         return result ? result.value : undefined;
     };
 
@@ -5957,7 +6022,7 @@
     // Get the limits currently defined for this input.
     // minimum : The minimum number of selections required. A value of zero means that there is no minimum limit.
     // maximum : The maximum number of selections required. A value of zero means that there is no maximum limit.
-    //
+    // Returns true if the selection limits were successfully returned.
     adsk.core.SelectionCommandInput.prototype.getSelectionLimits = function (minimum, maximum) {
         if (typeof minimum !== 'object') { throw new TypeError('minimum must be an object'); }
         if (typeof maximum !== 'object') { throw new TypeError('maximum must be an object'); }
@@ -6247,6 +6312,22 @@
                 value : value
             };
             var result = this._execute('isReadOnly', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Specifies if the current value shown is valid or not. Any string is valid for a StringValueCommandInput, but you many have some criteria that the string needs to meet for it to be valid in your application. You you use the command's validateInputs event to verify that inputs are valid and control whether the "OK" button is enabled or not, and you can also set this property on specific StringValueCommandInputs objects to indicate to the user that a specific value is not correct. When this property is true, Fusion will change the color of the text to red to indicate to the user there is a problem.
+    Object.defineProperty(adsk.core.StringValueCommandInput.prototype, 'isValueError', {
+        get : function () {
+            var result = this._execute('isValueError');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (typeof value !== 'boolean') { throw new TypeError('value must be a boolean'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('isValueError', args);
             return result ? result.value : undefined;
         }
     });
@@ -6565,7 +6646,7 @@
 
     // Adds a new command input to the toolbar at the bottom of the table.
     // input : Adds a command input to the toolbar at the bottom of the table. The inputs are displayed in the same order that they're added. The command input is created in the standard way but when it's added to the table using this method it will be displayed in the table instead of the main area of the dialog.
-    //
+    // Returns true if the command input was successfully added.
     adsk.core.TableCommandInput.prototype.addToolbarCommandInput = function (input) {
         if (input !== null && !(input instanceof adsk.core.CommandInput)) { throw new TypeError('input must be a adsk.core.CommandInput'); }
         var args = {

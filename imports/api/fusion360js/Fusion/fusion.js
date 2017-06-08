@@ -2522,7 +2522,7 @@
 
     // Deletes the group with the option of deleting or keeping the contents.
     // deleteGroupAndContents : Indicates if the group and its contents should be deleted or if only the group should be deleted and the contents kept and expanded. A value of true will delete the group and its contents.
-    //
+    // Returns true if the delete was successful.
     adsk.fusion.TimelineGroup.prototype.deleteMe = function (deleteGroupAndContents) {
         if (typeof deleteGroupAndContents !== 'boolean') { throw new TypeError('deleteGroupAndContents must be a boolean'); }
         var args = {

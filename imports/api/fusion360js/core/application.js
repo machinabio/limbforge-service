@@ -272,7 +272,7 @@
         }
     });
 
-    // The DocumentOpening event fires at the VERY start of a document being opened. There is no promise that the document will be opened, hence a documentOpened event may not follow. The client can add or remove DocumentEventHandlers from the DocumentEvent.
+    // The DocumentOpening event fires at the VERY start of a document being opened. There is no promise that the document will be opened, hence a documentOpened event may not follow. When a document is being opened that references other documents, only the top-level document will cause a documentOpening event to be fired.
     Object.defineProperty(adsk.core.Application.prototype, 'documentOpening', {
         get : function () {
             var result = this._execute('documentOpening');
@@ -280,7 +280,7 @@
         }
     });
 
-    // The DocumentOpened event fires at the VERY end of a document being opened - e.g. the UI is all displayed. The client can add or remove DocumentEventHandlers from the DocumentEvent.
+    // The DocumentOpened event fires at the VERY end of a document being opened so the Document object is avialable to be used. When a document is opened that references other documents, only the top-level document will cause the documentOpened event to be fired. You can access the referenced documents by using the documentReferences property of the Document object.
     Object.defineProperty(adsk.core.Application.prototype, 'documentOpened', {
         get : function () {
             var result = this._execute('documentOpened');
@@ -389,6 +389,78 @@
         get : function () {
             var result = this._execute('version');
             return result ? result.value : undefined;
+        }
+    });
+
+    // The DocumentCreated event fires when a new document is created.
+    Object.defineProperty(adsk.core.Application.prototype, 'documentCreated', {
+        get : function () {
+            var result = this._execute('documentCreated');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.DocumentEvent) : null;
+        }
+    });
+
+    // The DocumentClosing event fires at the VERY start of a document being closed. User can set the isSaveCanceled property of DocumentEventArgs to true to cancel the document close.
+    Object.defineProperty(adsk.core.Application.prototype, 'documentClosing', {
+        get : function () {
+            var result = this._execute('documentClosing');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.DocumentEvent) : null;
+        }
+    });
+
+    // The DocumentClosed event fires at the VERY end of a document being closed. The Document object is not longer available because it has been closed.
+    Object.defineProperty(adsk.core.Application.prototype, 'documentClosed', {
+        get : function () {
+            var result = this._execute('documentClosed');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.DocumentEvent) : null;
+        }
+    });
+
+    // The DocumentSaving event fires at the VERY start of a document being saved. You can set the isSaveCanceled property of DocumentEventArgs to true to cancel the document save.
+    Object.defineProperty(adsk.core.Application.prototype, 'documentSaving', {
+        get : function () {
+            var result = this._execute('documentSaving');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.DocumentEvent) : null;
+        }
+    });
+
+    // The DocumentSaved event fires after the save operation has been completed.
+    Object.defineProperty(adsk.core.Application.prototype, 'documentSaved', {
+        get : function () {
+            var result = this._execute('documentSaved');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.DocumentEvent) : null;
+        }
+    });
+
+    // The DocumentActivating event fires at the VERY start of a document being activated.
+    Object.defineProperty(adsk.core.Application.prototype, 'documentActivating', {
+        get : function () {
+            var result = this._execute('documentActivating');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.DocumentEvent) : null;
+        }
+    });
+
+    // The DocumentActivated event fires at the VERY end of a document being activated.
+    Object.defineProperty(adsk.core.Application.prototype, 'documentActivated', {
+        get : function () {
+            var result = this._execute('documentActivated');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.DocumentEvent) : null;
+        }
+    });
+
+    // The DocumentDeactivating event fires at the VERY start of a document being deactivated.
+    Object.defineProperty(adsk.core.Application.prototype, 'documentDeactivating', {
+        get : function () {
+            var result = this._execute('documentDeactivating');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.DocumentEvent) : null;
+        }
+    });
+
+    // The DocumentDeactivated event fires at the VERY end of a document being deactivated.
+    Object.defineProperty(adsk.core.Application.prototype, 'documentDeactivated', {
+        get : function () {
+            var result = this._execute('documentDeactivated');
+            return (result && result.value) ? adsk.createObject(result.value, adsk.core.DocumentEvent) : null;
         }
     });
 
@@ -2063,6 +2135,22 @@
                 value : value
             };
             var result = this._execute('filename', args);
+            return result ? result.value : undefined;
+        }
+    });
+
+    // Specifies if the camera should be adjusted to fit the geometry of the import. This defaults to true, which will cause a change in the current view. Setting this to false will leave the view as-is and just import the geometry.
+    Object.defineProperty(adsk.core.ImportOptions.prototype, 'isViewFit', {
+        get : function () {
+            var result = this._execute('isViewFit');
+            return result ? result.value : undefined;
+        },
+        set : function (value) {
+            if (typeof value !== 'boolean') { throw new TypeError('value must be a boolean'); }
+            var args = {
+                value : value
+            };
+            var result = this._execute('isViewFit', args);
             return result ? result.value : undefined;
         }
     });
