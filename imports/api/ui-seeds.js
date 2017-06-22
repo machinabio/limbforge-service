@@ -7,7 +7,6 @@ if (uiSeeds.find({})
   console.warn('Components collection empty, adding seeds.');
 
   uiSeeds.insert({
-    devices: {
       amputationLevels: {
         slug: "transradial",
         name: "Transradial"
@@ -39,7 +38,7 @@ if (uiSeeds.find({})
         }
         ],
     }
-  })
+  )
 };
 
 export default uiSeeds;
