@@ -33,5 +33,5 @@ var old_palette = palettes.itemById(palette_id);
 var agent_id = Session.get('agentId');
 
 if (old_palette != null) old_palette.deleteMe();
-var palette = palettes.add(palette_id, 'Fusion360.io', `http://localhost:3000/palette/${agent_id}`, true, true, true, 400, 400)
+var palette = palettes.add(palette_id, 'Fusion360.io', `http://fusion360.io/palette/${agent_id}`, true, true, true, 400, 400)
 

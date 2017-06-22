@@ -31,6 +31,3 @@ ui.messageBox('parameter '+length.name);
 
 var filtered = OrigArry.filter((val)=>{return val!='abc'});
 
-
-
-MONGO_URL='mongodb://meteor:QUW6xHwQDw1E@aws-us-east-1-portal.5.dblayer.com:16976,aws-us-east-1-portal.4.dblayer.com:16976/staging?ssl=true' MONGO_OPLOG_URL='mongodb://oploguser:JWt6_M4T-fWFsjA_GUPU7e2_gG2FvbCgLzAI-K_MtDw@aws-us-east-1-portal.5.dblayer.com:16978/local?authSource=admin&ssl=true' meteor run --settings settings.json"
