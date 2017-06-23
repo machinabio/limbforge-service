@@ -1,0 +1,12 @@
+<template name="paletteLayout">
+  <div>
+    {{#with agent}}
+      Microserver name: {{ name }} <br>
+      User id: {{ user_id }} <br>
+      LastSeen: {{ lastSeen }} <br>
+      Status: {{ status }} <br>
+      Transaction: {{ transaction }} <br>
+      Ping: {{ ping }} <br>
+    {{/with}}
+  </div>
+</template>

@@ -8,10 +8,10 @@ import humanInterval from 'human-interval';
 
 import { analytics } from "meteor/okgrow:analytics";
 
-import Agent from '/imports/api/agents.js';
-import Transaction from '/imports/models/transaction.js';
+import Agent from '/imports/collections/agents.js';
+import Transaction from '/imports/collections/transactions.js';;
 import Queue from '/imports/api/job-queue.js';
-import Script from '/imports/api/scripts.js';
+import Script from '/imports/collections/scripts.js';
 
 const purgeLimit = humanInterval('1 minute'); // seconds until an agent is considered "dead" and purged
 const agentWatchdogTick = humanInterval('3 seconds'); // check each active agent's status every 2 seconds 
@@ -38,13 +38,16 @@ Api.addRoute('retrieveId', {
   get: function() {
     var adskEmail;
     var adskId = this.queryParams.adskId;
+    console.log(this.queryParams);
 
     // lookup account by adskId first
     var user = Accounts.users.findOne({ autodesk_id: adskId });
     if (user) {
+      console.log('found existing user with autodesk id');
       adskEmail = user.emails[0].address;
     } else {
       // lookup account by email
+      console.log('trying to match user by autodesk email');
       user = Accounts.findUserByEmail(this.queryParams.adskEmail);
       Meteor.users.update(user._id, {
         $set: {
@@ -53,6 +56,7 @@ Api.addRoute('retrieveId', {
       });
     };
     if (!user) throw new Meteor.Error('failed to find a matching autodeskAccount');
+    
     console.log('cloud agent log in for user ', user.emails[0].address);
 
     this.response.writeHead(200, 'retrieving id', {
@@ -249,9 +253,12 @@ Queue.define(
     // console.log('Agenda scriptRex transaction:', transaction);
 
     agent.save();
-    job.remove();
+
+
+    // following needs to be moved to an OnSuccess event after Fusion360 finished the job.
+    // FIX!!! This is swallowing jobs!
+    job.remove(); 
     console.log(`## Job ${id} - Job successfully delegated to agent ${agent._id}`);
-    // console.log(agent);
   })
 );
 
