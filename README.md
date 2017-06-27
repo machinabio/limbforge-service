@@ -13,17 +13,29 @@ This is the backend for the (Limbforge)[https://github.com/limbforge/Limbforge] 
 4. `meteor run --settings settings.json`
 
 **Directory Structure**
+
 /client : All of these files are loaded on a desktop or embedded Fusion360 browser.
+
 /server : These files are loaded on the server.
+
 /public : Images and other static content
+
 /imports/api             - Shared code.
+
 /imports/api/fusion360js - Copy of the Fusion360 javascript libraries.
+
 /imports/api/shift       - Shift javascript extensions.
+
 /imports/collections     - Data models for important classes.
+
 /imports/publications    - Data publications.
+
 /imports/routes          - Both client- and server-side routes.
+
 /imports/ui/browser      - Templates for the browser interface.
+
 /imports/ui/fusion360    - Templates for the embdedded Fusion360 plugin. Only displayed in the Elements panel of the Chrome debugher console.
+
 /imports/ui/palette      - Templates presented in a Fusion360 Palette.
 
 
