@@ -29,7 +29,7 @@ if (uiSeeds.find({})
           lower_range: 20,
           default: 25,
           instructions: 'instructions go here',
-        },
+        }
         ],
       terminalDevices: [
         {
