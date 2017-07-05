@@ -27,7 +27,7 @@ Api.addRoute('ui/components', {
       name: true,
       icon: true,
       creator: true,
-      component_type: true,
+      componentType: true,
       weight: true,
       description: true,
       uses: true,
