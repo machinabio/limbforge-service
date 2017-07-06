@@ -31,10 +31,6 @@ Api.addRoute( 'components', {
     };
     const components = uiSeeds.find( { "amputationLevels.slug": amputationLevel }, { fields } )
       .fetch();
-    return {
-      statusCode: 200,
-      body: { components },
-    }
     return { components };
   }
 } );
