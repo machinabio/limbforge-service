@@ -3,10 +3,11 @@ import { check } from 'meteor/check';
 
 //Restivus is a global. See https://github.com/kahmali/meteor-restivus
 let Api = new Restivus({
-  prettyJson: true
+  prettyJson: true,
+  apiPath: '/api/ui',
 });
 
-Api.addRoute('ui/amputationLevels', {
+Api.addRoute('amputationLevels', {
   get() {
     const amputationLevels = uiSeeds.rawCollection()
       .distinct('amputationLevels')
@@ -18,7 +19,7 @@ Api.addRoute('ui/amputationLevels', {
   }
 });
 
-Api.addRoute('ui/components', {
+Api.addRoute('components', {
   get() {
     const amputationLevel = this.queryParams.amputationLevel;
     const fields = {
@@ -45,7 +46,7 @@ Api.addRoute('ui/components', {
   }
 });
 
-Api.addRoute('ui/measurements', {
+Api.addRoute('measurements', {
   get() {
     const device = this.queryParams.device;
     const fields = {
@@ -66,7 +67,7 @@ Api.addRoute('ui/measurements', {
 });
 
 
-Api.addRoute('ui/terminalDevices', {
+Api.addRoute('terminalDevices', {
   get() {
     const device = this.queryParams.device;
     const fields = {
