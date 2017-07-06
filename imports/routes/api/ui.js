@@ -1,19 +1,22 @@
 import uiSeeds from '/imports/api/ui-seeds.js';
+import { Restivus } from 'meteor/nimble:restivus';
 import { check } from 'meteor/check';
-//Restivus is a global. See https://github.com/kahmali/meteor-restivus
-let Api = new Restivus( {
+
+let Api = new Restivus({
   prettyJson: true,
   apiPath: '/api/ui',
-} );
-Api.addRoute( 'amputationLevels', {
+});
+
+Api.addRoute('amputationLevels', {
   get() {
     const amputationLevels = uiSeeds.rawCollection()
       .distinct( 'amputationLevels' )
       .await();
     return { amputationLevels };
-  }
-} );
-Api.addRoute( 'components', {
+  },
+});
+
+Api.addRoute('components', {
   get() {
     const amputationLevel = this.queryParams.amputationLevel;
     check( amputationLevel, String );
@@ -32,9 +35,10 @@ Api.addRoute( 'components', {
     const components = uiSeeds.find( { "amputationLevels.slug": amputationLevel }, { fields } )
       .fetch();
     return { components };
-  }
-} );
-Api.addRoute( 'measurements', {
+  },
+});
+
+Api.addRoute('measurements', {
   get() {
     const device = this.queryParams.device;
     check( device, String );
@@ -46,7 +50,8 @@ Api.addRoute( 'measurements', {
       .measurements;
     return { measurements };
   }
-} );
+});
+
 Api.addRoute( 'terminalDevices', {
   get() {
     const device = this.queryParams.device;
@@ -59,4 +64,4 @@ Api.addRoute( 'terminalDevices', {
       .terminalDevices;
     return { terminalDevices };
   }
-} );
+});
