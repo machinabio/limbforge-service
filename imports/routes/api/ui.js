@@ -1,25 +1,22 @@
 import uiSeeds from '/imports/api/ui-seeds.js';
 import { check } from 'meteor/check';
-
 //Restivus is a global. See https://github.com/kahmali/meteor-restivus
-let Api = new Restivus({
+let Api = new Restivus( {
   prettyJson: true,
   apiPath: '/api/ui',
-});
-
-Api.addRoute('amputationLevels', {
+} );
+Api.addRoute( 'amputationLevels', {
   get() {
     const amputationLevels = uiSeeds.rawCollection()
-      .distinct('amputationLevels')
+      .distinct( 'amputationLevels' )
       .await();
     return { amputationLevels };
   }
-});
-
-Api.addRoute('components', {
+} );
+Api.addRoute( 'components', {
   get() {
     const amputationLevel = this.queryParams.amputationLevel;
-    check(amputationLevel, String);
+    check( amputationLevel, String );
     const fields = {
       _id: false,
       slug: true,
@@ -32,52 +29,38 @@ Api.addRoute('components', {
       uses: true,
       printTime: true,
     };
-    const components = uiSeeds.find(
-      { "amputationLevels.slug": amputationLevel },
-      { fields }
-    ).fetch();
+    const components = uiSeeds.find( { "amputationLevels.slug": amputationLevel }, { fields } )
+      .fetch();
     return {
       statusCode: 200,
       body: { components },
     }
     return { components };
   }
-});
-
-Api.addRoute('measurements', {
+} );
+Api.addRoute( 'measurements', {
   get() {
     const device = this.queryParams.device;
-    check(device, String);
+    check( device, String );
     const fields = {
       _id: false,
       measurements: true
     };
-    const measurements = uiSeeds.findOne(
-      {slug: { $eq: device } },
-      { fields }
-    ).measurements;
-    // console.log(measurements)
+    const measurements = uiSeeds.findOne( { slug: { $eq: device } }, { fields } )
+      .measurements;
     return { measurements };
   }
-});
-
-
-Api.addRoute('terminalDevices', {
+} );
+Api.addRoute( 'terminalDevices', {
   get() {
     const device = this.queryParams.device;
+    check( device, String );
     const fields = {
       _id: false,
       terminalDevices: true
     };
-    check(device, String);
-    const terminalDevices = uiSeeds.findOne(
-      { slug: { $eq: device } },
-      { fields }
-    ).terminalDevices;
-    // console.log(terminalDevices);
-    return {
-      statusCode: 200,
-      body: { terminalDevices },
-    }
+    const terminalDevices = uiSeeds.findOne( { slug: { $eq: device } }, { fields } )
+      .terminalDevices;
+    return { terminalDevices };
   }
-});
+} );
