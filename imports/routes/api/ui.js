@@ -19,6 +19,7 @@ Api.addRoute('amputationLevels', {
 Api.addRoute('components', {
   get() {
     const amputationLevel = this.queryParams.amputationLevel;
+    check(amputationLevel, String);
     const fields = {
       _id: false,
       slug: true,
@@ -31,7 +32,6 @@ Api.addRoute('components', {
       uses: true,
       printTime: true,
     };
-    check(amputationLevel, String);
     const components = uiSeeds.find(
       { "amputationLevels.slug": amputationLevel },
       { fields }
@@ -40,6 +40,7 @@ Api.addRoute('components', {
       statusCode: 200,
       body: { components },
     }
+    return { components };
   }
 });
 
