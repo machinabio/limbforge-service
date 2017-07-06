@@ -1,0 +1,15 @@
+{
+  "storage": {
+    "accessKeyId": "<ACCESSKEYID>",
+    "secretAccessKey": "<SECRETKEYID>",
+    "region": "<REGION>",
+    "bucket": "<BUCKET>"
+  },
+  "shift": {
+    "foreman": {
+      "name": "any-name",
+      "maxWorkers": 2,
+      "url": "limbforge"
+    }
+  }
+}

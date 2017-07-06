@@ -8,7 +8,7 @@ This is the backend for the (Limbforge)[https://github.com/limbforge/Limbforge] 
 **Installation**
 1. Install Meteor
 2. Clone the git repo
-3. Create a `settings.json`
+3. Copy the `settings.sample.json` as `settings.json` and update contents accordingly.
 3. `meteor npm install`
 4. `meteor run --settings settings.json`
 
