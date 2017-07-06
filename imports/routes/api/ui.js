@@ -12,10 +12,7 @@ Api.addRoute('amputationLevels', {
     const amputationLevels = uiSeeds.rawCollection()
       .distinct('amputationLevels')
       .await();
-    return {
-      statusCode: 200,
-      body: { amputationLevels },
-    }
+    return { amputationLevels };
   }
 });
 
