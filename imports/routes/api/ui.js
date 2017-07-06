@@ -47,20 +47,17 @@ Api.addRoute('components', {
 Api.addRoute('measurements', {
   get() {
     const device = this.queryParams.device;
+    check(device, String);
     const fields = {
       _id: false,
       measurements: true
     };
-    check(device, String);
     const measurements = uiSeeds.findOne(
       {slug: { $eq: device } },
       { fields }
     ).measurements;
     // console.log(measurements)
-    return {
-      statusCode: 200,
-      body: { measurements },
-    }
+    return { measurements };
   }
 });
 
