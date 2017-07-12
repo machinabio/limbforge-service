@@ -20,16 +20,23 @@ Api.addRoute(':componentId', {
     const accessStarted = Date.now();
 
     const rexId = component.rexId;
+    logger.info('***** looked up component ', component);
     logger.info(`***** looked up rexId ${rexId}`);
 
     const url = `http://${Meteor.settings.public.shift.url}/api/rex/${rexId}`
     logger.info(`***** trying HTTP POST: ${url}`);
     let data = this.urlParams;
+    const filenameTemplate = handlebars.compile(component.filename);
+    const filename = filenameTemplate({
+      c1: "120",
+      c2: "180",
+    });
     logger.info(`***** with request body ${data}`);
     console.log('***** with request body', data);
     let results = HTTP.post(url, { data });
     logger.info('***** received ', results);
     results.body = results.content;
+    results.headers['Content-Disposition'] = `inline; filename="${filename}"`
     delete results.data;
     console.log('***** received ', results);
     component.logGenerationTime(accessStarted - Date.now());

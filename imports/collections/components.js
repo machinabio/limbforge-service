@@ -14,7 +14,7 @@ const Metrics = Class.create({
       optional: true,
       transient: true,
     },
-    fileSize: {
+    filesize: {
       type: Number,
       optional: true,
     },
@@ -44,6 +44,10 @@ const Component = Class.create({
       type: String,
     },
     rexId: String,
+    filename: {
+      type: String,
+      optional: true,
+    },
     metrics: Metrics
   },
   helpers: {
