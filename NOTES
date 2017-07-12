@@ -1,3 +1,8 @@
+TO DO NEXT
+- Switch to use "Modules" vs "Components"
+- Build filename from template string in Module
+
+
 var app = adsk.core.Application.get();
 var ui = app.userInterface;
 var data = app.data;
