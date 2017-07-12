@@ -1,3 +1,6 @@
+import jsend from 'jsend';
+import handlebars from 'handlebars';
+
 import { Restivus } from 'meteor/nimble:restivus';
 import { HTTP } from 'meteor/http'
 import Component from '/imports/collections/components.js';
@@ -19,15 +22,20 @@ Api.addRoute(':componentId', {
     const rexId = component.rexId;
     logger.info(`***** looked up rexId ${rexId}`);
 
-    const options = {};
-    const url = `http://${Meteor.settings.shift.foreman.url}/api/rex/${rexId}`
-    logger.info(`***** trying HTTP Get: ${url}`);
-    const results = HTTP.post(url, options);
-    logger.info(`***** received {$results}`);
-
+    const url = `http://${Meteor.settings.public.shift.url}/api/rex/${rexId}`
+    logger.info(`***** trying HTTP POST: ${url}`);
+    let data = this.urlParams;
+    logger.info(`***** with request body ${data}`);
+    console.log('***** with request body', data);
+    let results = HTTP.post(url, { data });
+    logger.info('***** received ', results);
+    results.body = results.content;
+    delete results.data;
+    console.log('***** received ', results);
     component.logGenerationTime(accessStarted - Date.now());
     component.save();
-    return 'reached preview endpoint for component ' + this.urlParams.componentId;
+
+    return results;
   },
 });
 

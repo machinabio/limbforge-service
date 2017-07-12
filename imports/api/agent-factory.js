@@ -74,7 +74,7 @@ Api.addRoute('retrieveId', {
     }
     agent.lastSeen = new Date();
 
-    agent.foreman = Meteor.settings.shift.foreman.name;
+    agent.foreman = Meteor.settings.public.shift.foreman;
 
     agent.save(() => {
       console.log('creating agent id ' + agent._id);
@@ -129,7 +129,7 @@ Api.addRoute('retrieveAgent', {
     agent.name = namor.generate({ words: 3, numbers: 4, manly: true });
     agent.lastSeen = new Date();
 
-    agent.foreman = Meteor.settings.shift.foreman.name;
+    agent.foreman = Meteor.settings.public.shift.foreman;
     agent.save(() => {
       console.log('creating agent id ' + agent._id);
       console.log('creating agent name ' + agent.name);
@@ -227,7 +227,7 @@ Queue.define(
       agent._runningScript = true;
       agent.save();
     } else {
-      let agents = Agent.find({ foreman: Meteor.settings.shift.foreman.name, remote: true, online: true, _runningScript: false }).fetch();
+      let agents = Agent.find({ foreman: Meteor.settings.public.shift.foreman, remote: true, online: true, _runningScript: false }).fetch();
 
       if (agents.length == 0) {
         console.log(`## Job ${id} - No free agents, rescheduling in 1 s`);

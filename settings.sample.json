@@ -5,9 +5,9 @@
     "region": "<REGION>",
     "bucket": "<BUCKET>"
   },
-  "shift": {
-    "foreman": {
-      "name": "any-name",
+  "public": {
+    "shift": {
+      "foreman": "any-name",
       "maxWorkers": 2,
       "url": "limbforge"
     }

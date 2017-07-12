@@ -4,15 +4,15 @@ import Transaction from '/imports/collections/transactions.js';;
 import { Accounts } from 'meteor/accounts-base'
 
 Meteor.publish("agents", function() {
-  if (this.userId) {
+  // if (this.userId) {
     console.log('publishing agents for userId: ', this.userId);
     return [
       Agent.find({ user_id: this.userId }),
       Transaction.find({ user_id: this.userId })
     ];
-  } else {
+  // } else {
     console.error('Not logged in');
-  }
+  // }
 });
 
 Meteor.publish("scripts", function() {

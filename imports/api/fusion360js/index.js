@@ -16,22 +16,27 @@ import './Fusion/tSpline.js';
 import './CAM/operations.js';
 import './CAM/cam.js';
 
-import Agent from '/imports/collections/agents.js';
-import { Accounts } from 'meteor/accounts-base'
 import { Meteor } from 'meteor/meteor';
+import { Accounts } from 'meteor/accounts-base';
+import { Session } from 'meteor/session';
 
-const palette_id = 'shift_palette_id';
+import Agent from '/imports/collections/agents.js';
+
+var palettes = adsk.core.Application.get().userInterface.palettes;
+
+var palette_id = 'shift_palette_id';
+var old_palette = palettes.itemById(palette_id);
+if (old_palette != null) old_palette.deleteMe();
 
 Meteor.call("printLog", "...building palette");
 console.log('...building palette');
 
-var agent = Agent.findOne(Session.get('agentId'));
+Meteor.setTimeout(() => {
+  var agent_id = Session.get('agentId');
+  console.log('found agent id ', agent_id);
+  // var agent = Agent.findOne(agent_id);
 
-
-var palettes = adsk.core.Application.get().userInterface.palettes;
-var old_palette = palettes.itemById(palette_id);
-var agent_id = Session.get('agentId');
-
-if (old_palette != null) old_palette.deleteMe();
-var palette = palettes.add(palette_id, 'Fusion360.io', `http://fusion360.io/palette/${agent_id}`, true, true, true, 400, 400)
-
+  var paletteUrl = `http://${Meteor.settings.public.shift.url}/palette/${agent_id}`
+  console.log(`Calling palette enpoint at ${paletteUrl}`);
+  var palette = palettes.add(palette_id, 'Fusion360.io', paletteUrl, true, true, true, 400, 400);
+},5000);

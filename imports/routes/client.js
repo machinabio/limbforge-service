@@ -25,7 +25,9 @@ FlowRouter.route('/palette/:agent_id', {
       window.location.replace(Meteor.absoluteUrl('', { replaceLocalhost: true }));
     };
     const agent_id = params.agent_id;
-    logger.info(`palette for agent ${agent_id}`);
+    // TODO logger not available on client? verify
+    // logger.info(`palette for agent ${agent_id}`); 
+    console.log(`palette for agent ${agent_id}`);
     Meteor.call("printLog", "...connection on /palette route from agent id "+agent_id);
     Session.setPersistent('agentId', agent_id);
     import '/imports/ui/palette';

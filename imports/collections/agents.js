@@ -102,7 +102,7 @@ if (Meteor.isServer) {
 
   Meteor.methods({
     spawn_agent() {
-      var agent_count = Agent.find({ foreman: Meteor.settings.shift.foreman.name, remote: true }).fetch().length;
+      var agent_count = Agent.find({ foreman: Meteor.settings.public.shift.foreman, remote: true }).fetch().length;
 
       if (agent_count >= Meteor.settings.shift.foreman.maxWorkers) {
         console.log('Too many agents!');

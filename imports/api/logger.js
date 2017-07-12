@@ -1,6 +1,6 @@
 import winston from 'winston';
 
-const logger = winston;
+var logger = winston;
 
 logger.level = 'debug';
 
