@@ -57,11 +57,20 @@ const Module = Class.create({
       logger.info('accessed module '+this.slug);
     },
     logRun(milliseconds) {
-      this.metrics.runTimes = this.metrics.runTimes.concat(milliseconds).slice(-100);
+      // logger.info(`logged excution time (${milliseconds} ms) for module ${this.slug}`);
+      // logger.info('metrics object', this.metrics)
+      // logger.info('runTime history ', this.metrics.runTimes);
+
+      // const modified = this.metrics.runTimes.concat(Number(milliseconds));
+
+      this.metrics.set('runTimes', this.metrics.runTimes.concat(milliseconds));
+
+      // this.metrics.runTimes = modified;
       this.save();
 
       logger.info(`logged excution time (${milliseconds} ms) for module ${this.slug}`);
       logger.info('runTime history ', this.metrics.runTimes);
+      // logger.info('runTime modified ', modified);
       logger.info('metrics object', this.metrics)
     }
   },

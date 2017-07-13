@@ -30,12 +30,26 @@ Api.addRoute(':moduleId', {
 
     const url = `http://${Meteor.settings.public.shift.url}/api/rex/${rexId}`
     logger.info(`***** trying HTTP POST: ${url}`);
+    
     let data = this.urlParams;
+    logger.info('@@@@@ received URL params', data);
+
+    // TODO check and santize data against the component information and min/max/increment
+
+    // TODO make a simple version of at the measurements (using the slug field) to pass into
+    //      the handlebars filename template.
+
     const filenameTemplate = handlebars.compile(module.filenameTemplate);
     const filename = filenameTemplate({
       c1: "120",
       c2: "180",
     });
+
+    // TODO hash the filename (should be unique).
+    //      check the cache (via the */info endpoint)
+    //      if cached, fetch.
+    //         otherwise trigger job and block until finished. 
+
     logger.info('***** with request body',data);
     let results = HTTP.post(url, { data });
     logger.info('***** received ', results);
