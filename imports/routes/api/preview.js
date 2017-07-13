@@ -37,23 +37,14 @@ Api.addRoute(':moduleId', {
       c2: "180",
     });
     logger.info('***** with request body',data);
-    console.log('***** with request body',data);
     let results = HTTP.post(url, { data });
     logger.info('***** received ', results);
-    console.log('***** received ', results);
 
-    // results.body = EJSON.parse(results.content);
-    // results.body = TextEncoder.encode(results.content);
     this.response.setHeader('Content-Type', 'application/vnd.ms-pkistl');
     this.response.setHeader('Content-Disposition', `inline; filename="${filename}"`);
-    this.response.write(EJSON.parse(results.content));
-    // this.response.write(TextEncoder.encode(results.content));
-    
-    // delete results.data;
-    
-    // console.log('***** responding with ', results);
+    this.response.write(EJSON.parse(results.content)); // need to strip extra set of quotes around the String response.
 
-    module.logGenerationTime(Date.now()-accessStarted);
+    module.logRun(Date.now()-accessStarted);
     module.save();
 
     this.done();

@@ -9,11 +9,6 @@ const Modules = new Mongo.Collection('modules');
 const Metrics = Class.create({
   name: 'Metrics',
   fields: {
-    averageGenerationTime: {
-      type: Number,
-      optional: true,
-      transient: true,
-    },
     filesize: {
       type: Number,
       optional: true,
@@ -29,8 +24,12 @@ const Metrics = Class.create({
     lastAccessedAt: {
       type: Date
     },
-    generationHistory: {
+    runTimes: {
       type: [Number],
+      optional: true
+    },
+    runTimeStats: {
+      type: Object,
       optional: true
     },
   },
@@ -57,17 +56,10 @@ const Module = Class.create({
       metrics.lastAccessedAt = new Date();
       this.save();
     },
-    logGenerationTime(milliseconds) {
+    logRun(milliseconds) {
       logger.info('logging excution time ('+milliseconds+' ms) for module '+this.slug);
-      const metrics = this.metrics;
-      // const Component = this.constructor;
-      // Component.update(this._id, {
-      //   $push: {
-      //     'metrics.generationHistory': {
-      //      $each: [ milliseconds ],
-      //       $slice: -100,
-      //   }
-      // }, callback);
+      // console.log(this.metrics.runTimes); 
+      this.metrics.runTimes.concat(milliseconds).slice(-100); // extract last 100 entires 
       this.save();
     }
   },
