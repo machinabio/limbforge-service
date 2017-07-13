@@ -49,18 +49,20 @@ const Module = Class.create({
     },
     metrics: Metrics
   },
-  helpers: {
+  meteorMethods: {
     logAccess() {
-      logger.info('accessing module '+this.slug);
-      const metrics = this.metrics;
-      metrics.lastAccessedAt = new Date();
+      this.metrics.lastAccessedAt = new Date();
       this.save();
+
+      logger.info('accessed module '+this.slug);
     },
     logRun(milliseconds) {
-      logger.info('logging excution time ('+milliseconds+' ms) for module '+this.slug);
-      // console.log(this.metrics.runTimes); 
-      this.metrics.runTimes.concat(milliseconds).slice(-100); // extract last 100 entires 
+      this.metrics.runTimes = this.metrics.runTimes.concat(milliseconds).slice(-100);
       this.save();
+
+      logger.info(`logged excution time (${milliseconds} ms) for module ${this.slug}`);
+      logger.info('runTime history ', this.metrics.runTimes);
+      logger.info('metrics object', this.metrics)
     }
   },
   events: {
