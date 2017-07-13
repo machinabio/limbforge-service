@@ -52,13 +52,13 @@ const Module = Class.create({
   },
   helpers: {
     logAccess() {
-      logger.info('accessing component '+this.slug);
+      logger.info('accessing module '+this.slug);
       const metrics = this.metrics;
       metrics.lastAccessedAt = new Date();
       this.save();
     },
     logGenerationTime(milliseconds) {
-      logger.info('logging excution time ('+milliseconds+' ms) for component '+this.slug);
+      logger.info('logging excution time ('+milliseconds+' ms) for module '+this.slug);
       const metrics = this.metrics;
       // const Component = this.constructor;
       // Component.update(this._id, {
@@ -75,12 +75,12 @@ const Module = Class.create({
     afterInit(event) {
       // need to figure out how to initialize a transient field!
 
-      // const component = event.currentTarget;
-      // const Class = component.constructor;
+      // const module = event.currentTarget;
+      // const Class = module.constructor;
       // const rawCollection = Class.getCollection();
-      // var average = rawCollection.find({slug:{$eq:component.slug}}).aggregate()
-      // component.averageGenerationTime = 10;
-      // logger.info('computed transient field "averageGenerationTime" to '+component.averageGenerationTime+' for component');
+      // var average = rawCollection.find({slug:{$eq:module.slug}}).aggregate()
+      // module.averageGenerationTime = 10;
+      // logger.info('computed transient field "averageGenerationTime" to '+module.averageGenerationTime+' for module');
     }
   },
 });
