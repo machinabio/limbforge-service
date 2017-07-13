@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Class } from 'meteor/jagi:astronomy';
 import logger from '/imports/api/logger.js';
+import Qty from 'meteor/fathom:quantities';
 
 // import { check } from 'meteor/check';
 
@@ -35,6 +36,19 @@ const Metrics = Class.create({
   },
 });
 
+const Measurements = Class.create({
+  name: 'Measurements',
+  fields: {
+    name: String,          // displayed
+    instructions: String,  // displayed
+    slug: String,          // internal. must be unique.
+    step: Number,    
+    upper_range: Number,
+    lower_range: Number,
+    default: Number,
+  },
+});
+
 const Module = Class.create({
   name: 'Module',
   collection: Modules,
@@ -47,12 +61,19 @@ const Module = Class.create({
       type: String,
       optional: true,
     },
-    metrics: Metrics
+    metrics: {
+      type: Metrics,
+      optional: true,
+    },
+    meaurements: {
+      type: Measurements,
+      optional: true,
+    }
   },
   meteorMethods: {
     logAccess() {
       this.metrics.lastAccessedAt = new Date();
-      this.save();
+      this.save({ fields: ['metrics'] });
 
       logger.info('accessed module '+this.slug);
     },
@@ -66,7 +87,7 @@ const Module = Class.create({
       this.metrics.set('runTimes', this.metrics.runTimes.concat(milliseconds));
 
       // this.metrics.runTimes = modified;
-      this.save();
+      this.save({ fields: ['metrics'] });
 
       logger.info(`logged excution time (${milliseconds} ms) for module ${this.slug}`);
       logger.info('runTime history ', this.metrics.runTimes);

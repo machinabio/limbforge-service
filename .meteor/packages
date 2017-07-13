@@ -37,3 +37,6 @@ gantrim:meteor-json-view-materialize
 okgrow:analytics
 planettraining:material-design-icons
 dynamic-import
+fathom:quantities
+autopublish
+insecure

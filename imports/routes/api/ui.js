@@ -31,6 +31,7 @@ Api.addRoute('components', {
       description: true,
       uses: true,
       printTime: true,
+      revision: true,
     };
     const components = uiSeeds.find( { "amputationLevels.slug": amputationLevel }, { fields } )
       .fetch();
