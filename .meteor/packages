@@ -38,5 +38,6 @@ okgrow:analytics
 planettraining:material-design-icons
 dynamic-import
 fathom:quantities
-autopublish
+
+#autopublish
 insecure
