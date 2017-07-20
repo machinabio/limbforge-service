@@ -53,11 +53,14 @@ Api.addRoute('rex/:hash', {
       const query_handle = Transaction.find(transaction_id, { fields: { response: true } })
         .observeChanges({
           changed: () => {
+            query_handle.stop();
             console.log(`-- Transaction ${id}: observed change in response`);
-            // console.log(transaction_id);
+            console.log(transaction_id);
             const transaction = Transaction.findOne(transaction_id);
-            // console.log(transaction);
+            console.log(transaction);
             this.response.write(transaction.response);
+            transaction.read_time = new Date();
+            transaction.save();
             fiber.run();
           }
         });
@@ -67,7 +70,6 @@ Api.addRoute('rex/:hash', {
       }, job_timeout);
       Fiber.yield();
       Meteor.clearTimeout(watchog_handle);
-      query_handle.stop();
       this.done();
     } else {
       return {

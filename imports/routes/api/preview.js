@@ -1,5 +1,6 @@
 import { HTTP } from 'meteor/http'
 import { EJSON } from 'meteor/ejson'
+import { check } from 'meteor/check'
 
 import { Restivus } from 'meteor/nimble:restivus';
 
@@ -20,6 +21,16 @@ Api.addRoute(':moduleId', {
   get() {
     logger.info('*** preview endpoint for module ' + this.urlParams.moduleId);
     const module = Module.findOne({ slug: { $eq: this.urlParams.moduleId } });
+    
+    const authHeader = this.request.headers.authorization;
+    const method = authHeader.split(' ')[0];
+    if (method != 'userid') throw Meteor.Error('Only support Auth method is `userid`');
+    const userId = authHeader.split(' ')[1];
+
+    // magic authorization goes here!
+
+    console.log('Auth method: ', method);
+    console.log('Auth user: ', userId);
 
     module.logAccess();
     const accessStarted = Date.now();
@@ -48,6 +59,7 @@ Api.addRoute(':moduleId', {
     //      if cached, fetch.
     //         otherwise trigger job and block until finished. 
 
+    data._user_id = userId;
     logger.info('***** with request body',data);
     let results = HTTP.post(url, { data });
     logger.info('***** received ', results);

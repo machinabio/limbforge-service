@@ -195,20 +195,20 @@ Queue.define(
 */
 Meteor.methods({
   rex_enqueue(params) {
-    if (!this.userId) {
-      console.warn('API REX call with no logged in user');
+    // if (!this.userId) {
+      // console.warn('API REX call with no logged in user');
 
       // throw Meteor.Error('User must be logged in to call "rex_enqueue"')
-    }
+    // }
 
-    // console.log('MeteorMethod rex_enqueue', params);
+    console.log('MeteorMethod rex_enqueue', params);
     let transaction = new Transaction();
     transaction.data = params.data;
     transaction.script_id = params.script_id;
-    transaction.user_id = this.userId || Script.findOne(transaction.script_id).userId;
+    transaction.user_id = params._user_id;
     transaction.agent_id = params.agent_id;
     transaction.save();
-    // console.log('MeteorMethod rex_enqueue transaction', transaction);
+    console.log('MeteorMethod rex_enqueue transaction', transaction);
     Queue.now('script_rex', transaction._id);
     return transaction._id;
   }

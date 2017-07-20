@@ -37,15 +37,17 @@ Template.fusionClientLayout.helpers({
 
   runScript() {
     if (this._runOnce) {
-      Deathknell.ring();
-      // Meteor.call("printLog", 'Fusion360 looking up transaction: ', this.transaction);
       var transaction = Transaction.findOne(this.transaction);
-      if (!transaction) return;
+      if (!transaction) {
+        Meteor.call("printLog", 'Fusion360 Microserver failed to lookup transaction: '+this.transaction);
+        return;
+      }
       // Meteor.call("printLog", 'Fusion360 running transaction: ', transaction);
       // console.log('transaction: ', transaction);
       this._runOnce = false;
       this._runningScript = true;
       this.save();
+      Deathknell.ring();
       // Using eval() doesn't allow the console debugger to display source or set breakpoints'
       delete global.Shift;
       global.Shift = new shift(transaction ? transaction._id : null)

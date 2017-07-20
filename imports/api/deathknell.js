@@ -18,10 +18,10 @@ var Deathknell = {
         console.log('DEATHKNELL ring called after ' + (Date.now() - starttime) + ' ms');
         Meteor.call("printLog", 'DEATHKNELL ring called after ' + String(Date.now() - starttime) + ' ms');
 
-        global.clearTimeout(timeoutHandle);
+        Meteor.clearTimeout(timeoutHandle);
         idleTO = false;
 
-        timeoutHandle = global.setTimeout(expireDeathknell, maxExecTime);
+        timeoutHandle = Meteor.setTimeout(expireDeathknell, maxExecTime);
         executionTO = true;
 
         rings++;
@@ -31,12 +31,12 @@ var Deathknell = {
         console.log('DEATHKNELL finish called after ' + (Date.now() - starttime) + ' ms');
         Meteor.call("printLog", 'DEATHKNELL finish called after ' + String(Date.now() - starttime) + ' ms');
 
-        global.clearTimeout(timeoutHandle);
+        Meteor.clearTimeout(timeoutHandle);
         executionTO = false;
 
         if (rings >= maxRings) expire();
 
-        timeoutHandle = global.setTimeout(expireDeathknell, maxIdleTime);
+        timeoutHandle = Meteor.setTimeout(expireDeathknell, maxIdleTime);
         idleTO = true;
     },
 
@@ -44,15 +44,15 @@ var Deathknell = {
         console.log('DEATHKNELL initialize called after ' + (Date.now() - starttime) + ' ms');
         Meteor.call("printLog", 'DEATHKNELL initialize called after ' + String(Date.now() - starttime) + ' ms');
 
-        global.clearTimeout(timeoutInitHandle);
+        Meteor.clearTimeout(timeoutInitHandle);
         initialiaztionTO = false;
 
         this.initialize = () => { return };
     }
 }
 
-var timeoutHandle = global.setTimeout(expireDeathknell, maxIdleTime);
-var timeoutInitHandle = global.setTimeout(restartMicroserver, maxInitTime);
+var timeoutHandle = Meteor.setTimeout(expireDeathknell, maxIdleTime);
+var timeoutInitHandle = Meteor.setTimeout(restartMicroserver, maxInitTime);
 
 module.exports = Deathknell;
 
