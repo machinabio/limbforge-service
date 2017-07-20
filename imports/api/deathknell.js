@@ -54,6 +54,8 @@ var Deathknell = {
 var timeoutHandle = Meteor.setTimeout(expireDeathknell, maxIdleTime);
 var timeoutInitHandle = Meteor.setTimeout(restartMicroserver, maxInitTime);
 
+global.Deathknell = Deathknell;
+
 module.exports = Deathknell;
 
 // This functions are hoisted

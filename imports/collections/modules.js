@@ -72,8 +72,7 @@ const Module = Class.create({
   },
   meteorMethods: {
     logAccess() {
-      this.metrics.lastAccessedAt = new Date();
-      this.save({ fields: ['metrics'] });
+      this.set('metrics.lastAccessedAt', new Date());
 
       logger.info('accessed module '+this.slug);
     },
@@ -82,17 +81,17 @@ const Module = Class.create({
       // logger.info('metrics object', this.metrics)
       // logger.info('runTime history ', this.metrics.runTimes);
 
-      // const modified = this.metrics.runTimes.concat(Number(milliseconds));
+      const modified = this.metrics.runTimes.concat(Number(milliseconds));
 
-      this.metrics.set('runTimes', this.metrics.runTimes.concat(milliseconds));
+      this.set('metrics.runTimes', modified);
 
       // this.metrics.runTimes = modified;
-      this.save({ fields: ['metrics'] });
+      // this.save({ fields: ['metrics'] });
 
       logger.info(`logged excution time (${milliseconds} ms) for module ${this.slug}`);
-      logger.info('runTime history ', this.metrics.runTimes);
+      // logger.info('runTime history ', this.metrics.runTimes);
       // logger.info('runTime modified ', modified);
-      logger.info('metrics object', this.metrics)
+      logger.info('metrics object', this.metrics);
     }
   },
   events: {

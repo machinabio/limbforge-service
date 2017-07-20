@@ -69,7 +69,7 @@ Api.addRoute(':moduleId', {
     this.response.write(EJSON.parse(results.content)); // need to strip extra set of quotes around the String response.
 
     module.logRun(Date.now()-accessStarted);
-    module.save();
+    // module.save();
 
     this.done();
   },

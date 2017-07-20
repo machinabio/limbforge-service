@@ -59,8 +59,7 @@ Api.addRoute('rex/:hash', {
             const transaction = Transaction.findOne(transaction_id);
             // console.log(transaction);
             this.response.write(transaction.response);
-            transaction.read_time = new Date();
-            transaction.save();
+            transaction.set('read_time', new Date());
             fiber.run();
           }
         });
