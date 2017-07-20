@@ -1,3 +1,5 @@
+// First import the adsk libraries
+
 import './core/application.js';
 import './core/dashboard.js';
 import './core/geometry.js';
@@ -16,12 +18,20 @@ import './Fusion/tSpline.js';
 import './CAM/operations.js';
 import './CAM/cam.js';
 
+// IMPORTANT
+// Fusion360 on Windows does NOT support ES6
+//   i.e. const, let, async, ..., etc
+// 
+
+// Initialize Fusion360 Microserver 
+
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 import { Session } from 'meteor/session';
 
 import Agent from '/imports/collections/agents.js';
 
+// Create palette
 var palettes = adsk.core.Application.get().userInterface.palettes;
 
 var palette_id = 'shift_palette_id';
@@ -36,7 +46,11 @@ Meteor.setTimeout(() => {
   console.log('found agent id ', agent_id);
   // var agent = Agent.findOne(agent_id);
 
-  var paletteUrl = `http://${Meteor.settings.public.shift.url}/palette/${agent_id}`
+  var paletteUrl = `http://${Meteor.settings.public.shift.url}/palette/${agent_id}`;
   console.log(`Calling palette enpoint at ${paletteUrl}`);
   var palette = palettes.add(palette_id, 'Fusion360.io', paletteUrl, true, true, true, 400, 400);
 },5000);
+
+// Start the deathknell...
+import '/imports/api/deathknell.js';
+

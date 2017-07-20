@@ -10,6 +10,8 @@ import text_encoding from 'text-encoding';
 import Agent from '/imports/collections/agents.js';
 import Transaction from '/imports/collections/transactions.js';;
 import shift from '/imports/api/shift/client.js';
+import Deathknell from '/imports/api/deathknell.js';
+
 
 import './index.html';
 
@@ -29,11 +31,13 @@ Template.fusionClientLayout.helpers({
     if (!agent) return;
     agent.online = true;
     agent.save();
+    Deathknell.initialize();
     return agent
   },
 
   runScript() {
     if (this._runOnce) {
+      Deathknell.ring();
       // Meteor.call("printLog", 'Fusion360 looking up transaction: ', this.transaction);
       var transaction = Transaction.findOne(this.transaction);
       if (!transaction) return;
@@ -60,7 +64,8 @@ Template.fusionClientLayout.helpers({
         transaction.response = EJSON.stringify(Shift.response);
         transaction.save();
       });
-      e.src = 'data:text/javascript;charset=utf-8,' + encodeURI(this._script);
+
+      e.src = 'data:text/javascript;charset=utf-8,' + encodeURI(this._script+'\nDeathknell.finish();');
       document.head.appendChild(e);
       // console.log('script ran!');
       // transaction.finish_time = new Date();
