@@ -1,5 +1,7 @@
 HumInt = require('human-interval');
 
+var shutdownDelay = HumInt(Meteor.settings.public.shift.shutdownDelay);
+var expirationBehavior = Meteor.settings.public.shift.expirationBehavior;
 var maxIdleTime = HumInt(Meteor.settings.public.shift.maxIdleTime);
 var maxExecTime = HumInt(Meteor.settings.public.shift.maxExecTime);
 var maxInitTime = HumInt(Meteor.settings.public.shift.maxInitTime);
@@ -52,13 +54,13 @@ var Deathknell = {
 }
 
 var timeoutHandle = Meteor.setTimeout(expireDeathknell, maxIdleTime);
-var timeoutInitHandle = Meteor.setTimeout(restartMicroserver, maxInitTime);
+var timeoutInitHandle = Meteor.setTimeout(reloadMicroserver, maxInitTime);
 
 global.Deathknell = Deathknell;
 
 module.exports = Deathknell;
 
-// This functions are hoisted
+// The functions below are hoisted
 function expireDeathknell() {
     console.error('DEATHKNELL');
 
@@ -89,16 +91,29 @@ function expireDeathknell() {
 
     // exit the application
     if (initialiaztionTO) {
-        window.location.reload();
+        reloadMicroserver();
     } else {
-        var exitCmdDef = ui.commandDefinitions.itemById('ExitApplicationCommand');
-        exitCmdDef.execute();
-        window.location.reload();
+        switch (expirationBehavior) {
+            case 'shutdown':
+                Meteor.setTimeout(terminateMicroserver, shutdownDelay);
+                break
+            case 'reload':
+                reloadMicroserver();
+                break
+            default:
+                Meteor.call("printLog", 'expirationBehavior "'+expirationBehavior+'" is not recognized');
+                throw new Meteor.Error('expirationBehavior "'+expirationBehavior+'" is not recognized');
+        }
     }
-
-    console.error('Goodbye');
 }
 
-function restartMicroserver() {
+function terminateMicroserver() {
+    Meteor.call("printLog", 'Terminating Fusion360 agent down after ' + (Date.now() - starttime) + ' milliseconds');
+    var exitCmdDef = ui.commandDefinitions.itemById('ExitApplicationCommand');
+    exitCmdDef.execute();
+}
 
+function reloadMicroserver() {
+    Meteor.call("printLog", 'Reloading microserver after ' + (Date.now() - starttime) + ' milliseconds');
+    window.location.reload();
 }
