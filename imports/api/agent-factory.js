@@ -201,14 +201,14 @@ Meteor.methods({
       // throw Meteor.Error('User must be logged in to call "rex_enqueue"')
     // }
 
-    console.log('MeteorMethod rex_enqueue', params);
+    // console.log('MeteorMethod rex_enqueue', params);
     let transaction = new Transaction();
     transaction.data = params.data;
     transaction.script_id = params.script_id;
     transaction.user_id = params._user_id;
     transaction.agent_id = params.agent_id;
     transaction.save();
-    console.log('MeteorMethod rex_enqueue transaction', transaction);
+    // console.log('MeteorMethod rex_enqueue transaction', transaction);
     Queue.now('script_rex', transaction._id);
     return transaction._id;
   }

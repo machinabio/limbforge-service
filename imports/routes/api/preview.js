@@ -29,8 +29,8 @@ Api.addRoute(':moduleId', {
 
     // magic authorization goes here!
 
-    console.log('Auth method: ', method);
-    console.log('Auth user: ', userId);
+    logger.log('Auth method: ', method);
+    logger.log('Auth user: ', userId);
 
     module.logAccess();
     const accessStarted = Date.now();
@@ -62,7 +62,7 @@ Api.addRoute(':moduleId', {
     data._user_id = userId;
     logger.info('***** with request body',data);
     let results = HTTP.post(url, { data });
-    logger.info('***** received ', results);
+    logger.info('***** received ', results.content.slice(0,500));
 
     this.response.setHeader('Content-Type', 'application/vnd.ms-pkistl');
     this.response.setHeader('Content-Disposition', `inline; filename="${filename}"`);

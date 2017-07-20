@@ -54,10 +54,10 @@ Api.addRoute('rex/:hash', {
         .observeChanges({
           changed: () => {
             query_handle.stop();
-            console.log(`-- Transaction ${id}: observed change in response`);
-            console.log(transaction_id);
+            // console.log(`-- Transaction ${id}: observed change in response`);
+            // console.log(transaction_id);
             const transaction = Transaction.findOne(transaction_id);
-            console.log(transaction);
+            // console.log(transaction);
             this.response.write(transaction.response);
             transaction.read_time = new Date();
             transaction.save();
