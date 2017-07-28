@@ -39,16 +39,32 @@ Api.addRoute('components', {
   },
 });
 
+// Api.addRoute('measurements', {
+//   get() {
+//     const device = this.queryParams.device;
+//     check( device, String );
+//     const fields = {
+//       _id: false,
+//       measurements: true
+//     };
+//     const measurements = uiSeeds.findOne( { slug: { $eq: device } }, { fields } )
+//       .measurements;
+//     return { measurements };
+//   }
+// });
+
 Api.addRoute('measurements', {
   get() {
-    const device = this.queryParams.device;
-    check( device, String );
+    const amputationLevel = this.queryParams.amputationLevel;
+
+    check( amputationLevel, String );
     const fields = {
       _id: false,
       measurements: true
     };
-    const measurements = uiSeeds.findOne( { slug: { $eq: device } }, { fields } )
+    const measurements = uiSeeds.findOne( { "amputationLevels.slug": amputationLevel }, { fields } )
       .measurements;
+
     return { measurements };
   }
 });
