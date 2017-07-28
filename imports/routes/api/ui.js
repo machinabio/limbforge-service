@@ -16,7 +16,16 @@ Api.addRoute('amputationLevels', {
   },
 });
 
-Api.addRoute('components', {
+Api.addRoute('recipe', {
+  get() {
+    const recipe = uiSeeds.rawCollection()
+      .distinct( 'type' )
+      .await();
+    return { recipe };
+  },
+});
+
+Api.addRoute('modules', {
   get() {
     const amputationLevel = this.queryParams.amputationLevel;
     check( amputationLevel, String );
@@ -33,25 +42,26 @@ Api.addRoute('components', {
       printTime: true,
       revision: true,
     };
-    const components = uiSeeds.find( { "amputationLevels.slug": amputationLevel }, { fields } )
+    const modules = uiSeeds.find( { "amputationLevels.slug": amputationLevel }, { fields } )
       .fetch();
-    return { components };
+    return { modules };
   },
 });
 
-// Api.addRoute('measurements', {
-//   get() {
-//     const device = this.queryParams.device;
-//     check( device, String );
-//     const fields = {
-//       _id: false,
-//       measurements: true
-//     };
-//     const measurements = uiSeeds.findOne( { slug: { $eq: device } }, { fields } )
-//       .measurements;
-//     return { measurements };
-//   }
-// });
+Api.addRoute('parameters', {
+  get() {
+    const device = this.queryParams.device;
+    check( device, String );
+    const fields = {
+      _id: false,
+      parameters: true
+    };
+    // console.log('request for parameters of device ', device)
+    const parameters = uiSeeds.findOne( { slug: { $eq: device } }, { fields } )
+      .parameters;
+    return { parameters };
+  }
+});
 
 Api.addRoute('measurements', {
   get() {
