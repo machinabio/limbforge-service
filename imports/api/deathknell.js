@@ -109,6 +109,7 @@ function expireDeathknell() {
 
 function terminateMicroserver() {
     Meteor.call("printLog", 'Terminating Fusion360 agent down after ' + (Date.now() - starttime) + ' milliseconds');
+    var ui = adsk.core.Application.get().userInterface;
     var exitCmdDef = ui.commandDefinitions.itemById('ExitApplicationCommand');
     exitCmdDef.execute();
 }
