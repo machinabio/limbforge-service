@@ -5,3 +5,5 @@
 settings*
 node_modules/
 .idea
+bundle.tar.gz
+pm2-env.json

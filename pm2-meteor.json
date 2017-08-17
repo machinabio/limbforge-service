@@ -1,0 +1,31 @@
+{
+  "appName": "limbforge-service",
+  "appLocation": {
+    "local": "~/dev/limbforge-service"
+  },
+  "meteorSettingsLocation": "./settings.json",
+  "meteorSettingsInRepo": false,
+  "prebuildScript": "",
+  "meteorBuildFlags": "--architecture os.linux.x86_64",
+  "env": {
+    "ROOT_URL": "https://fusion360.io",
+    "PORT": 3000,
+    "MONGO_URL": "mongodb://meteor:QUW6xHwQDw1E@aws-us-east-1-portal.5.dblayer.com:16976,aws-us-east-1-portal.4.dblayer.com:16976/staging?ssl=true",
+    "MONGO_OPLOG_URL": "mongodb://oploguser:JWt6_M4T-fWFsjA_GUPU7e2_gG2FvbCgLzAI-K_MtDw@aws-us-east-1-portal.5.dblayer.com:16978/local?authSource=admin&ssl=true",
+    "METEORTOYSSHELL": true,
+    "NODE_ENV": "development"
+  },
+  "server": {
+    "host": "ec2-52-11-41-246.us-west-2.compute.amazonaws.com",
+    "username": "ec2-user",
+    "deploymentDir": "~/meteor-apps",
+    "loadProfile": "",
+    "nvm": {
+      "bin": "~/.nvm/nvm.sh",
+      "use": ""
+    },
+    "exec_mode": "cluster_mode",
+    "instances": 1,
+    "pem": "~/.ssh/cjq-limbforge-us-west.pem"
+  }
+}
