@@ -1,8 +1,10 @@
-import { Meteor } from "meteor/meteor";
+import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
 import logger from '/imports/api/logger.js';
 
 import humanInterval from 'human-interval';
+
+import Agent from '/imports/collections/agents.js';
 
 import '/imports/startup/client.js';
 
@@ -11,71 +13,109 @@ const timeout = humanInterval('2 seconds'); // seconds we retry fetching an agen
 FlowRouter.route('/', {
   action(params) {
     if (Meteor.isFusion360) {
-      window.location.replace(Meteor.absoluteUrl('fusion360', { replaceLocalhost: true }));
-    };
+      window.location.replace(
+        Meteor.absoluteUrl('fusion360', { replaceLocalhost: true })
+      );
+    }
     import '/imports/ui/browser';
-    Meteor.call("printLog", "...connection on / route");
-    BlazeLayout.render("App_body", { main: "webClientLayout" });
-  }
+
+    Meteor.subscribe('agents');
+    Meteor.subscribe('scripts');
+
+    Meteor.call('printLog', '...connection on / route');
+    BlazeLayout.render('App_body', { main: 'webClientLayout' });
+  },
 });
 
-FlowRouter.route('/palette/:agent_id', {
+FlowRouter.route('/palette/:agentId', {
   action(params) {
     if (!Meteor.isFusion360) {
-      window.location.replace(Meteor.absoluteUrl('', { replaceLocalhost: true }));
-    };
-    const agent_id = params.agent_id;
-    // TODO logger not available on client? verify
-    // logger.info(`palette for agent ${agent_id}`); 
-    console.log(`palette for agent ${agent_id}`);
-    Meteor.call("printLog", "...connection on /palette route from agent id "+agent_id);
-    Session.setPersistent('agentId', agent_id);
+      window.location.replace(
+        Meteor.absoluteUrl('', { replaceLocalhost: true })
+      );
+    }
+
     import '/imports/ui/palette';
-    BlazeLayout.render("App_body", { main: "paletteLayout" });
-  }
+
+    Meteor.call(
+      'printLog',
+      '...connection on /palette route from agent id ' + params.agentId
+    );
+
+    Meteor.subscribe('palette', params.agentId, {
+      onReady() {
+        BlazeLayout.render('App_body', { main: 'paletteLayout' });
+      },
+    });
+  },
 });
 
 FlowRouter.route('/fusion360', {
-  action(params) {
+  action() {
     if (!Meteor.isFusion360) {
-      window.location.replace(Meteor.absoluteUrl('', { replaceLocalhost: true }));
-    };
-    import Agent from '/imports/collections/agents.js';
-    import '/imports/api/fusion360js';
-    import '/imports/ui/fusion360';
-    Meteor.call("printLog", "...connection on /fusion360 route");
-    let queryParams = {
-      adskEmail: adsk.core.Application.get().userName,
-      adskId: adsk.core.Application.get().userId
+      window.location.replace(
+        Meteor.absoluteUrl('', { replaceLocalhost: true })
+      );
     }
-    // console.log('setting retry timeout for agent id');
-    // let retry_handle = Meteor.setTimeout(window.location.reload, timeout)
-    HTTP.get('/api/retrieveId', { params: queryParams }, (err, res) => {
-      // Meteor.clearTimeout(retry_handle);
-      Agent.initialize(res.data.agentId);
+
+    Meteor.call('printLog', '...connection on /fusion360 route');
+    Meteor.call(
+      'printLog',
+      'Fusion360 agent capabilities:',
+      navigator.userAgent
+    );
+    import { initPalette } from '/imports/api/fusion360js';
+    const params = {
+      adskEmail: adsk.core.Application.get().userName,
+      adskId: adsk.core.Application.get().userId,
+    };
+
+    HTTP.get('/api/retrieveId', { params }, (err, res) => {
+      Meteor.subscribe('fusion', res.data.agentId, {
+        onReady() {
+          import '/imports/ui/fusion360';
+          initPalette();
+
+          Agent.initialize(res.data.agentId);
+          BlazeLayout.render('App_body', { main: 'fusionClientLayout' });
+        },
+      });
     });
-    BlazeLayout.render("App_body", { main: "fusionClientLayout" });
-  }
+  },
 });
 
 FlowRouter.route('/agent', {
-  action(params) {
+  action() {
     if (!Meteor.isFusion360) {
-      window.location.replace(Meteor.absoluteUrl('', { replaceLocalhost: true }));
-    };
-    Meteor.call("printLog", "...connection on /agent route");
-    import '/imports/api/fusion360js';
-    import '/imports/ui/fusion360';
-    import Agent from '/imports/collections/agents.js';
-    let queryParams = {
-      adskEmail: adsk.core.Application.get().userName,
-      adskId: adsk.core.Application.get().userId
+      window.location.replace(
+        Meteor.absoluteUrl('', { replaceLocalhost: true })
+      );
     }
-    HTTP.get('/api/retrieveAgent', { params: queryParams }, (err, res) => {
-      Agent.initialize(res.data.agentId);
+
+    import Agent from '/imports/collections/agents.js';
+
+    Meteor.call('printLog', '...connection on /agent route');
+    Meteor.call(
+      'printLog',
+      'Fusion360 agent capabilities:',
+      navigator.userAgent
+    );
+    import { initPalette } from '/imports/api/fusion360js';
+    const params = {
+      adskEmail: adsk.core.Application.get().userName,
+      adskId: adsk.core.Application.get().userId,
+    };
+
+    HTTP.get('/api/retrieveAgent', { params }, (err, res) => {
+      Meteor.subscribe('fusion', res.data.agentId, {
+        onReady() {
+          import '/imports/ui/fusion360';
+          initPalette();
+
+          Agent.initialize(res.data.agentId);
+          BlazeLayout.render('App_body', { main: 'fusionClientLayout' });
+        },
+      });
     });
-    BlazeLayout.render("App_body", { main: "fusionClientLayout" });
-  }
+  },
 });
-
-

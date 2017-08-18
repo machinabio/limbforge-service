@@ -15,7 +15,8 @@
       "maxIdleTime" :"1 minutes",
       "maxExecTime" :"2 minutes",
       "maxInitTime" :"20 seconds",
-      "maxJobs" :""
+      "maxJobs" :"4",
+      "credentials" : "<CONSOLE_ACCOUNT_PASSWORD>"
     }
   }
 }

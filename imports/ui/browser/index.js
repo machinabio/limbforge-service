@@ -13,6 +13,10 @@ import Transaction from '/imports/collections/transactions.js';;
 
 import './index.html';
 
+Meteor.subscribe('agents');
+Meteor.subscribe('scripts');
+Meteor.subscribe('parameters');
+
 Session.setDefault('activeTab', 'scripting');
 
 Template.webClientLayout.onRendered(() => {

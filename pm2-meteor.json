@@ -15,14 +15,15 @@
     "METEORTOYSSHELL": true,
     "NODE_ENV": "development"
   },
+  "localBuildDir": "/tmp/pm2-meteor-builds",
   "server": {
-    "host": "ec2-52-11-41-246.us-west-2.compute.amazonaws.com",
+    "host": "ec2-34-211-98-103.us-west-2.compute.amazonaws.com",
     "username": "ec2-user",
-    "deploymentDir": "~/meteor-apps",
+    "deploymentDir": "/home/ec2-user/meteor-apps/",
     "loadProfile": "",
     "nvm": {
-      "bin": "~/.nvm/nvm.sh",
-      "use": ""
+      "bin": "/home/ec2-user/.nvm/nvm.sh",
+      "use": "4.6"
     },
     "exec_mode": "cluster_mode",
     "instances": 1,
