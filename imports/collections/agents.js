@@ -149,6 +149,7 @@ if (Meteor.isFusion360) {
             // console.log('called watchdog agent id ' + this._id);
             let agent = Agent.findOne(this._id);
             agent.lastSeen = new Date();
+            agent.online = true;
             if (agent._runningScript) {
               console.log('reseting _runningScript flag');
               agent._runningScript = false;

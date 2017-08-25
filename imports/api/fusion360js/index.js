@@ -37,6 +37,8 @@ const solidToolbars = adskUI.workspaces.itemById('FusionSolidEnvironment')
 
 const Fusion360 = {
   initPalette() {
+    // The Agents aren't published until after this module is loaded.
+    // TODO refactor to load this module AFTER the subscription is ready
     const agent_id = Agent.findOne({})._id;
     console.log('found agent id ', agent_id);
     const paletteUrl = `http://${Meteor.settings.public.shift

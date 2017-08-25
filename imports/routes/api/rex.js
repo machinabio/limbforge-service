@@ -42,7 +42,7 @@ Api.addRoute('rex/:hash', {
     const script = Script.findOne({ _md5: this.urlParams.hash, published: true });
     if (script) {
       const data = this.bodyParams ? this.bodyParams : {};
-      // console.log('rex data:', data);
+      console.log('rex data:', data);
       const params = {
         script_id: script._id,
         data: data
@@ -54,7 +54,7 @@ Api.addRoute('rex/:hash', {
         .observeChanges({
           changed: () => {
             query_handle.stop();
-            // console.log(`-- Transaction ${id}: observed change in response`);
+            console.log(`-- Transaction ${id}: observed change in response`);
             // console.log(transaction_id);
             const transaction = Transaction.findOne(transaction_id);
             // console.log(transaction);

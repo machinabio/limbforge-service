@@ -15,7 +15,7 @@ import './index.html';
 
 Meteor.subscribe('agents');
 Meteor.subscribe('scripts');
-Meteor.subscribe('parameters');
+// Meteor.subscribe('parameters');
 
 Session.setDefault('activeTab', 'scripting');
 

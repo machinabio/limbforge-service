@@ -36,7 +36,7 @@ var Deathknell = {
         Meteor.clearTimeout(timeoutHandle);
         executionTO = false;
 
-        if (rings >= maxRings) expire();
+        if (rings >= maxRings) expireDeathknell();
 
         timeoutHandle = Meteor.setTimeout(expireDeathknell, maxIdleTime);
         idleTO = true;
