@@ -57,7 +57,7 @@ const Fusion360 = {
       true,
       true,
       400,
-      400
+      400,
     );
 
     // show shift console command
@@ -71,7 +71,7 @@ const Fusion360 = {
       commandID,
       commandName,
       '',
-      ''
+      '',
     );
 
     commandDefinition.commandCreated.add(args => {

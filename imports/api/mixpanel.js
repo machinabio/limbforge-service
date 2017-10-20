@@ -15,7 +15,7 @@
 //       // special mixpanel property names
 //       "$created": user.createdAt.toISOString(),
 //       "$email": user.emails[0].address
-//       // "$id": xxxxx.getAutodeskId(); // want to get the adsk user hash ... 
+//       // "$id": xxxxx.getAutodeskId(); // want to get the adsk user hash ...
 //     }
 
 //     analytics.people.set(person);

@@ -1,4 +1,4 @@
-import { Meteor } from "meteor/meteor";
+import { Meteor } from 'meteor/meteor';
 import { Session } from 'meteor/session';
 import { Random } from 'meteor/random';
 
@@ -15,7 +15,7 @@ const timeout = humanInterval('10 seconds'); // seconds until an agent reloads t
 
 const Status = Enum.create({
   name: 'Status',
-  identifiers: ['IDLE', 'BUSY', 'TERMINATING']
+  identifiers: ['IDLE', 'BUSY', 'TERMINATING'],
 });
 
 const Agents = new Mongo.Collection('agents');
@@ -26,53 +26,53 @@ let Agent = Class.create({
     name: String,
     factory: {
       type: String,
-      optional: true
+      optional: true,
     },
     foreman: {
       type: String,
-      optional: true
+      optional: true,
     },
     lastSeen: {
       type: Date,
-      optional: true
+      optional: true,
     },
     autodeskAccount: {
       type: String,
-      optional: true
+      optional: true,
     },
     online: {
       type: Boolean,
-      optional: true
+      optional: true,
     },
     remote: {
       type: Boolean,
-      optional: true
+      optional: true,
     },
     ping: {
       type: String,
-      optional: true
+      optional: true,
     },
     user_id: {
       type: String,
-      optional: true
+      optional: true,
     },
     transaction: {
       type: String,
-      optional: true
+      optional: true,
     },
     _script: {
       type: String,
-      optional: true
+      optional: true,
     },
     _runningScript: {
       type: Boolean,
       optional: true,
-      default: false
+      default: false,
     },
     _runOnce: {
       type: Boolean,
       optional: true,
-      default: false
+      default: false,
     },
   },
   behaviors: {},
@@ -91,18 +91,21 @@ let Agent = Class.create({
     // }
     // ]
   },
-  secured: false
+  secured: false,
 });
 
 /// Persistant server-side controllers for Agents
 if (Meteor.isServer) {
   Agent.extend({
-    events: {}
+    events: {},
   });
 
   Meteor.methods({
     spawn_agent() {
-      var agent_count = Agent.find({ foreman: Meteor.settings.public.shift.foreman, remote: true }).fetch().length;
+      var agent_count = Agent.find({
+        foreman: Meteor.settings.public.shift.foreman,
+        remote: true,
+      }).fetch().length;
 
       if (agent_count >= Meteor.settings.shift.foreman.maxWorkers) {
         console.log('Too many agents!');
@@ -111,7 +114,7 @@ if (Meteor.isServer) {
         console.log('Spawn a new agent (TODO)');
         return true;
       }
-    }
+    },
   });
 }
 
@@ -127,7 +130,7 @@ if (Meteor.isClient) {
 
 if (Meteor.isFusion360) {
   Agent.initialize = function initialize(id) {
-    Tracker.autorun((c) => {
+    Tracker.autorun(c => {
       let agent = Agent.findOne(id);
       if (agent) {
         Meteor.defer(agent.initialize.bind(agent));
@@ -157,12 +160,11 @@ if (Meteor.isFusion360) {
             agent.save();
             // Meteor.clearTimeout(watchdog);
             // watchdog = Meteor.setTimeout(window.location.reload, timeout);
-          }
+          },
         });
-      }
-    }
+      },
+    },
   });
 }
 
 export default Agent;
-

@@ -14,7 +14,7 @@ FlowRouter.route('/', {
   action(params) {
     if (Meteor.isFusion360) {
       window.location.replace(
-        Meteor.absoluteUrl('fusion360', { replaceLocalhost: true })
+        Meteor.absoluteUrl('fusion360', { replaceLocalhost: true }),
       );
     }
     import '/imports/ui/browser';
@@ -31,7 +31,7 @@ FlowRouter.route('/palette/:agentId', {
   action(params) {
     if (!Meteor.isFusion360) {
       window.location.replace(
-        Meteor.absoluteUrl('', { replaceLocalhost: true })
+        Meteor.absoluteUrl('', { replaceLocalhost: true }),
       );
     }
 
@@ -39,7 +39,7 @@ FlowRouter.route('/palette/:agentId', {
 
     Meteor.call(
       'printLog',
-      '...connection on /palette route from agent id ' + params.agentId
+      '...connection on /palette route from agent id ' + params.agentId,
     );
 
     Meteor.subscribe('palette', params.agentId, {
@@ -54,7 +54,7 @@ FlowRouter.route('/fusion360', {
   action() {
     if (!Meteor.isFusion360) {
       window.location.replace(
-        Meteor.absoluteUrl('', { replaceLocalhost: true })
+        Meteor.absoluteUrl('', { replaceLocalhost: true }),
       );
     }
 
@@ -62,7 +62,7 @@ FlowRouter.route('/fusion360', {
     Meteor.call(
       'printLog',
       'Fusion360 agent capabilities:',
-      navigator.userAgent
+      navigator.userAgent,
     );
     import { initPalette } from '/imports/api/fusion360js';
     const params = {
@@ -88,7 +88,7 @@ FlowRouter.route('/agent', {
   action() {
     if (!Meteor.isFusion360) {
       window.location.replace(
-        Meteor.absoluteUrl('', { replaceLocalhost: true })
+        Meteor.absoluteUrl('', { replaceLocalhost: true }),
       );
     }
 
@@ -98,7 +98,7 @@ FlowRouter.route('/agent', {
     Meteor.call(
       'printLog',
       'Fusion360 agent capabilities:',
-      navigator.userAgent
+      navigator.userAgent,
     );
     import { initPalette } from '/imports/api/fusion360js';
     const params = {

@@ -23,15 +23,15 @@ const Metrics = Class.create({
       optional: true,
     },
     lastAccessedAt: {
-      type: Date
+      type: Date,
     },
     runTimes: {
       type: [Number],
-      optional: true
+      optional: true,
     },
     runTimeStats: {
       type: Object,
-      optional: true
+      optional: true,
     },
   },
 });
@@ -39,10 +39,10 @@ const Metrics = Class.create({
 const Measurements = Class.create({
   name: 'Measurements',
   fields: {
-    name: String,          // displayed
-    instructions: String,  // displayed
-    slug: String,          // internal. must be unique.
-    step: Number,    
+    name: String, // displayed
+    instructions: String, // displayed
+    slug: String, // internal. must be unique.
+    step: Number,
     upper_range: Number,
     lower_range: Number,
     default: Number,
@@ -68,13 +68,13 @@ const Module = Class.create({
     meaurements: {
       type: Measurements,
       optional: true,
-    }
+    },
   },
   meteorMethods: {
     logAccess() {
       this.set('metrics.lastAccessedAt', new Date());
 
-      logger.info('accessed module '+this.slug);
+      logger.info('accessed module ' + this.slug);
     },
     logRun(milliseconds) {
       // logger.info(`logged excution time (${milliseconds} ms) for module ${this.slug}`);
@@ -88,23 +88,24 @@ const Module = Class.create({
       // this.metrics.runTimes = modified;
       // this.save({ fields: ['metrics'] });
 
-      logger.info(`logged excution time (${milliseconds} ms) for module ${this.slug}`);
+      logger.info(
+        `logged excution time (${milliseconds} ms) for module ${this.slug}`,
+      );
       // logger.info('runTime history ', this.metrics.runTimes);
       // logger.info('runTime modified ', modified);
       logger.info('metrics object', this.metrics);
-    }
+    },
   },
   events: {
     afterInit(event) {
       // need to figure out how to initialize a transient field!
-
       // const module = event.currentTarget;
       // const Class = module.constructor;
       // const rawCollection = Class.getCollection();
       // var average = rawCollection.find({slug:{$eq:module.slug}}).aggregate()
       // module.averageGenerationTime = 10;
       // logger.info('computed transient field "averageGenerationTime" to '+module.averageGenerationTime+' for module');
-    }
+    },
   },
 });
 

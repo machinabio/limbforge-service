@@ -42,7 +42,7 @@ Template.fusionClientLayout.helpers({
         Meteor.call(
           'printLog',
           'Fusion360 Microserver failed to lookup transaction: ' +
-            this.transaction
+            this.transaction,
         );
         return;
       }

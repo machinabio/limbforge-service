@@ -14,4 +14,4 @@ Invoke-Command -Session $session -ScriptBlock $startFusionCommand`);
   },
 };
 
-module.exports = Workgang; 
+module.exports = Workgang;

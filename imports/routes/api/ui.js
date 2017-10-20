@@ -9,8 +9,9 @@ let Api = new Restivus({
 
 Api.addRoute('amputationLevels', {
   get() {
-    const amputationLevels = uiSeeds.rawCollection()
-      .distinct( 'amputationLevels' )
+    const amputationLevels = uiSeeds
+      .rawCollection()
+      .distinct('amputationLevels')
       .await();
     return { amputationLevels };
   },
@@ -18,8 +19,9 @@ Api.addRoute('amputationLevels', {
 
 Api.addRoute('recipe', {
   get() {
-    const recipe = uiSeeds.rawCollection()
-      .distinct( 'type' )
+    const recipe = uiSeeds
+      .rawCollection()
+      .distinct('type')
       .await();
     return { recipe };
   },
@@ -28,7 +30,7 @@ Api.addRoute('recipe', {
 Api.addRoute('modules', {
   get() {
     const amputationLevel = this.queryParams.amputationLevel;
-    check( amputationLevel, String );
+    check(amputationLevel, String);
     const fields = {
       _id: false,
       slug: true,
@@ -42,7 +44,8 @@ Api.addRoute('modules', {
       printTime: true,
       revision: true,
     };
-    const modules = uiSeeds.find( { "amputationLevels.slug": amputationLevel }, { fields } )
+    const modules = uiSeeds
+      .find({ 'amputationLevels.slug': amputationLevel }, { fields })
       .fetch();
     return { modules };
   },
@@ -51,44 +54,48 @@ Api.addRoute('modules', {
 Api.addRoute('parameters', {
   get() {
     const device = this.queryParams.device;
-    check( device, String );
+    check(device, String);
     const fields = {
       _id: false,
-      parameters: true
+      parameters: true,
     };
     // console.log('request for parameters of device ', device)
-    const parameters = uiSeeds.findOne( { slug: { $eq: device } }, { fields } )
+    const parameters = uiSeeds.findOne({ slug: { $eq: device } }, { fields })
       .parameters;
     return { parameters };
-  }
+  },
 });
 
 Api.addRoute('measurements', {
   get() {
     const amputationLevel = this.queryParams.amputationLevel;
 
-    check( amputationLevel, String );
+    check(amputationLevel, String);
     const fields = {
       _id: false,
-      measurements: true
+      measurements: true,
     };
-    const measurements = uiSeeds.findOne( { "amputationLevels.slug": amputationLevel }, { fields } )
-      .measurements;
+    const measurements = uiSeeds.findOne(
+      { 'amputationLevels.slug': amputationLevel },
+      { fields },
+    ).measurements;
 
     return { measurements };
-  }
+  },
 });
 
-Api.addRoute( 'terminalDevices', {
+Api.addRoute('terminalDevices', {
   get() {
     const device = this.queryParams.device;
-    check( device, String );
+    check(device, String);
     const fields = {
       _id: false,
-      terminalDevices: true
+      terminalDevices: true,
     };
-    const terminalDevices = uiSeeds.findOne( { slug: { $eq: device } }, { fields } )
-      .terminalDevices;
+    const terminalDevices = uiSeeds.findOne(
+      { slug: { $eq: device } },
+      { fields },
+    ).terminalDevices;
     return { terminalDevices };
-  }
+  },
 });

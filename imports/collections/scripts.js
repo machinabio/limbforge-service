@@ -7,32 +7,32 @@ const Script = Class.create({
   fields: {
     code: {
       type: String,
-      optional: true
+      optional: true,
     },
     name: {
       type: String,
-      optional: true
+      optional: true,
     },
     userId: {
       type: String,
-      optional: true
+      optional: true,
     },
     parameters: {
       type: String,
-      optional: true
+      optional: true,
     },
     published: {
       type: Boolean,
-      optional: true
+      optional: true,
     },
     _md5: {
       type: String,
-      optional: true
-    }
+      optional: true,
+    },
   },
   behaviors: {},
   events: {},
-  secured: false
+  secured: false,
 });
 
 // var doc = {};

@@ -10,8 +10,8 @@ jobs.rawCollection().ensureIndex('priority', () => {});
 const Queue = new Agenda({
   mongo: jobs.rawDatabase(),
   db: {
-    collection: agendaCollectionNAme
-  }
+    collection: agendaCollectionNAme,
+  },
 });
 
 Queue.on('ready', () => {
@@ -19,7 +19,7 @@ Queue.on('ready', () => {
   Queue.start();
 });
 
-Queue.on('error', (error) => {
+Queue.on('error', error => {
   console.log('Error starting Queue', error);
 });
 

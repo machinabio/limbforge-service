@@ -1,15 +1,15 @@
-import { Meteor } from "meteor/meteor";
+import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { EJSON } from 'meteor/ejson';
 
 import moment from 'moment';
 import md5 from 'md5';
 
-import { analytics } from "meteor/okgrow:analytics";
+import { analytics } from 'meteor/okgrow:analytics';
 
 import Agent from '/imports/collections/agents.js';
 import Script from '/imports/collections/scripts.js';
-import Transaction from '/imports/collections/transactions.js';;
+import Transaction from '/imports/collections/transactions.js';
 
 import './index.html';
 
@@ -21,8 +21,8 @@ Session.setDefault('activeTab', 'scripting');
 
 Template.webClientLayout.onRendered(() => {
   Tracker.autorun(() => {
-    BlazeLayout.render("webClientLayout", {
-      body: Session.get('activeTab')
+    BlazeLayout.render('webClientLayout', {
+      body: Session.get('activeTab'),
     });
   });
 });
@@ -32,16 +32,16 @@ Template.scriptList.helpers({
     return Script.find({}, { sort: { name: 1 } });
   },
   active() {
-    return this._id == Session.get('activeScript') ? "active" : "";
-  }
+    return this._id == Session.get('activeScript') ? 'active' : '';
+  },
 });
 
 Template.scriptList.events({
-  'click .collection-item' (event) {
+  'click .collection-item'(event) {
     Session.set('activeScript', this._id);
     event.preventDefault();
   },
-  'click #newScript' (event) {
+  'click #newScript'(event) {
     analytics.track('script.new');
     var script = new Script();
     script.name = 'new script';
@@ -49,24 +49,27 @@ Template.scriptList.events({
     script.save(() => {
       Session.set('activeScript', script._id);
     });
-  }
+  },
 });
 
 Template.code.events({
-  'click #runScript' (event) {
+  'click #runScript'(event) {
     let agent = Agent.getLocal();
     if (!agent) {
-      console.error('No local agent found for autodesk ID ' + Meteor.user().emails[0].address);
+      console.error(
+        'No local agent found for autodesk ID ' +
+          Meteor.user().emails[0].address,
+      );
       return;
     }
     analytics.track('script.execute');
     let params = {
       script_id: Session.get('activeScript'),
       agent_id: agent._id,
-      data: {}
+      data: {},
     };
     Meteor.call('rex_enqueue', params);
-  }
+  },
 });
 
 Template.code.helpers({
@@ -85,15 +88,15 @@ Template.code.helpers({
   codeEditorOptions() {
     return {
       lineNumbers: true,
-      mode: "javascript",
-      autofocus: true
-    }
-  }
+      mode: 'javascript',
+      autofocus: true,
+    };
+  },
 });
 
 Template.code.onRendered(() => {
   $('.collapsible').collapsible();
-  CodeMirrors["scriptBody"].refresh();
+  CodeMirrors['scriptBody'].refresh();
 });
 
 Template.code.onCreated(() => {
@@ -102,31 +105,31 @@ Template.code.onCreated(() => {
 });
 
 Template.codeSettings.events({
-  'change #script_name' (event) {
+  'change #script_name'(event) {
     this.name = String(event.target.value);
     this.save();
   },
-  'click #deleteScript' (event) {
+  'click #deleteScript'(event) {
     analytics.track('script.remove');
     this.remove();
   },
-  'click #copyScript' (event) {
+  'click #copyScript'(event) {
     analytics.track('script.copy');
     this.copy().save();
-  }
+  },
 });
 
 Template.script_publish.events({
-  'change #script_published' (event) {
+  'change #script_published'(event) {
     this.published = event.target.checked;
     this.save();
-  }
+  },
 });
 
 Template.script_publish.helpers({
   published() {
     return this.published;
-  }
+  },
 });
 
 Template.agent_dropdown.onRendered(() => {
@@ -136,10 +139,10 @@ Template.agent_dropdown.onRendered(() => {
 Template.agent_dropdown.helpers({
   cloud_agents() {
     var agent_list = [];
-    agent_list.push({ _id: 'next_available', name: 'Next available' })
+    agent_list.push({ _id: 'next_available', name: 'Next available' });
     agent_list = agent_list.concat(Agent.getCloud().fetch());
     return agent_list;
-  }
+  },
 });
 
 Template.agent_count.helpers({
@@ -148,7 +151,7 @@ Template.agent_count.helpers({
     // agent_list.push({_id: 'next_available', name: 'Next available'})
     // agent_list = agent_list.concat(Agent.getCloud().fetch());
     return Agent.getCloud().count();
-  }
+  },
 });
 
 Template.agent_collection.helpers({
@@ -165,7 +168,7 @@ Template.agent_collection.helpers({
       agent_list = agent_list.concat(cloud_agents);
     }
     return agent_list;
-  }
+  },
 });
 
 Template.agent_details.helpers({
@@ -173,10 +176,10 @@ Template.agent_details.helpers({
     return Agent.findOne(Session.get('active_agent_collection_item'));
   },
   type() {
-    return this.remote ? "Cloud" : "Desktop";
+    return this.remote ? 'Cloud' : 'Desktop';
   },
   busy() {
-    return this._runningScript ? "Running a script" : "Idle";
+    return this._runningScript ? 'Running a script' : 'Idle';
   },
   last_seen() {
     //TODO format in local/relative units
@@ -184,36 +187,36 @@ Template.agent_details.helpers({
   },
   status() {
     if (this._runningScript) {
-      return "Running a script";
+      return 'Running a script';
     }
     if (this.online) {
-      return "Online";
+      return 'Online';
     }
-    return "No information";
-  }
+    return 'No information';
+  },
 });
 
 Template.agent_collection.events({
-  'click .collection-item' (event) {
+  'click .collection-item'(event) {
     Session.set('active_agent_collection_item', this._id);
     event.preventDefault();
-  }
-})
+  },
+});
 
 Template.agentList.events({
-  'click #new_agent' (event) {
+  'click #new_agent'(event) {
     Agent.spawn();
-  }
-})
+  },
+});
 
 Template.agent_collection_item.helpers({
   active() {
     if (this._id == Session.get('active_agent_collection_item')) {
-      return "active";
+      return 'active';
     } else {
-      return "";
+      return '';
     }
-  }
+  },
 });
 
 Template.debug_api.helpers({
@@ -221,55 +224,58 @@ Template.debug_api.helpers({
     return {
       lineNumbers: false,
       mode: {
-        name: "javascript",
-        json: true
+        name: 'javascript',
+        json: true,
       },
-      autofocus: true
-    }
+      autofocus: true,
+    };
   },
   url() {
     //TODO generate the MD5 in the astronomy class for scripts...
-    this._md5 = md5(this._id);;
+    this._md5 = md5(this._id);
     this.save();
     return 'https://fusion360.io/api/rex/' + this._md5;
   },
   response() {
     let transaction = Transaction.findOne(Session.get('transaction_id'));
     if (!transaction) return 'No response';
-    console.log('Transaction: ', transaction)
+    console.log('Transaction: ', transaction);
     return transaction.response;
-  }
+  },
 });
 
 Template.debug_api.events({
-  'click #runCloudScript' (event) {
+  'click #runCloudScript'(event) {
     var script = Script.findOne();
     // var data = {foo:"bar"};
     var data = EJSON.parse(Session.get('cloud_params'));
-    Meteor.call("rex_enqueue", { script_id: Session.get('activeScript'), data: data }, (error, result) => {
-      console.log('rex_enqueue result was ', result);
-      Session.set('transaction_id', result)
-    });
-  }
+    Meteor.call(
+      'rex_enqueue',
+      { script_id: Session.get('activeScript'), data: data },
+      (error, result) => {
+        console.log('rex_enqueue result was ', result);
+        Session.set('transaction_id', result);
+      },
+    );
+  },
 });
 
 Template.navbar.helpers({
   scriptActive() {
-    return Session.get('activeTab') == 'scripting' ? "grey lighten-2" : "";
+    return Session.get('activeTab') == 'scripting' ? 'grey lighten-2' : '';
   },
   workgangActive() {
-    return Session.get('activeTab') == 'workgang' ? "grey lighten-2" : "";
-  }
+    return Session.get('activeTab') == 'workgang' ? 'grey lighten-2' : '';
+  },
 });
 
 Template.navbar.events({
-  'click #workgangtNavButton' (event) {
+  'click #workgangtNavButton'(event) {
     analytics.track('nav.workgang');
     Session.set('activeTab', 'workgang');
   },
-  'click #scriptNavButton' (event) {
+  'click #scriptNavButton'(event) {
     analytics.track('nav.scripting');
     Session.set('activeTab', 'scripting');
-  }
+  },
 });
-

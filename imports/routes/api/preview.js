@@ -1,6 +1,6 @@
-import { HTTP } from 'meteor/http'
-import { EJSON } from 'meteor/ejson'
-import { check } from 'meteor/check'
+import { HTTP } from 'meteor/http';
+import { EJSON } from 'meteor/ejson';
+import { check } from 'meteor/check';
 
 import { Restivus } from 'meteor/nimble:restivus';
 
@@ -21,10 +21,11 @@ Api.addRoute(':moduleId', {
   get() {
     logger.info('*** preview endpoint for module ' + this.urlParams.moduleId);
     const module = Module.findOne({ slug: { $eq: this.urlParams.moduleId } });
-    
+
     const authHeader = this.request.headers.authorization;
     const method = authHeader.split(' ')[0];
-    if (method != 'userid') throw Meteor.Error('Only support Auth method is `userid`');
+    if (method != 'userid')
+      throw Meteor.Error('Only support Auth method is `userid`');
     const userId = authHeader.split(' ')[1];
 
     // magic authorization goes here!
@@ -39,9 +40,9 @@ Api.addRoute(':moduleId', {
     logger.info('***** looked up module ', module);
     logger.info(`***** looked up rexId ${rexId}`);
 
-    const url = `http://${Meteor.settings.public.shift.url}/api/rex/${rexId}`
+    const url = `http://${Meteor.settings.public.shift.url}/api/rex/${rexId}`;
     logger.info(`***** trying HTTP POST: ${url}`);
-    
+
     let data = this.queryParams;
     logger.info('@@@@@ received query params', data);
 
@@ -50,25 +51,28 @@ Api.addRoute(':moduleId', {
     // TODO make a simple version of at the measurements (using the slug field) to pass into
     //      the handlebars filename template.
 
-    // the filename is also used as the slug for cache lookups 
+    // the filename is also used as the slug for cache lookups
     const filenameTemplate = handlebars.compile(module.filenameTemplate);
-    const filename = filenameTemplate({ ... data });
+    const filename = filenameTemplate({ ...data });
 
     // TODO hash the filename (should be unique).
     //      check the cache (via the */info endpoint)
     //      if cached, fetch.
-    //         otherwise trigger job and block until finished. 
+    //         otherwise trigger job and block until finished.
 
     data._user_id = userId;
-    logger.info('***** with request body',data);
+    logger.info('***** with request body', data);
     let results = HTTP.post(url, { data });
-    logger.info('***** received ', results.content.slice(0,500));
+    logger.info('***** received ', results.content.slice(0, 500));
 
     this.response.setHeader('Content-Type', 'application/vnd.ms-pkistl');
-    this.response.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+    this.response.setHeader(
+      'Content-Disposition',
+      `inline; filename="${filename}"`,
+    );
     this.response.write(EJSON.parse(results.content)); // need to strip extra set of quotes around the String response.
 
-    module.logRun(Date.now()-accessStarted);
+    module.logRun(Date.now() - accessStarted);
     // module.save();
 
     this.done();
@@ -77,17 +81,23 @@ Api.addRoute(':moduleId', {
 
 Api.addRoute(':moduleId/sync', {
   get() {
-    logger.info('*** synchronous preview endpoint for module ' + this.urlParams.moduleId);
-    return 'reached synchronous preview endpoint for module ' + this.urlParams.moduleId;
+    logger.info(
+      '*** synchronous preview endpoint for module ' + this.urlParams.moduleId,
+    );
+    return (
+      'reached synchronous preview endpoint for module ' +
+      this.urlParams.moduleId
+    );
   },
 });
 
 Api.addRoute(':moduleId/info', {
   get() {
     logger.info('*** info for preview of module ' + this.urlParams.moduleId);
-    const metrics = Component.findOne({ slug: { $eq: this.urlParams.moduleId } })
-      .metrics;
+    const metrics = Component.findOne({
+      slug: { $eq: this.urlParams.moduleId },
+    }).metrics;
     logger.info('***** looked up info ', metrics);
-    return {...metrics };
+    return { ...metrics };
   },
 });

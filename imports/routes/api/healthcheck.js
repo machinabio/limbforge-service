@@ -1,7 +1,6 @@
 let Api = new Restivus({
-  prettyJson: true
+  prettyJson: true,
 });
-
 
 let microserverReady = true;
 
@@ -12,7 +11,7 @@ Api.addRoute('healthcheck', {
     } else {
       return {
         statusCode: 503,
-        body: 'busy'
+        body: 'busy',
       };
     }
   },
@@ -22,8 +21,8 @@ Api.addRoute('healthcheck', {
     } else {
       return {
         statusCode: 503,
-        body: 'busy'
+        body: 'busy',
       };
     }
-  }
+  },
 });

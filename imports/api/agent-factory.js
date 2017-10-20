@@ -1,26 +1,26 @@
-import { Meteor } from "meteor/meteor";
-import { Accounts } from 'meteor/accounts-base'
+import { Meteor } from 'meteor/meteor';
+import { Accounts } from 'meteor/accounts-base';
 import { EJSON } from 'meteor/ejson';
 import { Random } from 'meteor/random';
 
 import namor from 'namor';
 import humanInterval from 'human-interval';
 
-import { analytics } from "meteor/okgrow:analytics";
+import { analytics } from 'meteor/okgrow:analytics';
 
 import Agent from '/imports/collections/agents.js';
-import Transaction from '/imports/collections/transactions.js';;
+import Transaction from '/imports/collections/transactions.js';
 import Queue from '/imports/api/job-queue.js';
 import Script from '/imports/collections/scripts.js';
 
 const purgeLimit = humanInterval('1 minute'); // seconds until an agent is considered "dead" and purged
-const agentWatchdogTick = humanInterval('3 seconds'); // check each active agent's status every 2 seconds 
+const agentWatchdogTick = humanInterval('3 seconds'); // check each active agent's status every 2 seconds
 const agentTimeout = humanInterval('7 seconds'); // 5 seconds until an agent is considered "offline"
 
 if (Meteor.isClient) throw Error('tried importing agent-factory.js on client');
 
 let Api = new Restivus({
-  prettyJson: true
+  prettyJson: true,
 });
 
 /**
@@ -51,16 +51,17 @@ Api.addRoute('retrieveId', {
       user = Accounts.findUserByEmail(this.queryParams.adskEmail);
       Meteor.users.update(user._id, {
         $set: {
-          autodesk_id: adskId
-        }
+          autodesk_id: adskId,
+        },
       });
-    };
-    if (!user) throw new Meteor.Error('failed to find a matching autodeskAccount');
-    
+    }
+    if (!user)
+      throw new Meteor.Error('failed to find a matching autodeskAccount');
+
     console.log('cloud agent log in for user ', user.emails[0].address);
 
     this.response.writeHead(200, 'retrieving id', {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     });
 
     var agent = Agent.findOne({ autodeskAccount: adskEmail, remote: false });
@@ -83,7 +84,7 @@ Api.addRoute('retrieveId', {
       this.response.write(EJSON.stringify({ agentId: agent._id }));
       this.done();
     });
-  }
+  },
 });
 
 /**
@@ -111,15 +112,16 @@ Api.addRoute('retrieveAgent', {
       user = Accounts.findUserByEmail(this.queryParams.adskEmail);
       Meteor.users.update(user._id, {
         $set: {
-          autodesk_id: adskId
-        }
+          autodesk_id: adskId,
+        },
       });
-    };
-    if (!user) throw new Meteor.Error('failed to find a matching autodeskAccount');
+    }
+    if (!user)
+      throw new Meteor.Error('failed to find a matching autodeskAccount');
     console.log('cloud agent log in for user ', adskEmail);
 
     this.response.writeHead(200, 'retrieving id', {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     });
 
     var agent = new Agent();
@@ -137,23 +139,25 @@ Api.addRoute('retrieveAgent', {
       this.response.write(EJSON.stringify({ agentId: agent._id }));
       this.done();
     });
-  }
+  },
 });
 
 Queue.processEvery('0.5 second');
 
 Queue.define(
-  'agent_check_all', { lockLifetime: 500 },
+  'agent_check_all',
+  { lockLifetime: 500 },
   Meteor.bindEnvironment((job, done) => {
     agents = Agent.find({}).fetch();
     // console.log('checking watchdogs for ' + agents.length + ' agents');
-    agents.forEach((agent) => {
+    agents.forEach(agent => {
       Queue.create('agent_check', agent._id)
         .unique({ id: agent._id })
         .schedule('now')
         .save();
     });
-  }));
+  }),
+);
 
 Queue.define(
   'agent_check',
@@ -185,7 +189,7 @@ Queue.define(
     job.remove();
 
     return;
-  })
+  }),
 );
 
 /**
@@ -196,9 +200,9 @@ Queue.define(
 Meteor.methods({
   rex_enqueue(params) {
     // if (!this.userId) {
-      // console.warn('API REX call with no logged in user');
+    // console.warn('API REX call with no logged in user');
 
-      // throw Meteor.Error('User must be logged in to call "rex_enqueue"')
+    // throw Meteor.Error('User must be logged in to call "rex_enqueue"')
     // }
 
     // console.log('MeteorMethod rex_enqueue', params);
@@ -211,13 +215,13 @@ Meteor.methods({
     // console.log('MeteorMethod rex_enqueue transaction', transaction);
     Queue.now('script_rex', transaction._id);
     return transaction._id;
-  }
+  },
 });
 
 Queue.define(
   'script_rex',
   Meteor.bindEnvironment((job, done) => {
-    const id = job.attrs.data.slice(0,4);
+    const id = job.attrs.data.slice(0, 4);
     const transaction = Transaction.findOne(job.attrs.data);
     let agent;
     console.log(`## Job ${id} - Starting with transaction ${transaction._id}`);
@@ -227,13 +231,18 @@ Queue.define(
       agent._runningScript = true;
       agent.save();
     } else {
-      let agents = Agent.find({ foreman: Meteor.settings.public.shift.foreman, remote: true, online: true, _runningScript: false }).fetch();
+      let agents = Agent.find({
+        foreman: Meteor.settings.public.shift.foreman,
+        remote: true,
+        online: true,
+        _runningScript: false,
+      }).fetch();
 
       if (agents.length == 0) {
         console.log(`## Job ${id} - No free agents, rescheduling in 1 s`);
         job.schedule('in 1 second');
         job.save();
-        return
+        return;
       }
       agent = agents[Math.floor(Math.random() * agents.length)];
       agent._runningScript = true;
@@ -254,16 +263,16 @@ Queue.define(
 
     agent.save();
 
-
     // following needs to be moved to an OnSuccess event after Fusion360 finished the job.
     // FIX!!! This is swallowing jobs!
-    job.remove(); 
-    console.log(`## Job ${id} - Job successfully delegated to agent ${agent._id}`);
-  })
+    job.remove();
+    console.log(
+      `## Job ${id} - Job successfully delegated to agent ${agent._id}`,
+    );
+  }),
 );
 
 Queue.create('agent_check_all', {})
   .unique({})
   .repeatEvery(agentWatchdogTick)
   .save();
-

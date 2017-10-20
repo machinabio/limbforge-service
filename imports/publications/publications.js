@@ -27,7 +27,7 @@ Meteor.publish('fusion', function(agentId) {
   console.log(
     'publishing ' +
       Transaction.find({ agent_id: agentId }).count() +
-      ' transactions'
+      ' transactions',
   );
   return [Agent.find(agentId), Transaction.find({ agent_id: agentId })];
 });
@@ -41,7 +41,7 @@ Meteor.publish('palette', function(agentId) {
   console.log(
     'publishing ' +
       Transaction.find({ agent_id: agentId }).count() +
-      ' transactions'
+      ' transactions',
   );
   return [Agent.find(agentId), Transaction.find({ agent_id: agentId })];
 });

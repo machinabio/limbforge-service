@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { EJSON } from 'meteor/ejson'
+import { EJSON } from 'meteor/ejson';
 import { check } from 'meteor/check';
 import { Random } from 'meteor/random';
 
@@ -16,13 +16,13 @@ const settings = Meteor.settings.storage;
 const storage_client = knox.createClient({
   key: settings.accessKeyId,
   secret: settings.secretAccessKey,
-  bucket: settings.bucket
+  bucket: settings.bucket,
 });
 
 //Restivus is a global. See https://github.com/kahmali/meteor-restivus
 const Api = new Restivus({
   prettyJson: true,
-  apiPath: '/limbforge'
+  apiPath: '/limbforge',
 });
 
 Api.addRoute('preview', {
@@ -38,7 +38,7 @@ Api.addRoute('preview', {
         console.log('*** found a single component');
         components = [this.queryParams.component];
       }
-      components.forEach((component) => {
+      components.forEach(component => {
         let parsed = parse_and_normalize(component);
         const id = parsed.id;
         const cache_id = get_hash(parsed);
@@ -48,16 +48,18 @@ Api.addRoute('preview', {
 
       this.response.writeHead(200, {
         'Content-Type': 'application/zip',
-        'Content-disposition': 'attachment; filename=Limbforge.zip'
+        'Content-disposition': 'attachment; filename=Limbforge.zip',
       });
       // console.log('ops: ', operations)
       let archive = archiver('zip');
       archive.pipe(this.response);
 
-      operations.forEach((operation) => {
+      operations.forEach(operation => {
         // const name = Random.id(4);
-        const name = filenames.findOne({component_id: operation.id}).filename;
-        console.log(`*** using "${name}" as the name for component ${operation.id}`);
+        const name = filenames.findOne({ component_id: operation.id }).filename;
+        console.log(
+          `*** using "${name}" as the name for component ${operation.id}`,
+        );
         archive.append(get_STL(operation), { name });
       });
       const fiber = Fiber.current;
@@ -73,16 +75,16 @@ Api.addRoute('preview', {
       console.error(error);
       return {
         statusCode: 400,
-        body: error
-      }
+        body: error,
+      };
     }
   },
   post() {
     return {
       statusCode: 405,
-      body: 'POST method not supported. Try GET instead?'
+      body: 'POST method not supported. Try GET instead?',
     };
-  }
+  },
 });
 
 function round_to_half(number) {
@@ -108,36 +110,43 @@ function parse_and_normalize(stringified_parameters) {
 }
 
 function get_hash(parameters) {
-  let object_string = EJSON.stringify({...parameters, quality }, { cannonical: true });
-  return hasha(object_string, { algorithm: "sha512" });
+  let object_string = EJSON.stringify(
+    { ...parameters, quality },
+    { cannonical: true },
+  );
+  return hasha(object_string, { algorithm: 'sha512' });
 }
 
 function get_STL({ id, cache_id, parameters }) {
   console.log(`ID: ${id}, cache_id? ${cache_id}`);
-  const response = Meteor.wrapAsync(storage_client.headFile, storage_client)(cache_id);
-  const cached = (response.statusCode === 200);
+  const response = Meteor.wrapAsync(storage_client.headFile, storage_client)(
+    cache_id,
+  );
+  const cached = response.statusCode === 200;
   if (cached) {
     const url = storage_client.https(cache_id);
     console.log(`// already cached at ${url}`);
-    return request
-      .get(url)
-      .on('response', function(response) {
-        // console.log(`// response code ${response.statusCode}`); // 200 
-        // console.log(`// content type ${response.headers['content-type']}`);
-        console.log(`// content length ${response.headers['content-length']}`);
-        // console.log(response);
-      })
+    return request.get(url).on('response', function(response) {
+      // console.log(`// response code ${response.statusCode}`); // 200
+      // console.log(`// content type ${response.headers['content-type']}`);
+      console.log(`// content length ${response.headers['content-length']}`);
+      // console.log(response);
+    });
   }
   const data = { cache_id, parameters };
-  const url = `http://${Meteor.settings.shift.harbormaster_url}/api/rex/${id}`
-  console.log(`// generating part ID ${id}, passing parameters ${EJSON.stringify(data)} to ${url}`);
+  const url = `http://${Meteor.settings.shift.harbormaster_url}/api/rex/${id}`;
+  console.log(
+    `// generating part ID ${id}, passing parameters ${EJSON.stringify(
+      data,
+    )} to ${url}`,
+  );
   return request
     .post(url)
     .json(data)
     .on('response', function(response) {
-      // console.log(`// response code ${response.statusCode}`); // 200 
+      // console.log(`// response code ${response.statusCode}`); // 200
       // console.log(`// content type ${response.headers['content-type']}`);
       console.log(`// content length ${response.headers['content-length']}`);
       // console.log(response);
-    })
+    });
 }
