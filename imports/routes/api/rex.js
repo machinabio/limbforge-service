@@ -13,7 +13,7 @@ import s3Zip from 's3-zip';
 import path from 'path';
 import AWS from 'aws-sdk';
 
-import { analytics } from 'meteor/okgrow:analytics';
+// import { analytics } from 'meteor/okgrow:analytics';
 
 import Agent from '/imports/collections/agents.js';
 import Script from '/imports/collections/scripts.js';

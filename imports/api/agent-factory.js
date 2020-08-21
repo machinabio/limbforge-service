@@ -6,7 +6,7 @@ import { Random } from 'meteor/random';
 import namor from 'namor';
 import humanInterval from 'human-interval';
 
-import { analytics } from 'meteor/okgrow:analytics';
+// import { analytics } from 'meteor/okgrow:analytics';
 
 import Agent from '/imports/collections/agents.js';
 import Transaction from '/imports/collections/transactions.js';

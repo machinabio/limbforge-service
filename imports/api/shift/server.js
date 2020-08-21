@@ -14,7 +14,7 @@ import opn from 'opn';
 import toBuffer from 'typedarray-to-buffer';
 import text_encoding from 'text-encoding';
 
-import { analytics } from 'meteor/okgrow:analytics';
+// import { analytics } from 'meteor/okgrow:analytics';
 
 import Agent from '/imports/collections/agents.js';
 import Transaction from '/imports/collections/transactions.js';

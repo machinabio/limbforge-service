@@ -5,7 +5,7 @@ import { EJSON } from 'meteor/ejson';
 import moment from 'moment';
 import md5 from 'md5';
 
-import { analytics } from 'meteor/okgrow:analytics';
+// import { analytics } from 'meteor/okgrow:analytics';
 
 import Agent from '/imports/collections/agents.js';
 import Script from '/imports/collections/scripts.js';
@@ -42,7 +42,7 @@ Template.scriptList.events({
     event.preventDefault();
   },
   'click #newScript'(event) {
-    analytics.track('script.new');
+    // analytics.track('script.new');
     var script = new Script();
     script.name = 'new script';
     script.userId = Meteor.userId();
@@ -62,7 +62,7 @@ Template.code.events({
       );
       return;
     }
-    analytics.track('script.execute');
+    // analytics.track('script.execute');
     let params = {
       script_id: Session.get('activeScript'),
       agent_id: agent._id,
@@ -110,11 +110,11 @@ Template.codeSettings.events({
     this.save();
   },
   'click #deleteScript'(event) {
-    analytics.track('script.remove');
+    // analytics.track('script.remove');
     this.remove();
   },
   'click #copyScript'(event) {
-    analytics.track('script.copy');
+    // analytics.track('script.copy');
     this.copy().save();
   },
 });
@@ -271,11 +271,11 @@ Template.navbar.helpers({
 
 Template.navbar.events({
   'click #workgangtNavButton'(event) {
-    analytics.track('nav.workgang');
+    // analytics.track('nav.workgang');
     Session.set('activeTab', 'workgang');
   },
   'click #scriptNavButton'(event) {
-    analytics.track('nav.scripting');
+    // analytics.track('nav.scripting');
     Session.set('activeTab', 'scripting');
   },
 });
